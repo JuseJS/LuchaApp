@@ -1,7 +1,7 @@
 # Anteproyecto: LuchaApp
 
 **Curso:** 2º DAM - IES Haría - 2024/2025  
-**Fecha de entrega:** 12 de marzo de 2025  
+**Autor:** José Antonio Navarro Pérez 
 
 ## Índice
 1. [Tipo de proyecto](#tipo-de-proyecto)
@@ -150,7 +150,338 @@ La estructura del modelo UML de LuchaApp refleja un diseño orientado a objetos 
    
 - **Notificaciones y favoritos**: Implementación del sistema de seguimiento personalizado
 
-![Diagrama UML de LuchaApp](./luchaapp_completo.png)
+```mermaid
+classDiagram
+    %% Classes
+    class Usuario {
+        <<abstract>>
+        -id String
+        -email String
+        -passwordHash String
+        -nombre String
+        -apellidos String
+        -fechaRegistro Date
+        -rol Rol
+        -activo Boolean
+        +autenticar() Boolean
+        +actualizarPerfil() Boolean
+    }
+
+    class UsuarioInvitado {
+        -sesionId String
+        +convertirEnRegistrado() Usuario
+    }
+
+    class UsuarioRegistrado {
+        -favoritos List~Favorito~
+        +agregarFavorito(favorito) Boolean
+        +eliminarFavorito(favorito) Boolean
+        +recibirNotificaciones() List~Notificacion~
+    }
+
+    class Administrador {
+        -nivelAcceso NivelAcceso
+        +gestionarCompeticiones() Boolean
+        +gestionarEquipos() Boolean
+        +gestionarArbitros() Boolean
+        +generarInformes() Informe
+    }
+
+    class Arbitro {
+        -licencia String
+        -experiencia Int
+        +crearActa(lucha) Acta
+        +modificarActa(acta) Boolean
+        +cerrarActa(acta) Boolean
+        +historialArbitraje() List~Acta~
+    }
+
+    class EquipoGestor {
+        -equipo Equipo
+        -cargo String
+        +gestionarLuchadores() Boolean
+        +convocarLuchadores(lucha) List~Luchador~
+        +actualizarEquipo() Boolean
+    }
+
+    class Luchador {
+        -categoriaEdad CategoriaEdad
+        -clasificacion Clasificacion
+        -peso Double
+        -altura Double
+        -estado EstadoLuchador
+        -equipoActual Equipo
+        -mañasFavoritas List~Maña~
+        +verEstadisticas() Estadistica
+        +historialLuchas() List~ResultadoLucha~
+        +rankingActual() Integer
+    }
+
+    class Rol {
+        <<enumeration>>
+        INVITADO
+        REGISTRADO
+        LUCHADOR
+        EQUIPO_GESTOR
+        ARBITRO
+        ADMINISTRADOR
+    }
+
+    class EstadoLuchador {
+        <<enumeration>>
+        ACTIVO
+        LESIONADO
+        SANCIONADO
+        RETIRADO
+    }
+
+    class CategoriaEdad {
+        <<enumeration>>
+        BENJAMIN
+        ALEVIN
+        INFANTIL
+        CADETE
+        JUVENIL
+        REGIONAL
+    }
+
+    class Clasificacion {
+        <<enumeration>>
+        SIN_CLASIFICACION
+        DESTACADO_C
+        DESTACADO_B
+        DESTACADO_A
+        PUNTAL_C
+        PUNTAL_B
+        PUNTAL_A
+    }
+
+    class Equipo {
+        -id String
+        -nombre String
+        -logo String
+        -localidad String
+        -fundacion Date
+        -categoria CategoriaEquipo
+        -luchadores List~Luchador~
+        -historial List~Temporada~
+        +agregarLuchador(luchador) Boolean
+        +eliminarLuchador(luchador) Boolean
+        +obtenerPuntuacion() Integer
+        +historialEnfrentamientos(equipo) List~Lucha~
+    }
+
+    class Maña {
+        -id String
+        -nombre String
+        -descripcion String
+        -tipo TipoMaña
+        -dificultad Integer
+        -imagen String
+        -video String
+    }
+
+    class TipoMaña {
+        <<enumeration>>
+        CARGADO
+        MEDIA_CADERA
+        CADERA_COMPLETA
+        TOQUE_ATRAS
+        COGIDA
+        TRASPIÉS
+        PARDELERA
+        BURRA
+        SACÓN
+        TOQUE_POR_DENTRO
+    }
+
+    class Competicion {
+        -id String
+        -nombre String
+        -temporada String
+        -fechaInicio Date
+        -fechaFin Date
+        -estado EstadoCompeticion
+        -tipo TipoCompeticion
+        -equipos List~Equipo~
+        -jornadas List~Jornada~
+        +clasificacion() List~ClasificacionEquipo~
+        +proximasLuchas() List~Lucha~
+        +resultados() List~ResultadoLucha~
+    }
+
+    class Jornada {
+        -id String
+        -numero Integer
+        -fecha Date
+        -luchas List~Lucha~
+        -competicionId String
+        +agregarLucha(lucha) Boolean
+        +completada() Boolean
+    }
+
+    class Lucha {
+        -id String
+        -equipoLocal Equipo
+        -equipoVisitante Equipo
+        -fecha Date
+        -lugar String
+        -estado EstadoLucha
+        -arbitros List~Arbitro~
+        -acta Acta
+        -puntosLocal Integer
+        -puntosVisitante Integer
+        +asignarArbitro(arbitro) Boolean
+        +iniciarLucha() Boolean
+        +finalizarLucha() Boolean
+        +resultado() ResultadoLucha
+    }
+
+    class Acta {
+        -id String
+        -luchaId String
+        -fechaCreacion Date
+        -arbitroPrincipal Arbitro
+        -estado EstadoActa
+        -incidencias List~Incidencia~
+        -alineacionLocal List~Luchador~
+        -alineacionVisitante List~Luchador~
+        -enfrentamientos List~Enfrentamiento~
+        -firma String
+        +agregarEnfrentamiento(enfrentamiento) Boolean
+        +agregarIncidencia(incidencia) Boolean
+        +validar() Boolean
+        +exportarPDF() File
+    }
+
+    class Enfrentamiento {
+        -id String
+        -luchadorLocal Luchador
+        -luchadorVisitante Luchador
+        -ganador Luchador
+        -tiempoTotal Time
+        -observaciones String
+    }
+
+    class Estadistica {
+        -id String
+        -luchadorId String
+        -temporada String
+        -luchasTotales Integer
+        -victorias Integer
+        -derrotas Integer
+        -luchasSinDecision Integer
+        -equiposEnfrentados Map
+        -luchadoresEnfrentados Map
+        +calcularEfectividad() Double
+        +calcularPromedioDuracion() Time
+        +compararCon(estadistica) ComparacionEstadistica
+    }
+
+    class Notificacion {
+        -id String
+        -usuarioId String
+        -titulo String
+        -mensaje String
+        -tipo TipoNotificacion
+        -fechaCreacion Date
+        -leida Boolean
+        -entidadRelacionada String
+        -tipoEntidad TipoEntidad
+        +marcarLeida() Boolean
+    }
+
+    class Favorito {
+        -id String
+        -usuarioId String
+        -tipoFavorito TipoFavorito
+        -entidadId String
+        -fechaCreacion Date
+        +eliminar() Boolean
+    }
+
+    class EstadoCompeticion {
+        <<enumeration>>
+        PLANIFICADA
+        ACTIVA
+        FINALIZADA
+        CANCELADA
+    }
+
+    class TipoCompeticion {
+        <<enumeration>>
+        LIGA
+        COPA
+        DESAFIO
+        AMISTOSO
+    }
+
+    class EstadoLucha {
+        <<enumeration>>
+        PROGRAMADA
+        EN_CURSO
+        FINALIZADA
+        SUSPENDIDA
+        APLAZADA
+    }
+
+    class EstadoActa {
+        <<enumeration>>
+        BORRADOR
+        ABIERTA
+        CERRADA
+        VALIDADA
+    }
+
+    class TipoNotificacion {
+        <<enumeration>>
+        SISTEMA
+        COMPETICION
+        LUCHA
+        EQUIPO
+        LUCHADOR
+    }
+
+    class TipoFavorito {
+        <<enumeration>>
+        EQUIPO
+        LUCHADOR
+        COMPETICION
+    }
+
+    class TipoEntidad {
+        <<enumeration>>
+        EQUIPO
+        LUCHADOR
+        COMPETICION
+        LUCHA
+        ACTA
+    }
+
+    %% Relationships - Inheritance
+    Usuario <|-- UsuarioInvitado
+    Usuario <|-- UsuarioRegistrado
+    UsuarioRegistrado <|-- Administrador
+    UsuarioRegistrado <|-- Arbitro
+    UsuarioRegistrado <|-- EquipoGestor
+    UsuarioRegistrado <|-- Luchador
+
+    %% Relationships - Associations with cardinality
+    UsuarioRegistrado "1" -- "0..*" Favorito : tiene
+    UsuarioRegistrado "1" -- "0..*" Notificacion : recibe
+    Equipo "1" -- "0..*" Luchador : contiene
+    Equipo "1..*" -- "0..*" Competicion : participa en
+    Competicion "1" -- "1..*" Jornada : contiene
+    Jornada "1" -- "1..*" Lucha : agrupa
+    Lucha "1" -- "0..1" Acta : registrada en
+    Lucha "1" -- "1..*" Arbitro : arbitrada por
+    Lucha "1" -- "2" Equipo : enfrenta
+    Acta "1" -- "0..*" Enfrentamiento : contiene
+    Enfrentamiento "1" -- "2" Luchador : enfrenta
+    Luchador "1" -- "0..*" Estadistica : tiene
+    Luchador "1" -- "0..*" Maña : conoce
+    EquipoGestor "1" -- "1" Equipo : gestiona
+```
 
 ## Tecnologías a utilizar
 
@@ -231,57 +562,12 @@ La estructura del modelo UML de LuchaApp refleja un diseño orientado a objetos 
 - Auditoría de seguridad: Logging de acciones sensibles y monitorización
 - Cifrado de datos sensibles: A nivel de aplicación y base de datos
 
-## Viabilidad técnica/económica
-
-### Inversiones iniciales
-- Servidores y hosting: €X.XXX
-- Licencias de software: €X.XXX
-- Equipos de desarrollo: €X.XXX
-- Diseño y prototipado: €X.XXX
-- Desarrollo inicial: €X.XXX
-
-### Costes fijos y variables
-- **Costes fijos:**
-  - Mantenimiento de servidores: €XXX/mes
-  - Licencias recurrentes: €XXX/mes
-  - Personal de desarrollo y mantenimiento: €X.XXX/mes
-  - Servicios de soporte: €XXX/mes
-
-- **Costes variables:**
-  - Tráfico de datos y almacenamiento: €XXX/mes (según uso)
-  - Servicios de notificaciones push: €XXX/mes (según volumen)
-  - Marketing y promoción: €XXX/mes (según campañas)
-
-### Ingresos previstos
-- Suscripciones premium para usuarios: €XXX/mes
-- Patrocinios y publicidad: €XXX/mes
-- Licencias para federaciones y clubes: €X.XXX/año
-- Eventos especiales y transmisiones: €XXX/evento
-
-### Beneficio esperado
-- Proyección de ingresos a 12 meses: €XX.XXX
-- Proyección de costes a 12 meses: €XX.XXX
-- Beneficio esperado a 12 meses: €X.XXX
-- Punto de equilibrio: Mes X
-
-### Análisis de riesgos
-- Competencia de otras plataformas deportivas
-- Adopción lenta por parte de federaciones tradicionales
-- Escalabilidad durante eventos importantes
-- Cambios en regulaciones de protección de datos
-
-### Financiación
-- Inversión inicial propia: XX%
-- Financiación bancaria: XX%
-- Subvenciones deportivas y culturales: XX%
-- Inversores privados: XX%
-
 ## Planificación temporal
 
 | Fase | Descripción | Duración | Fechas |
 |------|-------------|----------|--------|
-| 1 | Análisis y diseño | 4 semanas | XX/XX - XX/XX |
-| 2 | Desarrollo de backend | 6 semanas | XX/XX - XX/XX |
-| 3 | Desarrollo frontend multiplataforma | 8 semanas | XX/XX - XX/XX |
-| 4 | Integración y pruebas | 4 semanas | XX/XX - XX/XX |
-| 5 | Despliegue y lanzamiento | 2 semanas | XX/XX - XX/XX |
+| 1 | Análisis y diseño | 1 semanas | XX/XX - XX/XX |
+| 2 | Desarrollo de backend | 1 semanas | XX/XX - XX/XX |
+| 3 | Desarrollo frontend multiplataforma | 2 semanas | XX/XX - XX/XX |
+| 4 | Integración y pruebas | 3 días | XX/XX - XX/XX |
+| 5 | Despliegue y lanzamiento | 3 días | XX/XX - XX/XX |
