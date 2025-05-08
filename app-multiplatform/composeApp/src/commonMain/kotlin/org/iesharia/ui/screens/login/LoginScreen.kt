@@ -8,6 +8,7 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.togetherWith
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -21,6 +22,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Lock
@@ -29,6 +31,11 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
+import org.jetbrains.compose.resources.painterResource
+import luchaapp.composeapp.generated.resources.Res
+import luchaapp.composeapp.generated.resources.app_logo
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -64,23 +71,15 @@ fun LoginScreen(viewModel: LoginViewModel) {
                 // Logo o imagen representativa
                 Spacer(modifier = Modifier.weight(0.1f))
 
-                // Aquí iría la imagen del logo
-                Box(
+                // Logo
+                Image(
+                    painter = painterResource(Res.drawable.app_logo),
+                    contentDescription = "Logo de Lucha Canaria",
                     modifier = Modifier
                         .size(LuchaTheme.dimensions.login_logo_size)
-                        .background(
-                            color = MaterialTheme.colorScheme.primaryContainer,
-                            shape = LuchaTheme.shapes.medium
-                        ),
-                    contentAlignment = Alignment.Center
-                ) {
-                    // Placeholder para el logo
-                    Text(
-                        text = "Lucha App",
-                        style = MaterialTheme.typography.headlineMedium,
-                        color = MaterialTheme.colorScheme.onPrimaryContainer
-                    )
-                }
+                        .clip(CircleShape),
+                    contentScale = ContentScale.Crop
+                )
 
                 Spacer(modifier = Modifier.height(LuchaTheme.dimensions.spacing_32))
 
