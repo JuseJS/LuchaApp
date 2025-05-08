@@ -1,4 +1,4 @@
-package org.iesharia
+package org.iesharia.app
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Image
@@ -15,6 +15,7 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 
 import luchaapp.composeapp.generated.resources.Res
 import luchaapp.composeapp.generated.resources.compose_multiplatform
+import org.iesharia.Greeting
 
 @Composable
 @Preview
