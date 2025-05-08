@@ -29,16 +29,15 @@ kotlin {
         commonMain.dependencies {
             implementation(compose.runtime)
             implementation(compose.foundation)
-            implementation(compose.material3) // Cambiado a Material 3
+            implementation(compose.material3)
             implementation(compose.ui)
             implementation(compose.components.resources)
             implementation(compose.components.uiToolingPreview)
             implementation(libs.androidx.lifecycle.viewmodel)
             implementation(libs.androidx.lifecycle.runtime.compose)
             implementation(projects.shared)
-
-            // Usamos kotlinx-coroutines-core que ya incluye soporte para animaciones nativas
             implementation(libs.kotlinx.coroutines.core)
+            implementation(libs.compose.material.icons.extended)
         }
         desktopMain.dependencies {
             implementation(compose.desktop.currentOs)
