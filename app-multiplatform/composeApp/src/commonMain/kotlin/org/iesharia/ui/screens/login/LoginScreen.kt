@@ -1,55 +1,24 @@
 package org.iesharia.ui.screens.login
 
-import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.*
 import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideInHorizontally
-import androidx.compose.animation.slideOutHorizontally
-import androidx.compose.animation.togetherWith
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Email
-import androidx.compose.material.icons.filled.Lock
-import androidx.compose.material.icons.filled.Person
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.layout.ContentScale
-import org.jetbrains.compose.resources.painterResource
-import luchaapp.composeapp.generated.resources.Res
-import luchaapp.composeapp.generated.resources.app_logo
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.unit.dp
-import org.iesharia.ui.components.LuchaPrimaryButton
-import org.iesharia.ui.components.LuchaSecondaryButton
-import org.iesharia.ui.components.LuchaTextField
-import org.iesharia.ui.components.LuchaTextButton
+import luchaapp.composeapp.generated.resources.Res
+import luchaapp.composeapp.generated.resources.app_logo
+import org.iesharia.ui.components.*
+import org.iesharia.ui.components.login.LoginForm
+import org.iesharia.ui.components.login.RegisterForm
 import org.iesharia.ui.theme.LuchaTheme
+import org.jetbrains.compose.resources.painterResource
 
 @Composable
 fun LoginScreen(viewModel: LoginViewModel) {
@@ -60,6 +29,7 @@ fun LoginScreen(viewModel: LoginViewModel) {
         color = MaterialTheme.colorScheme.background
     ) {
         Box(modifier = Modifier.fillMaxSize()) {
+            // Contenido principal
             Column(
                 modifier = Modifier
                     .fillMaxSize()
@@ -68,36 +38,21 @@ fun LoginScreen(viewModel: LoginViewModel) {
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
             ) {
-                // Logo o imagen representativa
+                // Sección superior con logo y título
                 Spacer(modifier = Modifier.weight(0.1f))
 
-                // Logo
-                Image(
+                // Logo (ahora usando componente global)
+                LuchaAppLogo(
                     painter = painterResource(Res.drawable.app_logo),
-                    contentDescription = "Logo de Lucha Canaria",
-                    modifier = Modifier
-                        .size(LuchaTheme.dimensions.login_logo_size)
-                        .clip(CircleShape),
-                    contentScale = ContentScale.Crop
+                    contentDescription = "Logo de Lucha Canaria"
                 )
 
                 Spacer(modifier = Modifier.height(LuchaTheme.dimensions.spacing_32))
 
-                // Título de la app
-                Text(
-                    text = "Lucha Canaria",
-                    style = MaterialTheme.typography.headlineLarge,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.primary
-                )
-
-                Spacer(modifier = Modifier.height(LuchaTheme.dimensions.spacing_8))
-
-                // Subtítulo
-                Text(
-                    text = "Tradición y Deporte",
-                    style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.onBackground
+                // Encabezado (ahora usando componente global)
+                LuchaAppHeader(
+                    title = "Lucha Canaria",
+                    subtitle = "Tradición y Deporte"
                 )
 
                 Spacer(modifier = Modifier.height(LuchaTheme.dimensions.spacing_40))
@@ -109,12 +64,11 @@ fun LoginScreen(viewModel: LoginViewModel) {
                         .fillMaxWidth(),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    // Animación entre formularios
+                    // Animación entre formularios (corregida)
                     AnimatedContent(
                         targetState = uiState.isLoginMode,
                         transitionSpec = {
                             if (targetState) {
-                                // Transición al login
                                 (slideInHorizontally(
                                     animationSpec = tween(durationMillis = 300),
                                     initialOffsetX = { it }
@@ -126,7 +80,6 @@ fun LoginScreen(viewModel: LoginViewModel) {
                                         ) + fadeOut(animationSpec = tween(300))
                                     )
                             } else {
-                                // Transición al registro
                                 (slideInHorizontally(
                                     animationSpec = tween(durationMillis = 300),
                                     initialOffsetX = { -it }
@@ -179,7 +132,10 @@ fun LoginScreen(viewModel: LoginViewModel) {
 
                     // Botón para alternar entre login y registro
                     LuchaTextButton(
-                        text = if (uiState.isLoginMode) "¿No tienes cuenta? Regístrate" else "¿Ya tienes cuenta? Inicia sesión",
+                        text = if (uiState.isLoginMode)
+                            "¿No tienes cuenta? Regístrate"
+                        else
+                            "¿Ya tienes cuenta? Inicia sesión",
                         onClick = viewModel::toggleAuthMode,
                         color = MaterialTheme.colorScheme.secondary
                     )
@@ -188,174 +144,14 @@ fun LoginScreen(viewModel: LoginViewModel) {
                 Spacer(modifier = Modifier.weight(0.2f))
             }
 
-            // Indicador de carga
+            // Overlay de carga (ahora usando componente global)
             AnimatedVisibility(
                 visible = uiState.isLoading,
                 enter = fadeIn(),
                 exit = fadeOut()
             ) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.7f)),
-                    contentAlignment = Alignment.Center
-                ) {
-                    CircularProgressIndicator(
-                        modifier = Modifier.size(48.dp),
-                        color = MaterialTheme.colorScheme.primary
-                    )
-                }
+                LuchaLoadingOverlay()
             }
         }
-    }
-}
-
-@Composable
-private fun LoginForm(
-    email: String,
-    password: String,
-    emailError: String,
-    passwordError: String,
-    onEmailChange: (String) -> Unit,
-    onPasswordChange: (String) -> Unit,
-    onSubmit: () -> Unit,
-    isLoading: Boolean
-) {
-    Column(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text(
-            text = "Iniciar Sesión",
-            style = MaterialTheme.typography.headlineSmall,
-            modifier = Modifier.padding(bottom = LuchaTheme.dimensions.spacing_24)
-        )
-
-        // Correo
-        LuchaTextField(
-            value = email,
-            onValueChange = onEmailChange,
-            label = "Correo electrónico",
-            keyboardType = KeyboardType.Email,
-            isError = emailError.isNotEmpty(),
-            errorMessage = emailError,
-            leadingIcon = Icons.Filled.Email
-        )
-
-        // Contraseña
-        LuchaTextField(
-            value = password,
-            onValueChange = onPasswordChange,
-            label = "Contraseña",
-            isPassword = true,
-            imeAction = ImeAction.Done,
-            isError = passwordError.isNotEmpty(),
-            errorMessage = passwordError,
-            leadingIcon = Icons.Filled.Lock
-        )
-
-        Spacer(modifier = Modifier.height(LuchaTheme.dimensions.spacing_16))
-
-        // Botón login
-        LuchaPrimaryButton(
-            text = "Iniciar Sesión",
-            onClick = onSubmit,
-            enabled = !isLoading
-        )
-    }
-}
-
-@Composable
-private fun RegisterForm(
-    name: String,
-    surname: String,
-    email: String,
-    password: String,
-    confirmPassword: String,
-    nameError: String,
-    surnameError: String,
-    emailError: String,
-    passwordError: String,
-    confirmPasswordError: String,
-    onNameChange: (String) -> Unit,
-    onSurnameChange: (String) -> Unit,
-    onEmailChange: (String) -> Unit,
-    onPasswordChange: (String) -> Unit,
-    onConfirmPasswordChange: (String) -> Unit,
-    onSubmit: () -> Unit,
-    isLoading: Boolean
-) {
-    Column(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text(
-            text = "Crear Cuenta",
-            style = MaterialTheme.typography.headlineSmall,
-            modifier = Modifier.padding(bottom = LuchaTheme.dimensions.spacing_24)
-        )
-
-        // Nombre
-        LuchaTextField(
-            value = name,
-            onValueChange = onNameChange,
-            label = "Nombre",
-            isError = nameError.isNotEmpty(),
-            errorMessage = nameError,
-            leadingIcon = Icons.Filled.Person
-        )
-
-        // Apellidos
-        LuchaTextField(
-            value = surname,
-            onValueChange = onSurnameChange,
-            label = "Apellidos",
-            isError = surnameError.isNotEmpty(),
-            errorMessage = surnameError,
-            leadingIcon = Icons.Filled.Person
-        )
-
-        // Correo
-        LuchaTextField(
-            value = email,
-            onValueChange = onEmailChange,
-            label = "Correo electrónico",
-            keyboardType = KeyboardType.Email,
-            isError = emailError.isNotEmpty(),
-            errorMessage = emailError,
-            leadingIcon = Icons.Filled.Email
-        )
-
-        // Contraseña
-        LuchaTextField(
-            value = password,
-            onValueChange = onPasswordChange,
-            label = "Contraseña",
-            isPassword = true,
-            isError = passwordError.isNotEmpty(),
-            errorMessage = passwordError,
-            leadingIcon = Icons.Filled.Lock
-        )
-
-        // Confirmar contraseña
-        LuchaTextField(
-            value = confirmPassword,
-            onValueChange = onConfirmPasswordChange,
-            label = "Confirmar contraseña",
-            isPassword = true,
-            imeAction = ImeAction.Done,
-            isError = confirmPasswordError.isNotEmpty(),
-            errorMessage = confirmPasswordError,
-            leadingIcon = Icons.Filled.Lock
-        )
-
-        Spacer(modifier = Modifier.height(LuchaTheme.dimensions.spacing_16))
-
-        // Botón registro
-        LuchaSecondaryButton(
-            text = "Registrarse",
-            onClick = onSubmit,
-            enabled = !isLoading
-        )
     }
 }
