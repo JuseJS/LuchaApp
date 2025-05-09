@@ -1,0 +1,56 @@
+package org.iesharia.ui.components.login
+
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Email
+import androidx.compose.material.icons.filled.Lock
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
+import org.iesharia.ui.components.LuchaPrimaryButton
+
+@Composable
+fun LoginForm(
+    email: String,
+    password: String,
+    emailError: String,
+    passwordError: String,
+    onEmailChange: (String) -> Unit,
+    onPasswordChange: (String) -> Unit,
+    onSubmit: () -> Unit,
+    isLoading: Boolean
+) {
+    val fields = listOf(
+        FormField(
+            value = email,
+            onValueChange = onEmailChange,
+            label = "Correo electrónico",
+            error = emailError,
+            leadingIcon = Icons.Filled.Email,
+            keyboardType = KeyboardType.Email
+        ),
+        FormField(
+            value = password,
+            onValueChange = onPasswordChange,
+            label = "Contraseña",
+            error = passwordError,
+            leadingIcon = Icons.Filled.Lock,
+            isPassword = true,
+            imeAction = ImeAction.Done
+        )
+    )
+
+    AuthForm(
+        title = "Iniciar Sesión",
+        fields = fields,
+        onSubmit = onSubmit,
+        submitButtonText = "Iniciar Sesión",
+        isLoading = isLoading,
+        renderButton = { text, onClick, enabled ->
+            LuchaPrimaryButton(
+                text = text,
+                onClick = onClick,
+                enabled = enabled
+            )
+        }
+    )
+}
