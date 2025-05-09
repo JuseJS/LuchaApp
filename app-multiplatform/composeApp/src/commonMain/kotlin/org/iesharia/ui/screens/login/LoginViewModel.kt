@@ -2,11 +2,15 @@ package org.iesharia.ui.screens.login
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 /**
  * Estado de la pantalla de login
@@ -101,7 +105,7 @@ class LoginViewModel : ViewModel() {
 
     // Validación y envío de login
     fun submitLogin() {
-        viewModelScope.launch {
+        viewModelScope.launch(SupervisorJob() + Dispatchers.Main.immediate) {
             val currentState = _uiState.value
 
             // Validar campos
@@ -133,13 +137,16 @@ class LoginViewModel : ViewModel() {
                 return@launch
             }
 
-            // Iniciar carga y procesar login
-            _uiState.update { it.copy(isLoading = true) }
-
             try {
-                // Aquí iría la lógica para hacer login con el backend
-                // Por ahora, simulamos un delay
-                kotlinx.coroutines.delay(1000)
+                // Iniciar carga
+                _uiState.update { it.copy(isLoading = true) }
+
+                // Procesamiento de login en hilo de IO
+                withContext(Dispatchers.IO) {
+                    // Aquí iría la lógica real para hacer login con el backend
+                    // Por ahora, simulamos un delay
+                    delay(1000)
+                }
 
                 // Login exitoso - aquí se manejaría la navegación a la siguiente pantalla
                 _uiState.update { it.copy(isLoading = false) }
@@ -158,7 +165,7 @@ class LoginViewModel : ViewModel() {
 
     // Validación y envío de registro
     fun submitRegister() {
-        viewModelScope.launch {
+        viewModelScope.launch(SupervisorJob() + Dispatchers.Main.immediate) {
             val currentState = _uiState.value
 
             // Validar campos
@@ -214,13 +221,16 @@ class LoginViewModel : ViewModel() {
                 return@launch
             }
 
-            // Iniciar carga y procesar registro
-            _uiState.update { it.copy(isLoading = true) }
-
             try {
-                // Aquí iría la lógica para hacer registro con el backend
-                // Por ahora, simulamos un delay
-                kotlinx.coroutines.delay(1000)
+                // Iniciar carga
+                _uiState.update { it.copy(isLoading = true) }
+
+                // Procesamiento de registro en hilo de IO
+                withContext(Dispatchers.IO) {
+                    // Aquí iría la lógica real para hacer registro con el backend
+                    // Por ahora, simulamos un delay
+                    delay(1000)
+                }
 
                 // Registro exitoso - aquí se manejaría la navegación a la siguiente pantalla
                 _uiState.update { it.copy(isLoading = false) }
@@ -237,9 +247,9 @@ class LoginViewModel : ViewModel() {
         }
     }
 
-    // Función para validar formato de email
+    // Función mejorada para validar formato de email
     private fun isValidEmail(email: String): Boolean {
-        val emailRegex = "[a-zA-Z0-9._-]+@[a-z]+\\.+[a-z]+".toRegex()
+        val emailRegex = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$".toRegex()
         return email.matches(emailRegex)
     }
 }
