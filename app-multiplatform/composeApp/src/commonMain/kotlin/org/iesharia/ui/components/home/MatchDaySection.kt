@@ -1,0 +1,166 @@
+package org.iesharia.ui.components.home
+
+import androidx.compose.foundation.layout.*
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import org.iesharia.domain.model.Match
+import org.iesharia.domain.model.MatchDay
+import org.iesharia.ui.theme.LuchaTheme
+import java.time.format.DateTimeFormatter
+
+/**
+ * Sección para mostrar una jornada con sus enfrentamientos
+ */
+@Composable
+fun MatchDaySection(
+    matchDay: MatchDay,
+    modifier: Modifier = Modifier
+) {
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+    ) {
+        // Fechas de la jornada
+        Text(
+            text = matchDay.getDateRangeFormatted(),
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+
+        Spacer(modifier = Modifier.height(LuchaTheme.dimensions.spacing_8))
+
+        // Lista de enfrentamientos
+        matchDay.matches.forEach { match ->
+            MatchItem(
+                match = match,
+                modifier = Modifier.padding(bottom = LuchaTheme.dimensions.spacing_8)
+            )
+        }
+    }
+}
+
+/**
+ * Item para un enfrentamiento
+ */
+@Composable
+fun MatchItem(
+    match: Match,
+    modifier: Modifier = Modifier
+) {
+    Card(
+        modifier = modifier.fillMaxWidth(),
+        shape = LuchaTheme.shapes.cardShape,
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+        )
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(LuchaTheme.dimensions.spacing_12)
+        ) {
+            // Equipos y resultado
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceEvenly,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                // Equipo local
+                TeamScore(
+                    teamName = match.localTeam.name,
+                    score = match.localScore,
+                    isWinner = match.winner == match.localTeam,
+                    isDrawn = match.isDrawn,
+                    modifier = Modifier.weight(2f)
+                )
+
+                // Separador
+                Text(
+                    text = "vs",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.padding(horizontal = LuchaTheme.dimensions.spacing_8)
+                )
+
+                // Equipo visitante
+                TeamScore(
+                    teamName = match.visitorTeam.name,
+                    score = match.visitorScore,
+                    isWinner = match.winner == match.visitorTeam,
+                    isDrawn = match.isDrawn,
+                    modifier = Modifier.weight(2f)
+                )
+            }
+
+            Spacer(modifier = Modifier.height(LuchaTheme.dimensions.spacing_8))
+
+            // Información adicional
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                // Terrero
+                Text(
+                    text = match.venue,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+
+                // Fecha
+                val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")
+                Text(
+                    text = match.date.format(formatter),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+        }
+    }
+}
+
+/**
+ * Muestra el nombre y puntuación de un equipo
+ */
+@Composable
+private fun TeamScore(
+    teamName: String,
+    score: Int?,
+    isWinner: Boolean,
+    isDrawn: Boolean,
+    modifier: Modifier = Modifier
+) {
+    Column(
+        modifier = modifier,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        // Nombre del equipo
+        Text(
+            text = teamName,
+            style = MaterialTheme.typography.bodyMedium,
+            maxLines = 1,
+            textAlign = TextAlign.Center
+        )
+
+        // Puntuación
+        val scoreText = score?.toString() ?: "-"
+        val scoreColor = when {
+            !isDrawn && isWinner -> MaterialTheme.colorScheme.primary
+            isDrawn -> MaterialTheme.colorScheme.tertiary
+            else -> MaterialTheme.colorScheme.onSurface
+        }
+
+        Text(
+            text = scoreText,
+            style = MaterialTheme.typography.titleLarge,
+            fontWeight = FontWeight.Bold,
+            color = scoreColor
+        )
+    }
+}
