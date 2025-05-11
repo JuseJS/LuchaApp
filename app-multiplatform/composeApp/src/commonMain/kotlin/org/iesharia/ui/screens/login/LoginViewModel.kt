@@ -1,5 +1,8 @@
 package org.iesharia.ui.screens.login
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Dispatchers
@@ -47,9 +50,18 @@ class LoginViewModel : ViewModel() {
     private val _uiState = MutableStateFlow(LoginUiState())
     val uiState: StateFlow<LoginUiState> = _uiState.asStateFlow()
 
+    // Estado para controlar la navegación
+    var isLoggedIn by mutableStateOf(false)
+        private set
+
     // Cambiar entre modos login/registro
     fun toggleAuthMode() {
         _uiState.update { it.copy(isLoginMode = !it.isLoginMode) }
+    }
+
+    // Método para resetear el estado de login (después de navegar)
+    fun resetLoginState() {
+        isLoggedIn = false
     }
 
     // Métodos para actualizar campos del login
@@ -148,8 +160,11 @@ class LoginViewModel : ViewModel() {
                     delay(1000)
                 }
 
-                // Login exitoso - aquí se manejaría la navegación a la siguiente pantalla
+                // Login exitoso - ahora navegamos a la pantalla de inicio
                 _uiState.update { it.copy(isLoading = false) }
+
+                // Indicar que el login fue exitoso
+                isLoggedIn = true
 
             } catch (e: Exception) {
                 // Manejo de error
@@ -232,8 +247,11 @@ class LoginViewModel : ViewModel() {
                     delay(1000)
                 }
 
-                // Registro exitoso - aquí se manejaría la navegación a la siguiente pantalla
+                // Registro exitoso - ahora navegamos a la pantalla de inicio
                 _uiState.update { it.copy(isLoading = false) }
+
+                // Indicar que el registro fue exitoso
+                isLoggedIn = true
 
             } catch (e: Exception) {
                 // Manejo de error
