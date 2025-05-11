@@ -38,6 +38,10 @@ kotlin {
             implementation(projects.shared)
             implementation(libs.kotlinx.coroutines.core)
             implementation(libs.compose.material.icons.extended)
+            implementation(libs.voyager.navigator)
+            implementation(libs.voyager.transitions)
+            implementation(libs.voyager.bottom.sheet.navigator)
+            implementation(libs.voyager.tab.navigator)
         }
         desktopMain.dependencies {
             implementation(compose.desktop.currentOs)
