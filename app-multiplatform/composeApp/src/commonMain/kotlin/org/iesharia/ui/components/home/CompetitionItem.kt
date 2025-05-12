@@ -7,7 +7,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
 import org.iesharia.domain.model.Competition
+import org.iesharia.ui.components.common.SectionSubtitle
 import org.iesharia.ui.theme.LuchaTheme
 
 /**
@@ -17,7 +19,8 @@ import org.iesharia.ui.theme.LuchaTheme
 fun CompetitionItem(
     competition: Competition,
     onClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    showMatchDays: Boolean = true // Permite controlar si se muestran las jornadas
 ) {
     Card(
         modifier = modifier
@@ -34,34 +37,28 @@ fun CompetitionItem(
             // Encabezado de la competición
             CompetitionHeader(competition)
 
-            Spacer(modifier = Modifier.height(LuchaTheme.dimensions.spacing_16))
-
-            // Última jornada completada
-            competition.lastCompletedMatchDay?.let { matchDay ->
-                Text(
-                    text = "Última jornada (${matchDay.number})",
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold
-                )
-
-                Spacer(modifier = Modifier.height(LuchaTheme.dimensions.spacing_8))
-
-                MatchDaySection(matchDay = matchDay)
-
+            // Si se deben mostrar las jornadas y hay jornadas para mostrar
+            if (showMatchDays && (competition.lastCompletedMatchDay != null || competition.nextMatchDay != null)) {
                 Spacer(modifier = Modifier.height(LuchaTheme.dimensions.spacing_16))
-            }
 
-            // Próxima jornada
-            competition.nextMatchDay?.let { matchDay ->
-                Text(
-                    text = "Próxima jornada (${matchDay.number})",
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold
-                )
+                // Última jornada completada
+                competition.lastCompletedMatchDay?.let { matchDay ->
+                    SectionSubtitle(
+                        subtitle = "Última jornada (${matchDay.number})",
+                        modifier = Modifier.padding(horizontal = 0.dp) // Anular el padding horizontal predeterminado
+                    )
+                    MatchDaySection(matchDay = matchDay)
+                    Spacer(modifier = Modifier.height(LuchaTheme.dimensions.spacing_16))
+                }
 
-                Spacer(modifier = Modifier.height(LuchaTheme.dimensions.spacing_8))
-
-                MatchDaySection(matchDay = matchDay)
+                // Próxima jornada
+                competition.nextMatchDay?.let { matchDay ->
+                    SectionSubtitle(
+                        subtitle = "Próxima jornada (${matchDay.number})",
+                        modifier = Modifier.padding(horizontal = 0.dp) // Anular el padding horizontal predeterminado
+                    )
+                    MatchDaySection(matchDay = matchDay)
+                }
             }
         }
     }
