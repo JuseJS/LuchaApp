@@ -40,5 +40,9 @@ data class HomeUiState(
 
     // Competiciones
     val competitions: List<Competition> = emptyList(),
-    val filters: CompetitionFilters = CompetitionFilters()
+    val filters: CompetitionFilters = CompetitionFilters(),
+
+    // Datos adicionales para equipos y luchadores
+    val teamMatches: Map<String, Pair<List<Match>, List<Match>>> = emptyMap(),
+    val wrestlerResults: Map<String, List<WrestlerMatchResult>> = emptyMap()
 )
