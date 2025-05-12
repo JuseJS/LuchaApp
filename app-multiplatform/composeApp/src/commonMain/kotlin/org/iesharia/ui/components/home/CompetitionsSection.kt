@@ -10,6 +10,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import org.iesharia.domain.model.*
+import org.iesharia.ui.components.common.EmptyStateMessage
 import org.iesharia.ui.screens.home.CompetitionFilters
 import org.iesharia.ui.theme.LuchaTheme
 
@@ -24,7 +25,8 @@ fun CompetitionsSection(
     onFilterChanged: (ageCategory: AgeCategory?, divisionCategory: DivisionCategory?, island: Island?) -> Unit,
     onClearFilters: () -> Unit,
     onCompetitionClick: (Competition) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    showEmptyState: Boolean = true // Nuevo parámetro para controlar si se muestra el estado vacío
 ) {
     Column(
         modifier = modifier
@@ -54,12 +56,10 @@ fun CompetitionsSection(
             )
         }
 
-        // Estado vacío
-        if (competitions.isEmpty()) {
+        // Solo mostrar el estado vacío si showEmptyState es true
+        if (competitions.isEmpty() && showEmptyState) {
             EmptyCompetitions()
         }
-
-        // No incluimos el LazyColumn aquí, ya que se manejará en HomeScreen
     }
 }
 
@@ -234,10 +234,6 @@ fun EmptyCompetitions() {
             .height(200.dp),
         contentAlignment = Alignment.Center
     ) {
-        Text(
-            text = "No hay competiciones activas con los filtros seleccionados",
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
-        )
+        EmptyStateMessage("No hay competiciones activas con los filtros seleccionados")
     }
 }
