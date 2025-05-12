@@ -14,7 +14,7 @@ private val DarkColorScheme = darkColorScheme(
     primary = DarkPrimary,
     onPrimary = DarkOnPrimary,
     primaryContainer = SandDark,
-    onPrimaryContainer = DarkOnPrimary,
+    onPrimaryContainer = Color.White,
 
     secondary = DarkSecondary,
     onSecondary = DarkOnSecondary,
@@ -23,7 +23,7 @@ private val DarkColorScheme = darkColorScheme(
 
     tertiary = DarkTertiary,
     onTertiary = DarkOnTertiary,
-    tertiaryContainer = LausisilvaGreen,
+    tertiaryContainer = LaurisilvaGreen,
     onTertiaryContainer = Color.White,
 
     background = DarkBackground,
@@ -36,9 +36,16 @@ private val DarkColorScheme = darkColorScheme(
     errorContainer = TraditionalRed,
     onErrorContainer = Color.White,
 
-    surfaceVariant = Color(0xFF1E1E1E),
-    onSurfaceVariant = Color(0xFFDADADA),
-    outline = Color(0xFF3F3F3F)
+    surfaceVariant = DarkSurfaceVariant,
+    onSurfaceVariant = DarkOnSurface.copy(alpha = 0.8f),
+    outline = DarkOutline,
+    outlineVariant = DarkOutlineVariant,
+
+    // Colores adicionales para mejorar la UI
+    surfaceTint = DarkPrimary.copy(alpha = 0.05f),
+    inverseSurface = Color(0xFFEEEEEE),
+    inverseOnSurface = Color(0xFF1A1A1A),
+    scrim = Color.Black.copy(alpha = 0.6f)
 )
 
 // Esquema de colores claro (aunque nos centraremos en el oscuro para OLED)
@@ -53,7 +60,7 @@ private val LightColorScheme = lightColorScheme(
     secondaryContainer = CanaryBlueLight,
     onSecondaryContainer = Color(0xFF071B33),
 
-    tertiary = LausisilvaGreen,
+    tertiary = LaurisilvaGreen,
     onTertiary = Color.White,
     tertiaryContainer = LaurisilvaGreenLight,
     onTertiaryContainer = Color(0xFF002111),
