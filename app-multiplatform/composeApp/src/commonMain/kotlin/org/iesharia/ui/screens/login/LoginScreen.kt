@@ -13,7 +13,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import luchaapp.composeapp.generated.resources.Res
@@ -146,13 +145,14 @@ class LoginScreen : AppScreen() {
                         Spacer(modifier = Modifier.height(LuchaTheme.dimensions.spacing_16))
 
                         // Botón para alternar entre login y registro
-                        LuchaTextButton(
+                        LuchaButton(
                             text = if (uiState.isLoginMode)
                                 "¿No tienes cuenta? Regístrate"
                             else
                                 "¿Ya tienes cuenta? Inicia sesión",
                             onClick = viewModel::toggleAuthMode,
-                            color = MaterialTheme.colorScheme.secondary
+                            type = LuchaButtonType.TEXT,
+                            customColor = MaterialTheme.colorScheme.secondary
                         )
                     }
 
