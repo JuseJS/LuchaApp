@@ -3,25 +3,21 @@ package org.iesharia.ui.screens.home
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
+import org.iesharia.domain.model.Favorite
 import org.iesharia.navigation.AppScreen
 import org.iesharia.ui.components.LuchaLoadingOverlay
-import org.iesharia.ui.components.home.CompetitionItem
-import org.iesharia.ui.components.home.CompetitionsSection
-import org.iesharia.ui.components.home.EmptyCompetitions
-import org.iesharia.ui.components.home.FavoritesSection
+import org.iesharia.ui.components.common.SectionSubtitle
+import org.iesharia.ui.components.home.*
 import org.iesharia.ui.theme.LuchaTheme
 
 /**
- * Pantalla principal de la aplicación
+ * Pantalla principal de la aplicación, optimizada para mostrar secciones responsivas
  */
 class HomeScreen : AppScreen() {
     @Composable
@@ -56,34 +52,13 @@ class HomeScreen : AppScreen() {
     }
 }
 
-/**
- * Barra superior de la pantalla de inicio
- */
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun HomeTopBar() {
-    TopAppBar(
-        title = {
-            Text(
-                text = "Lucha Canaria",
-                style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.Bold
-            )
-        },
-        actions = {
-            IconButton(onClick = { /* Abrir menú */ }) {
-                Icon(
-                    imageVector = Icons.Default.Menu,
-                    contentDescription = "Menú"
-                )
-            }
-        }
-    )
+    // ... Sin cambios
 }
 
 /**
  * Contenido principal de la pantalla de inicio
- * Usamos LazyColumn para toda la pantalla para evitar anidamiento de scrolls
  */
 @Composable
 private fun HomeContent(
@@ -94,32 +69,146 @@ private fun HomeContent(
         modifier = Modifier.fillMaxSize(),
         contentPadding = PaddingValues(vertical = LuchaTheme.dimensions.spacing_16)
     ) {
-        // Sección de favoritos
+        // Sección de favoritos - Header con filtros
         item {
-            FavoritesSection(
-                favorites = viewModel.getFilteredFavorites(),
-                selectedType = uiState.selectedFavoriteType,
-                onTypeSelected = viewModel::setFavoriteType,
-                onFavoriteClick = { /* Navegar al detalle del favorito */ }
-            )
+            Surface(
+                color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
+                shape = LuchaTheme.shapes.medium,
+                modifier = Modifier.padding(horizontal = LuchaTheme.dimensions.spacing_16)
+            ) {
+                Column(modifier = Modifier.fillMaxWidth()) {
+                    // Header de la sección de favoritos
+                    FavoritesSectionHeader(
+                        selectedType = uiState.selectedFavoriteType,
+                        onTypeSelected = viewModel::setFavoriteType
+                    )
+
+                    // Contenido según el tipo seleccionado
+                    val favorites = viewModel.getFilteredFavorites()
+
+                    if (favorites.isEmpty()) {
+                        EmptyFavorites(uiState.selectedFavoriteType)
+                    } else {
+                        // Obtención de favoritos según tipo
+                        val competitions = favorites.filterIsInstance<Favorite.CompetitionFavorite>()
+                        val teams = favorites.filterIsInstance<Favorite.TeamFavorite>()
+                        val wrestlers = favorites.filterIsInstance<Favorite.WrestlerFavorite>()
+
+                        // Sección de competiciones
+                        if (competitions.isNotEmpty() && shouldShowCompetitions(uiState.selectedFavoriteType)) {
+                            SectionSubtitle(
+                                subtitle = "Competiciones Favoritas",
+                                modifier = Modifier.padding(horizontal = LuchaTheme.dimensions.spacing_16)
+                            )
+
+                            Spacer(modifier = Modifier.height(LuchaTheme.dimensions.spacing_8))
+
+                            Column(
+                                modifier = Modifier.padding(horizontal = LuchaTheme.dimensions.spacing_16),
+                                verticalArrangement = Arrangement.spacedBy(LuchaTheme.dimensions.spacing_12)
+                            ) {
+                                competitions.forEach { favorite ->
+                                    CompetitionItem(
+                                        competition = favorite.competition,
+                                        onClick = { /* Navegar al detalle */ },
+                                        showMatchDays = true
+                                    )
+                                }
+                            }
+
+                            if ((teams.isNotEmpty() && shouldShowTeams(uiState.selectedFavoriteType)) ||
+                                (wrestlers.isNotEmpty() && shouldShowWrestlers(uiState.selectedFavoriteType))) {
+                                FavoritesSectionDivider()
+                            }
+                        }
+
+                        // Sección de equipos
+                        if (teams.isNotEmpty() && shouldShowTeams(uiState.selectedFavoriteType)) {
+                            SectionSubtitle(
+                                subtitle = "Equipos Favoritos",
+                                modifier = Modifier.padding(horizontal = LuchaTheme.dimensions.spacing_16)
+                            )
+
+                            Spacer(modifier = Modifier.height(LuchaTheme.dimensions.spacing_8))
+
+                            Column(
+                                modifier = Modifier.padding(horizontal = LuchaTheme.dimensions.spacing_16),
+                                verticalArrangement = Arrangement.spacedBy(LuchaTheme.dimensions.spacing_12)
+                            ) {
+                                teams.forEach { favorite ->
+                                    // Obtener datos de enfrentamientos para equipos
+                                    val teamId = favorite.team.id
+                                    val lastMatches = viewModel.getTeamLastMatches(teamId)
+                                    val nextMatches = viewModel.getTeamNextMatches(teamId)
+
+                                    TeamItem(
+                                        team = favorite.team,
+                                        onClick = { /* Navegar al detalle */ },
+                                        lastMatches = lastMatches.take(2),
+                                        nextMatches = nextMatches.take(2)
+                                    )
+                                }
+                            }
+
+                            if (wrestlers.isNotEmpty() && shouldShowWrestlers(uiState.selectedFavoriteType)) {
+                                FavoritesSectionDivider()
+                            }
+                        }
+
+                        // Sección de luchadores
+                        if (wrestlers.isNotEmpty() && shouldShowWrestlers(uiState.selectedFavoriteType)) {
+                            SectionSubtitle(
+                                subtitle = "Luchadores Favoritos",
+                                modifier = Modifier.padding(horizontal = LuchaTheme.dimensions.spacing_16)
+                            )
+
+                            Spacer(modifier = Modifier.height(LuchaTheme.dimensions.spacing_8))
+
+                            Column(
+                                modifier = Modifier.padding(horizontal = LuchaTheme.dimensions.spacing_16),
+                                verticalArrangement = Arrangement.spacedBy(LuchaTheme.dimensions.spacing_12)
+                            ) {
+                                wrestlers.forEach { favorite ->
+                                    // Obtener resultados para luchadores
+                                    val wrestlerId = favorite.wrestler.id
+                                    val results = viewModel.getWrestlerResults(wrestlerId)
+
+                                    WrestlerItem(
+                                        wrestler = favorite.wrestler,
+                                        onClick = { /* Navegar al detalle */ },
+                                        matchResults = results
+                                    )
+                                }
+                            }
+                        }
+                    }
+
+                    // Espaciado final
+                    Spacer(modifier = Modifier.height(LuchaTheme.dimensions.spacing_16))
+                }
+            }
+
+            Spacer(modifier = Modifier.height(LuchaTheme.dimensions.spacing_16))
 
             HorizontalDivider(
                 modifier = Modifier.padding(
                     horizontal = LuchaTheme.dimensions.spacing_16,
-                    vertical = LuchaTheme.dimensions.spacing_16
                 ),
                 color = MaterialTheme.colorScheme.outlineVariant
             )
+
+            Spacer(modifier = Modifier.height(LuchaTheme.dimensions.spacing_16))
         }
 
         // Sección de competiciones - Header y filtros
         item {
             CompetitionsSection(
-                competitions = emptyList(), // No usamos esta lista aquí, solo para mostrar el header
+                competitions = emptyList(),
                 currentFilters = uiState.filters,
                 onFilterChanged = viewModel::updateFilters,
                 onClearFilters = viewModel::clearFilters,
-                onCompetitionClick = { /* No se usa */ }
+                onCompetitionClick = { /* No se usa */ },
+                showEmptyState = false
             )
         }
 
