@@ -7,6 +7,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -14,94 +15,77 @@ import androidx.compose.ui.text.style.TextAlign
 import org.iesharia.ui.theme.LuchaTheme
 
 /**
- * Botón personalizado para la aplicación de Lucha Canaria
+ * Tipos de botones disponibles en la aplicación
  */
-@Composable
-fun LuchaPrimaryButton(
-    text: String,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-    enabled: Boolean = true
-) {
-    Button(
-        onClick = onClick,
-        modifier = modifier
-            .fillMaxWidth()
-            .height(LuchaTheme.dimensions.button_height)
-            .padding(vertical = LuchaTheme.dimensions.spacing_8),
-        enabled = enabled,
-        shape = LuchaTheme.shapes.buttonShape,
-        colors = ButtonDefaults.buttonColors(
-            containerColor = MaterialTheme.colorScheme.primary,
-            contentColor = MaterialTheme.colorScheme.onPrimary,
-            disabledContainerColor = MaterialTheme.colorScheme.surfaceVariant,
-            disabledContentColor = MaterialTheme.colorScheme.onSurfaceVariant
-        )
-    ) {
-        Text(
-            text = text,
-            style = MaterialTheme.typography.labelLarge,
-            textAlign = TextAlign.Center
-        )
-    }
+enum class LuchaButtonType {
+    PRIMARY,
+    SECONDARY,
+    TEXT
 }
 
 /**
- * Botón secundario personalizado para la aplicación de Lucha Canaria
+ * Botón universal personalizado para la aplicación de Lucha Canaria
  */
 @Composable
-fun LuchaSecondaryButton(
+fun LuchaButton(
     text: String,
     onClick: () -> Unit,
+    type: LuchaButtonType = LuchaButtonType.PRIMARY,
     modifier: Modifier = Modifier,
-    enabled: Boolean = true
+    enabled: Boolean = true,
+    customColor: Color? = null // Solo usado para botones de tipo TEXT
 ) {
-    Button(
-        onClick = onClick,
-        modifier = modifier
-            .fillMaxWidth()
-            .height(LuchaTheme.dimensions.button_height)
-            .padding(vertical = LuchaTheme.dimensions.spacing_8),
-        enabled = enabled,
-        shape = LuchaTheme.shapes.buttonShape,
-        colors = ButtonDefaults.buttonColors(
-            containerColor = MaterialTheme.colorScheme.secondary,
-            contentColor = MaterialTheme.colorScheme.onSecondary,
-            disabledContainerColor = MaterialTheme.colorScheme.surfaceVariant,
-            disabledContentColor = MaterialTheme.colorScheme.onSurfaceVariant
-        )
-    ) {
-        Text(
-            text = text,
-            style = MaterialTheme.typography.labelLarge,
-            textAlign = TextAlign.Center
-        )
-    }
-}
+    when (type) {
+        LuchaButtonType.PRIMARY, LuchaButtonType.SECONDARY -> {
+            val colors = when (type) {
+                LuchaButtonType.PRIMARY -> ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = MaterialTheme.colorScheme.onPrimary,
+                    disabledContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+                    disabledContentColor = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                LuchaButtonType.SECONDARY -> ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.secondary,
+                    contentColor = MaterialTheme.colorScheme.onSecondary,
+                    disabledContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+                    disabledContentColor = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                else -> ButtonDefaults.buttonColors() // Nunca llegará aquí debido al when
+            }
 
-/**
- * Botón de texto personalizado para la aplicación
- */
-@Composable
-fun LuchaTextButton(
-    text: String,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-    color: Color = MaterialTheme.colorScheme.primary,
-    enabled: Boolean = true
-) {
-    androidx.compose.material3.TextButton(
-        onClick = onClick,
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(vertical = LuchaTheme.dimensions.spacing_4),
-        enabled = enabled
-    ) {
-        Text(
-            text = text,
-            style = MaterialTheme.typography.labelLarge,
-            color = if (enabled) color else MaterialTheme.colorScheme.onSurfaceVariant,
-            textAlign = TextAlign.Center
-        )
+            Button(
+                onClick = onClick,
+                modifier = modifier
+                    .fillMaxWidth()
+                    .height(LuchaTheme.dimensions.button_height)
+                    .padding(vertical = LuchaTheme.dimensions.spacing_8),
+                enabled = enabled,
+                shape = LuchaTheme.shapes.buttonShape,
+                colors = colors
+            ) {
+                Text(
+                    text = text,
+                    style = MaterialTheme.typography.labelLarge,
+                    textAlign = TextAlign.Center
+                )
+            }
+        }
+        LuchaButtonType.TEXT -> {
+            val color = customColor ?: MaterialTheme.colorScheme.primary
+            TextButton(
+                onClick = onClick,
+                modifier = modifier
+                    .fillMaxWidth()
+                    .padding(vertical = LuchaTheme.dimensions.spacing_4),
+                enabled = enabled
+            ) {
+                Text(
+                    text = text,
+                    style = MaterialTheme.typography.labelLarge,
+                    color = if (enabled) color else MaterialTheme.colorScheme.onSurfaceVariant,
+                    textAlign = TextAlign.Center
+                )
+            }
+        }
     }
 }
