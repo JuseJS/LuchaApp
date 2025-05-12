@@ -7,7 +7,8 @@ import androidx.compose.material.icons.filled.Person
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
-import org.iesharia.ui.components.LuchaSecondaryButton
+import org.iesharia.ui.components.LuchaButton
+import org.iesharia.ui.components.LuchaButtonType
 
 @Composable
 fun RegisterForm(
@@ -78,9 +79,10 @@ fun RegisterForm(
         submitButtonText = "Registrarse",
         isLoading = isLoading,
         renderButton = { text, onClick, enabled ->
-            LuchaSecondaryButton(
+            LuchaButton(
                 text = text,
                 onClick = onClick,
+                type = LuchaButtonType.SECONDARY,
                 enabled = enabled
             )
         }
