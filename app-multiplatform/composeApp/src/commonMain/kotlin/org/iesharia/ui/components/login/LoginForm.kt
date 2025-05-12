@@ -6,7 +6,8 @@ import androidx.compose.material.icons.filled.Lock
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
-import org.iesharia.ui.components.LuchaPrimaryButton
+import org.iesharia.ui.components.LuchaButton
+import org.iesharia.ui.components.LuchaButtonType
 
 @Composable
 fun LoginForm(
@@ -46,9 +47,10 @@ fun LoginForm(
         submitButtonText = "Iniciar Sesión",
         isLoading = isLoading,
         renderButton = { text, onClick, enabled ->
-            LuchaPrimaryButton(
+            LuchaButton(
                 text = text,
                 onClick = onClick,
+                type = LuchaButtonType.PRIMARY,
                 enabled = enabled
             )
         }
