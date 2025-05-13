@@ -1,7 +1,6 @@
 package org.iesharia.domain.model
 
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
+import kotlinx.datetime.LocalDate
 
 /**
  * Modelo que representa una jornada de competición
@@ -16,22 +15,20 @@ data class MatchDay(
      * Fecha del primer enfrentamiento de la jornada
      */
     val firstMatchDate: LocalDate? get() =
-        matches.minByOrNull { it.date }?.date?.toLocalDate()
+        matches.minByOrNull { it.date }?.date?.date
 
     /**
      * Fecha del último enfrentamiento de la jornada
      */
     val lastMatchDate: LocalDate? get() =
-        matches.maxByOrNull { it.date }?.date?.toLocalDate()
+        matches.maxByOrNull { it.date }?.date?.date
 
     /**
      * Formatea el rango de fechas de la jornada
      */
     fun getDateRangeFormatted(): String {
-        val formatter = DateTimeFormatter.ofPattern("d-M-yy")
-
-        val first = firstMatchDate?.format(formatter) ?: "-"
-        val last = lastMatchDate?.format(formatter) ?: "-"
+        val first = firstMatchDate?.toString()?.split("-")?.let { "${it[2]}-${it[1]}-${it[0].takeLast(2)}" } ?: "-"
+        val last = lastMatchDate?.toString()?.split("-")?.let { "${it[2]}-${it[1]}-${it[0].takeLast(2)}" } ?: "-"
 
         return if (first == last) first else "$first // $last"
     }
