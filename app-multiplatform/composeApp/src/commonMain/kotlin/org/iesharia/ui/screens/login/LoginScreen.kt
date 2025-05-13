@@ -10,13 +10,13 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import luchaapp.composeapp.generated.resources.Res
 import luchaapp.composeapp.generated.resources.app_logo
+import org.iesharia.di.rememberViewModel
 import org.iesharia.navigation.AppScreen
 import org.iesharia.ui.components.*
 import org.iesharia.ui.components.login.LoginForm
@@ -28,7 +28,7 @@ import org.jetbrains.compose.resources.painterResource
 class LoginScreen : AppScreen() {
     @Composable
     override fun Content() {
-        val viewModel = remember { LoginViewModel() }
+        val viewModel = rememberViewModel<LoginViewModel>()
         val uiState by viewModel.uiState.collectAsState()
         val navigator = LocalNavigator.currentOrThrow
 
