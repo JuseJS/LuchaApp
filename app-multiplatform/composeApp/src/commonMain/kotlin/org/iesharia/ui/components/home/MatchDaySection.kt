@@ -13,7 +13,6 @@ import androidx.compose.ui.text.style.TextAlign
 import org.iesharia.domain.model.Match
 import org.iesharia.domain.model.MatchDay
 import org.iesharia.ui.theme.LuchaTheme
-import java.time.format.DateTimeFormatter
 
 /**
  * Sección para mostrar una jornada con sus enfrentamientos
@@ -114,9 +113,8 @@ fun MatchItem(
                 )
 
                 // Fecha
-                val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")
                 Text(
-                    text = match.date.format(formatter),
+                    text = "${match.date.dayOfMonth}/${match.date.month}/${match.date.year} ${match.date.hour}:${match.date.minute.toString().padStart(2, '0')}",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
