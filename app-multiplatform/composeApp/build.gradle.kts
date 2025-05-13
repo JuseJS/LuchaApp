@@ -24,6 +24,8 @@ kotlin {
         androidMain.dependencies {
             implementation(compose.preview)
             implementation(libs.androidx.activity.compose)
+            implementation(libs.koin.android)
+            implementation(libs.koin.compose)
         }
         commonMain.dependencies {
             implementation(compose.runtime)
@@ -42,10 +44,14 @@ kotlin {
             implementation(libs.voyager.bottom.sheet.navigator)
             implementation(libs.voyager.tab.navigator)
             implementation(libs.kotlinx.datetime)
+            implementation(libs.koin.core)
+            implementation(libs.koin.compose)
         }
         desktopMain.dependencies {
             implementation(compose.desktop.currentOs)
             implementation(libs.kotlinx.coroutines.swing)
+            implementation(libs.koin.core)
+            implementation(libs.koin.compose)
         }
     }
 }
