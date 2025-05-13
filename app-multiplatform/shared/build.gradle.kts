@@ -35,6 +35,7 @@ kotlin {
             implementation(compose.ui)
             implementation(compose.material3)
             implementation(libs.kotlinx.datetime)
+            implementation(libs.koin.core)
         }
     }
 }
