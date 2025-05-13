@@ -1,0 +1,66 @@
+package org.iesharia.di
+
+import org.iesharia.data.repository.MockCompetitionRepository
+import org.iesharia.data.repository.MockUserRepository
+import org.iesharia.domain.repository.CompetitionRepository
+import org.iesharia.domain.repository.UserRepository
+import org.iesharia.domain.usecase.*
+import org.koin.core.KoinApplication
+import org.koin.core.context.startKoin
+import org.koin.core.module.Module
+import org.koin.dsl.module
+
+/**
+ * Módulo para los repositorios
+ */
+private val repositoryModule = module {
+    single<CompetitionRepository> { MockCompetitionRepository() }
+    single<UserRepository> { MockUserRepository() }
+}
+
+/**
+ * Módulo para los casos de uso
+ */
+private val useCaseModule = module {
+    factory { GetCompetitionsUseCase(get()) }
+    factory { GetFavoritesUseCase(get()) }
+    factory { GetTeamMatchesUseCase(get()) }
+    factory { GetWrestlerResultsUseCase(get()) }
+    factory { LoginUseCase(get()) }
+}
+
+/**
+ * Lista de todos los módulos del paquete shared
+ */
+internal val sharedModules = listOf(
+    repositoryModule,
+    useCaseModule
+)
+
+/**
+ * Función para inicializar Koin con módulos adicionales
+ */
+fun initKoin(
+    additionalModules: List<Module> = emptyList(),
+    appDeclaration: KoinApplication.() -> Unit = {}
+): KoinApplication {
+    return try {
+        // Intenta cerrar cualquier instancia previa (por si acaso)
+        try {
+            org.koin.core.context.stopKoin()
+        } catch (e: Exception) {
+            // Ignorar si no hay instancia previa
+        }
+
+        // Iniciar Koin con los módulos
+        startKoin {
+            appDeclaration()
+            modules(sharedModules + additionalModules)
+        }
+    } catch (e: Exception) {
+        println("Error detallado al inicializar Koin: ${e::class.simpleName}: ${e.message}")
+        e.printStackTrace()
+        // Retornar una instancia simple como fallback
+        KoinApplication.init()
+    }
+}
