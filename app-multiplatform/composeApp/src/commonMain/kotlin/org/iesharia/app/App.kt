@@ -8,7 +8,9 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 @Composable
 @Preview
 fun App() {
-    LuchaAppTheme {
-        RootNavigator()
+    org.koin.compose.KoinContext {
+        LuchaAppTheme {
+            RootNavigator()
+        }
     }
 }
