@@ -1,6 +1,6 @@
 package org.iesharia.domain.model
 
-import java.time.LocalDateTime
+import kotlinx.datetime.LocalDateTime
 
 /**
  * Modelo que representa un enfrentamiento entre dos equipos
