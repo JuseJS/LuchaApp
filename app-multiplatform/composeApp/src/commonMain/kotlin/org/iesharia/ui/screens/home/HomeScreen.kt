@@ -7,14 +7,9 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import org.iesharia.data.repository.MockCompetitionRepository
+import org.iesharia.di.rememberViewModel
 import org.iesharia.domain.model.Favorite
-import org.iesharia.domain.usecase.GetCompetitionsUseCase
-import org.iesharia.domain.usecase.GetFavoritesUseCase
-import org.iesharia.domain.usecase.GetTeamMatchesUseCase
-import org.iesharia.domain.usecase.GetWrestlerResultsUseCase
 import org.iesharia.navigation.AppScreen
 import org.iesharia.ui.components.LuchaLoadingOverlay
 import org.iesharia.ui.components.common.SectionSubtitle
@@ -27,19 +22,7 @@ import org.iesharia.ui.theme.LuchaTheme
 class HomeScreen : AppScreen() {
     @Composable
     override fun Content() {
-        val getCompetitionsUseCase = remember { GetCompetitionsUseCase(MockCompetitionRepository()) }
-        val getFavoritesUseCase = remember { GetFavoritesUseCase(MockCompetitionRepository()) }
-        val getTeamMatchesUseCase = remember { GetTeamMatchesUseCase(MockCompetitionRepository()) }
-        val getWrestlerResultsUseCase = remember { GetWrestlerResultsUseCase(MockCompetitionRepository()) }
-
-        val viewModel = remember {
-            HomeViewModel(
-                getCompetitionsUseCase = getCompetitionsUseCase,
-                getFavoritesUseCase = getFavoritesUseCase,
-                getTeamMatchesUseCase = getTeamMatchesUseCase,
-                getWrestlerResultsUseCase = getWrestlerResultsUseCase
-            )
-        }
+        val viewModel = rememberViewModel<HomeViewModel>()
         val uiState by viewModel.uiState.collectAsState()
 
         Scaffold(
@@ -52,7 +35,6 @@ class HomeScreen : AppScreen() {
                     .fillMaxSize()
                     .padding(paddingValues)
             ) {
-                // Contenido principal
                 when {
                     uiState.isLoading -> {
                         LuchaLoadingOverlay()
