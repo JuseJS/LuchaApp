@@ -1,6 +1,7 @@
-package org.iesharia.domain.model
+package org.iesharia.features.competitions.domain.model
 
 import kotlinx.datetime.LocalDate
+import org.iesharia.features.teams.domain.model.Match
 
 /**
  * Modelo que representa una jornada de competición
