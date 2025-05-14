@@ -1,4 +1,7 @@
-package org.iesharia.domain.model
+package org.iesharia.features.competitions.domain.model
+
+import org.iesharia.core.domain.model.Island
+import org.iesharia.features.teams.domain.model.Team
 
 /**
  * Categoría de edad en la competición
