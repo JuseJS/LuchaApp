@@ -1,6 +1,6 @@
-package org.iesharia.data.repository
+package org.iesharia.features.auth.data.repository
 
-import org.iesharia.domain.repository.UserRepository
+import org.iesharia.features.auth.domain.repository.UserRepository
 import kotlinx.coroutines.delay
 
 class MockUserRepository : UserRepository {
