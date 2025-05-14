@@ -1,4 +1,4 @@
-package org.iesharia.ui.components.home
+package org.iesharia.features.home.ui.components
 
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
@@ -11,10 +11,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import org.iesharia.ui.components.common.EmptyStateMessage
-import org.iesharia.ui.components.common.SectionTitle
-import org.iesharia.ui.screens.home.FavoriteType
-import org.iesharia.ui.theme.LuchaTheme
+import org.iesharia.core.ui.components.common.EmptyStateMessage
+import org.iesharia.core.ui.components.common.SectionTitle
+import org.iesharia.features.home.ui.viewmodel.FavoriteType
+import org.iesharia.core.ui.theme.LuchaTheme
 
 /**
  * Cabecera para la sección de favoritos con título y chips de filtro
