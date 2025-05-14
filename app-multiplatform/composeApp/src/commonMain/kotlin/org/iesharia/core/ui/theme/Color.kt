@@ -1,4 +1,4 @@
-package org.iesharia.ui.theme
+package org.iesharia.core.ui.theme
 
 import androidx.compose.ui.graphics.Color
 

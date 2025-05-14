@@ -1,4 +1,4 @@
-package org.iesharia.ui.theme
+package org.iesharia.core.ui.theme
 
 import androidx.compose.foundation.shape.CornerBasedShape
 import androidx.compose.foundation.shape.RoundedCornerShape

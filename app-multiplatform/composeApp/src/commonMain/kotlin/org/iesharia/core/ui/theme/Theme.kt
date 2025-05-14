@@ -1,4 +1,4 @@
-package org.iesharia.ui.theme
+package org.iesharia.core.ui.theme
 
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
