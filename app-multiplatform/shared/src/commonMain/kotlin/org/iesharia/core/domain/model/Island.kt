@@ -1,4 +1,4 @@
-package org.iesharia.domain.model
+package org.iesharia.core.domain.model
 
 /**
  * Enum para las islas del archipiélago canario
