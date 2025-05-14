@@ -1,4 +1,4 @@
-package org.iesharia.ui.base
+package org.iesharia.core.common
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
