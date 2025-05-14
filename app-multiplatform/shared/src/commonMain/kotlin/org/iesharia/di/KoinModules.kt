@@ -1,10 +1,14 @@
 package org.iesharia.di
 
-import org.iesharia.data.repository.MockCompetitionRepository
-import org.iesharia.data.repository.MockUserRepository
-import org.iesharia.domain.repository.CompetitionRepository
-import org.iesharia.domain.repository.UserRepository
-import org.iesharia.domain.usecase.*
+import org.iesharia.features.competitions.data.repository.MockCompetitionRepository
+import org.iesharia.features.auth.data.repository.MockUserRepository
+import org.iesharia.features.competitions.domain.repository.CompetitionRepository
+import org.iesharia.features.auth.domain.repository.UserRepository
+import org.iesharia.features.auth.domain.usecase.LoginUseCase
+import org.iesharia.features.common.domain.usecase.GetFavoritesUseCase
+import org.iesharia.features.competitions.domain.usecase.GetCompetitionsUseCase
+import org.iesharia.features.teams.domain.usecase.GetTeamMatchesUseCase
+import org.iesharia.features.wrestlers.domain.usecase.GetWrestlerResultsUseCase
 import org.koin.core.KoinApplication
 import org.koin.core.context.startKoin
 import org.koin.core.module.Module
