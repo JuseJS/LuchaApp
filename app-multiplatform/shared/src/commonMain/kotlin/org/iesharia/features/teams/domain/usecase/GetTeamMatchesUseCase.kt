@@ -1,7 +1,7 @@
-package org.iesharia.domain.usecase
+package org.iesharia.features.teams.domain.usecase
 
-import org.iesharia.domain.model.Match
-import org.iesharia.domain.repository.CompetitionRepository
+import org.iesharia.features.teams.domain.model.Match
+import org.iesharia.features.competitions.domain.repository.CompetitionRepository
 
 class GetTeamMatchesUseCase(private val repository: CompetitionRepository) {
     /**
