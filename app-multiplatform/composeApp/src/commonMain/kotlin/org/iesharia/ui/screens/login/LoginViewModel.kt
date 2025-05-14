@@ -3,52 +3,12 @@ package org.iesharia.ui.screens.login
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import org.iesharia.ui.base.BaseViewModel
 
-/**
- * Estado de la pantalla de login
- */
-data class LoginUiState(
-    // Estado común
-    val isLoading: Boolean = false,
-    val isLoginMode: Boolean = true, // true = login, false = registro
-
-    // Campos del formulario de login
-    val loginEmail: String = "",
-    val loginPassword: String = "",
-    val loginEmailError: String = "",
-    val loginPasswordError: String = "",
-
-    // Campos del formulario de registro
-    val registerName: String = "",
-    val registerSurname: String = "",
-    val registerEmail: String = "",
-    val registerPassword: String = "",
-    val registerConfirmPassword: String = "",
-    val registerNameError: String = "",
-    val registerSurnameError: String = "",
-    val registerEmailError: String = "",
-    val registerPasswordError: String = "",
-    val registerConfirmPasswordError: String = ""
-)
-
-/**
- * ViewModel para la pantalla de login
- */
-class LoginViewModel : ViewModel() {
-
-    private val _uiState = MutableStateFlow(LoginUiState())
-    val uiState: StateFlow<LoginUiState> = _uiState.asStateFlow()
+class LoginViewModel : BaseViewModel<LoginUiState>(LoginUiState()) {
 
     // Estado para controlar la navegación
     var isLoggedIn by mutableStateOf(false)
@@ -56,7 +16,7 @@ class LoginViewModel : ViewModel() {
 
     // Cambiar entre modos login/registro
     fun toggleAuthMode() {
-        _uiState.update { it.copy(isLoginMode = !it.isLoginMode) }
+        updateState { it.copy(isLoginMode = !it.isLoginMode) }
     }
 
     // Método para resetear el estado de login (después de navegar)
@@ -66,28 +26,28 @@ class LoginViewModel : ViewModel() {
 
     // Métodos para actualizar campos del login
     fun updateLoginEmail(email: String) {
-        _uiState.update { it.copy(loginEmail = email, loginEmailError = "") }
+        updateState { it.copy(loginEmail = email, loginEmailError = "") }
     }
 
     fun updateLoginPassword(password: String) {
-        _uiState.update { it.copy(loginPassword = password, loginPasswordError = "") }
+        updateState { it.copy(loginPassword = password, loginPasswordError = "") }
     }
 
     // Métodos para actualizar campos del registro
     fun updateRegisterName(name: String) {
-        _uiState.update { it.copy(registerName = name, registerNameError = "") }
+        updateState { it.copy(registerName = name, registerNameError = "") }
     }
 
     fun updateRegisterSurname(surname: String) {
-        _uiState.update { it.copy(registerSurname = surname, registerSurnameError = "") }
+        updateState { it.copy(registerSurname = surname, registerSurnameError = "") }
     }
 
     fun updateRegisterEmail(email: String) {
-        _uiState.update { it.copy(registerEmail = email, registerEmailError = "") }
+        updateState { it.copy(registerEmail = email, registerEmailError = "") }
     }
 
     fun updateRegisterPassword(password: String) {
-        _uiState.update {
+        updateState {
             it.copy(
                 registerPassword = password,
                 registerPasswordError = "",
@@ -103,7 +63,7 @@ class LoginViewModel : ViewModel() {
     }
 
     fun updateRegisterConfirmPassword(confirmPassword: String) {
-        _uiState.update {
+        updateState {
             it.copy(
                 registerConfirmPassword = confirmPassword,
                 registerConfirmPasswordError = if (confirmPassword != it.registerPassword) {
@@ -117,8 +77,18 @@ class LoginViewModel : ViewModel() {
 
     // Validación y envío de login
     fun submitLogin() {
-        viewModelScope.launch(SupervisorJob() + Dispatchers.Main.immediate) {
-            val currentState = _uiState.value
+        launchSafe(
+            handleError = { e ->
+                // Manejo de error
+                updateState {
+                    it.copy(
+                        isLoading = false,
+                        loginPasswordError = "Error al iniciar sesión: ${e.message}"
+                    )
+                }
+            }
+        ) {
+            val currentState = uiState.value
 
             // Validar campos
             var isValid = true
@@ -140,50 +110,45 @@ class LoginViewModel : ViewModel() {
 
             // Actualizar errores si hay
             if (!isValid) {
-                _uiState.update {
+                updateState {
                     it.copy(
                         loginEmailError = emailError,
                         loginPasswordError = passwordError
                     )
                 }
-                return@launch
+                return@launchSafe
             }
 
-            try {
-                // Iniciar carga
-                _uiState.update { it.copy(isLoading = true) }
+            // Iniciar carga
+            updateState { it.copy(isLoading = true) }
 
-                // Procesamiento de login en hilo de IO
-                withContext(Dispatchers.IO) {
-                    // Aquí iría la lógica real para hacer login con el backend
-                    // Por ahora, simulamos un delay
-                    delay(1000)
-                }
-
-                // Login exitoso - ahora navegamos a la pantalla de inicio
-                _uiState.update { it.copy(isLoading = false) }
-
-                // Indicar que el login fue exitoso
-                isLoggedIn = true
-
-            } catch (e: Exception) {
-                // Manejo de error
-                _uiState.update {
-                    it.copy(
-                        isLoading = false,
-                        loginPasswordError = "Error al iniciar sesión: ${e.message}"
-                    )
-                }
+            // Procesamiento de login en hilo de IO
+            withContext(Dispatchers.IO) {
+                // Aquí iría la lógica real para hacer login con el backend
+                delay(1000)
             }
+
+            // Login exitoso - ahora navegamos a la pantalla de inicio
+            updateState { it.copy(isLoading = false) }
+            isLoggedIn = true
         }
     }
 
     // Validación y envío de registro
     fun submitRegister() {
-        viewModelScope.launch(SupervisorJob() + Dispatchers.Main.immediate) {
-            val currentState = _uiState.value
+        launchSafe(
+            handleError = { e ->
+                updateState {
+                    it.copy(
+                        isLoading = false,
+                        registerPasswordError = "Error al registrarse: ${e.message}"
+                    )
+                }
+            }
+        ) {
+            val currentState = uiState.value
 
-            // Validar campos
+            // Validación de campos...
             var isValid = true
             var nameError = ""
             var surnameError = ""
@@ -224,7 +189,7 @@ class LoginViewModel : ViewModel() {
 
             // Actualizar errores si hay
             if (!isValid) {
-                _uiState.update {
+                updateState {
                     it.copy(
                         registerNameError = nameError,
                         registerSurnameError = surnameError,
@@ -233,39 +198,25 @@ class LoginViewModel : ViewModel() {
                         registerConfirmPasswordError = confirmPasswordError
                     )
                 }
-                return@launch
+                return@launchSafe
             }
 
-            try {
-                // Iniciar carga
-                _uiState.update { it.copy(isLoading = true) }
+            // Iniciar carga
+            updateState { it.copy(isLoading = true) }
 
-                // Procesamiento de registro en hilo de IO
-                withContext(Dispatchers.IO) {
-                    // Aquí iría la lógica real para hacer registro con el backend
-                    // Por ahora, simulamos un delay
-                    delay(1000)
-                }
-
-                // Registro exitoso - ahora navegamos a la pantalla de inicio
-                _uiState.update { it.copy(isLoading = false) }
-
-                // Indicar que el registro fue exitoso
-                isLoggedIn = true
-
-            } catch (e: Exception) {
-                // Manejo de error
-                _uiState.update {
-                    it.copy(
-                        isLoading = false,
-                        registerPasswordError = "Error al registrarse: ${e.message}"
-                    )
-                }
+            // Procesamiento de registro en hilo de IO
+            withContext(Dispatchers.IO) {
+                // Simular el registro
+                delay(1000)
             }
+
+            // Registro exitoso
+            updateState { it.copy(isLoading = false) }
+            isLoggedIn = true
         }
     }
 
-    // Función mejorada para validar formato de email
+    // Función para validar formato de email
     private fun isValidEmail(email: String): Boolean {
         val emailRegex = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$".toRegex()
         return email.matches(emailRegex)
