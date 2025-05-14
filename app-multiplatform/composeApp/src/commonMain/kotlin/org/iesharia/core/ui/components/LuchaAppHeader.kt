@@ -1,4 +1,4 @@
-package org.iesharia.ui.components
+package org.iesharia.core.ui.components
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -9,7 +9,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
-import org.iesharia.ui.theme.LuchaTheme
+import org.iesharia.core.ui.theme.LuchaTheme
 
 /**
  * Encabezado de la aplicación con título y subtítulo

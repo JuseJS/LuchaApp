@@ -1,4 +1,4 @@
-package org.iesharia.ui.components
+package org.iesharia.core.ui.components
 
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -12,7 +12,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
-import org.iesharia.ui.theme.LuchaTheme
+import org.iesharia.core.ui.theme.LuchaTheme
 
 /**
  * Tipos de botones disponibles en la aplicación

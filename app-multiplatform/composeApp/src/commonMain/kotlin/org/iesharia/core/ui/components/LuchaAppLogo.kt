@@ -1,4 +1,4 @@
-package org.iesharia.ui.components
+package org.iesharia.core.ui.components
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.size
@@ -8,7 +8,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
-import org.iesharia.ui.theme.LuchaTheme
+import org.iesharia.core.ui.theme.LuchaTheme
 
 /**
  * Logo de la aplicación con tamaño configurable
