@@ -1,4 +1,4 @@
-package org.iesharia.ui.screens.login
+package org.iesharia.features.auth.ui.screens
 
 import androidx.compose.animation.*
 import androidx.compose.animation.core.tween
@@ -16,13 +16,14 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import luchaapp.composeapp.generated.resources.Res
 import luchaapp.composeapp.generated.resources.app_logo
+import org.iesharia.features.home.ui.screens.HomeScreen
 import org.iesharia.di.rememberViewModel
-import org.iesharia.navigation.AppScreen
-import org.iesharia.ui.components.*
-import org.iesharia.ui.components.login.LoginForm
-import org.iesharia.ui.components.login.RegisterForm
-import org.iesharia.ui.screens.home.HomeScreen
-import org.iesharia.ui.theme.LuchaTheme
+import org.iesharia.core.navigation.AppScreen
+import org.iesharia.core.ui.components.*
+import org.iesharia.features.auth.ui.components.LoginForm
+import org.iesharia.features.auth.ui.components.RegisterForm
+import org.iesharia.core.ui.theme.LuchaTheme
+import org.iesharia.features.auth.ui.viewmodel.LoginViewModel
 import org.jetbrains.compose.resources.painterResource
 
 class LoginScreen : AppScreen() {
