@@ -1,4 +1,4 @@
-package org.iesharia.ui.components.home
+package org.iesharia.features.teams.ui.components
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Card
@@ -10,9 +10,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import org.iesharia.domain.model.Match
-import org.iesharia.domain.model.MatchDay
-import org.iesharia.ui.theme.LuchaTheme
+import org.iesharia.features.teams.domain.model.Match
+import org.iesharia.features.competitions.domain.model.MatchDay
+import org.iesharia.core.ui.theme.LuchaTheme
 
 /**
  * Sección para mostrar una jornada con sus enfrentamientos

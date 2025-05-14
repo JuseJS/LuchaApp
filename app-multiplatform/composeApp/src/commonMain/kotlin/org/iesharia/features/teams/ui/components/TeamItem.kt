@@ -1,4 +1,4 @@
-package org.iesharia.ui.components.home
+package org.iesharia.features.teams.ui.components
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
@@ -8,10 +8,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import org.iesharia.domain.model.Match
-import org.iesharia.domain.model.Team
-import org.iesharia.ui.components.common.SectionSubtitle
-import org.iesharia.ui.theme.LuchaTheme
+import org.iesharia.features.teams.domain.model.Match
+import org.iesharia.features.teams.domain.model.Team
+import org.iesharia.core.ui.components.common.SectionSubtitle
+import org.iesharia.core.ui.theme.LuchaTheme
 
 /**
  * Item para mostrar un equipo con sus últimos y próximos enfrentamientos
