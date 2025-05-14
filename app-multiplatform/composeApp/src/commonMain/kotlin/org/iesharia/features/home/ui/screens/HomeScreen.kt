@@ -1,4 +1,4 @@
-package org.iesharia.ui.screens.home
+package org.iesharia.features.home.ui.screens
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -8,13 +8,25 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import org.iesharia.core.domain.model.Favorite
+import org.iesharia.core.navigation.AppScreen
+import org.iesharia.core.ui.components.LuchaLoadingOverlay
+import org.iesharia.core.ui.components.common.SectionSubtitle
+import org.iesharia.core.ui.theme.LuchaTheme
 import org.iesharia.di.rememberViewModel
-import org.iesharia.domain.model.Favorite
-import org.iesharia.navigation.AppScreen
-import org.iesharia.ui.components.LuchaLoadingOverlay
-import org.iesharia.ui.components.common.SectionSubtitle
-import org.iesharia.ui.components.home.*
-import org.iesharia.ui.theme.LuchaTheme
+import org.iesharia.features.competitions.ui.components.CompetitionItem
+import org.iesharia.features.competitions.ui.components.CompetitionsSection
+import org.iesharia.features.competitions.ui.components.EmptyCompetitions
+import org.iesharia.features.home.ui.components.EmptyFavorites
+import org.iesharia.features.home.ui.components.FavoritesSectionDivider
+import org.iesharia.features.home.ui.components.FavoritesSectionHeader
+import org.iesharia.features.home.ui.components.shouldShowCompetitions
+import org.iesharia.features.home.ui.components.shouldShowTeams
+import org.iesharia.features.home.ui.components.shouldShowWrestlers
+import org.iesharia.features.home.ui.viewmodel.HomeUiState
+import org.iesharia.features.home.ui.viewmodel.HomeViewModel
+import org.iesharia.features.teams.ui.components.TeamItem
+import org.iesharia.features.wrestlers.ui.components.WrestlerItem
 
 /**
  * Pantalla principal de la aplicación, optimizada para mostrar secciones responsivas
