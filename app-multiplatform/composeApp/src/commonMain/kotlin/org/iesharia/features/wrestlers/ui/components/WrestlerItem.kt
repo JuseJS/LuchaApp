@@ -1,7 +1,6 @@
-package org.iesharia.ui.components.home
+package org.iesharia.features.wrestlers.ui.components
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
@@ -15,9 +14,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import org.iesharia.domain.model.Wrestler
-import org.iesharia.domain.model.WrestlerMatchResult
-import org.iesharia.ui.theme.LuchaTheme
+import org.iesharia.features.wrestlers.domain.model.Wrestler
+import org.iesharia.features.wrestlers.domain.model.WrestlerMatchResult
+import org.iesharia.core.ui.theme.LuchaTheme
 
 /**
  * Modelo para representar una agarrada en lucha canaria
