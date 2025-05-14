@@ -1,4 +1,4 @@
-package org.iesharia.domain.model
+package org.iesharia.features.teams.domain.model
 
 import kotlinx.datetime.LocalDateTime
 
