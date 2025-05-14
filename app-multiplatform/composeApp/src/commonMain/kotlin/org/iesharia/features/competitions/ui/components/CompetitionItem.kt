@@ -1,4 +1,4 @@
-package org.iesharia.ui.components.home
+package org.iesharia.features.competitions.ui.components
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Card
@@ -8,9 +8,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import org.iesharia.domain.model.Competition
-import org.iesharia.ui.components.common.SectionSubtitle
-import org.iesharia.ui.theme.LuchaTheme
+import org.iesharia.features.competitions.domain.model.Competition
+import org.iesharia.core.ui.components.common.SectionSubtitle
+import org.iesharia.core.ui.theme.LuchaTheme
+import org.iesharia.features.teams.ui.components.MatchDaySection
 
 /**
  * Item para una competición

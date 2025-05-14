@@ -1,4 +1,4 @@
-package org.iesharia.ui.components.home
+package org.iesharia.features.competitions.ui.components
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
@@ -9,10 +9,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import org.iesharia.domain.model.*
-import org.iesharia.ui.components.common.EmptyStateMessage
-import org.iesharia.ui.screens.home.CompetitionFilters
-import org.iesharia.ui.theme.LuchaTheme
+import org.iesharia.core.domain.model.Island
+import org.iesharia.core.ui.components.common.EmptyStateMessage
+import org.iesharia.features.home.ui.viewmodel.CompetitionFilters
+import org.iesharia.core.ui.theme.LuchaTheme
+import org.iesharia.features.competitions.domain.model.AgeCategory
+import org.iesharia.features.competitions.domain.model.Competition
+import org.iesharia.features.competitions.domain.model.DivisionCategory
 
 /**
  * Sección de competiciones activas en la pantalla de inicio
