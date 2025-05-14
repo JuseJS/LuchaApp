@@ -1,7 +1,7 @@
-package org.iesharia.domain.usecase
+package org.iesharia.features.wrestlers.domain.usecase
 
-import org.iesharia.domain.model.WrestlerMatchResult
-import org.iesharia.domain.repository.CompetitionRepository
+import org.iesharia.features.wrestlers.domain.model.WrestlerMatchResult
+import org.iesharia.features.competitions.domain.repository.CompetitionRepository
 
 class GetWrestlerResultsUseCase(private val repository: CompetitionRepository) {
     /**
