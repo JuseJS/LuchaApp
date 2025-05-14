@@ -1,4 +1,4 @@
-package org.iesharia.domain.model
+package org.iesharia.features.wrestlers.domain.model
 
 import androidx.compose.ui.graphics.Color
 
