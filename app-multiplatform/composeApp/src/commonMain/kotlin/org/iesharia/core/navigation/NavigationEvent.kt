@@ -1,4 +1,4 @@
-package org.iesharia.navigation
+package org.iesharia.core.navigation
 
 import cafe.adriel.voyager.core.screen.Screen
 
