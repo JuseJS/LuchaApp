@@ -1,6 +1,9 @@
-package org.iesharia.domain.repository
+package org.iesharia.features.competitions.domain.repository
 
-import org.iesharia.domain.model.*
+import org.iesharia.core.domain.model.Favorite
+import org.iesharia.features.competitions.domain.model.Competition
+import org.iesharia.features.teams.domain.model.Match
+import org.iesharia.features.wrestlers.domain.model.WrestlerMatchResult
 
 interface CompetitionRepository {
     suspend fun getCompetitions(): List<Competition>
