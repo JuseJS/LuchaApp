@@ -1,4 +1,6 @@
-package org.iesharia.domain.model
+package org.iesharia.features.teams.domain.model
+
+import org.iesharia.core.domain.model.Island
 
 /**
  * Modelo que representa un equipo de lucha canaria
