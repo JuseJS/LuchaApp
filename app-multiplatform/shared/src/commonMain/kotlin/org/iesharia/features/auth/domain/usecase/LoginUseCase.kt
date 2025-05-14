@@ -1,6 +1,6 @@
-package org.iesharia.domain.usecase
+package org.iesharia.features.auth.domain.usecase
 
-import org.iesharia.domain.repository.UserRepository
+import org.iesharia.features.auth.domain.repository.UserRepository
 
 class LoginUseCase(private val repository: UserRepository) {
     suspend operator fun invoke(email: String, password: String): Boolean =
