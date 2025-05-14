@@ -1,6 +1,12 @@
-package org.iesharia.ui.screens.home
+package org.iesharia.features.home.ui.viewmodel
 
-import org.iesharia.domain.model.*
+import org.iesharia.core.domain.model.Favorite
+import org.iesharia.core.domain.model.Island
+import org.iesharia.features.competitions.domain.model.AgeCategory
+import org.iesharia.features.competitions.domain.model.Competition
+import org.iesharia.features.competitions.domain.model.DivisionCategory
+import org.iesharia.features.teams.domain.model.Match
+import org.iesharia.features.wrestlers.domain.model.WrestlerMatchResult
 
 /**
  * Opciones para el tipo de favorito seleccionado

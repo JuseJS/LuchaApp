@@ -1,8 +1,17 @@
-package org.iesharia.ui.screens.home
+package org.iesharia.features.home.ui.viewmodel
 
-import org.iesharia.domain.model.*
-import org.iesharia.domain.usecase.*
-import org.iesharia.ui.base.BaseViewModel
+import org.iesharia.core.common.BaseViewModel
+import org.iesharia.core.domain.model.Favorite
+import org.iesharia.core.domain.model.Island
+import org.iesharia.features.common.domain.usecase.GetFavoritesUseCase
+import org.iesharia.features.competitions.domain.model.AgeCategory
+import org.iesharia.features.competitions.domain.model.Competition
+import org.iesharia.features.competitions.domain.model.DivisionCategory
+import org.iesharia.features.competitions.domain.usecase.GetCompetitionsUseCase
+import org.iesharia.features.teams.domain.model.Match
+import org.iesharia.features.teams.domain.usecase.GetTeamMatchesUseCase
+import org.iesharia.features.wrestlers.domain.model.WrestlerMatchResult
+import org.iesharia.features.wrestlers.domain.usecase.GetWrestlerResultsUseCase
 
 class HomeViewModel(
     private val getCompetitionsUseCase: GetCompetitionsUseCase,
