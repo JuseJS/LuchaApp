@@ -1,4 +1,4 @@
-package org.iesharia.ui.screens.login
+package org.iesharia.features.auth.ui.viewmodel
 
 /**
  * Estado de la pantalla de login

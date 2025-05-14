@@ -1,4 +1,4 @@
-package org.iesharia.ui.screens.login
+package org.iesharia.features.auth.ui.viewmodel
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -6,7 +6,7 @@ import androidx.compose.runtime.setValue
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
-import org.iesharia.ui.base.BaseViewModel
+import org.iesharia.core.common.BaseViewModel
 
 class LoginViewModel : BaseViewModel<LoginUiState>(LoginUiState()) {
 
