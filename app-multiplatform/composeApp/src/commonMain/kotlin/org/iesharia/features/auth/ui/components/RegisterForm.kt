@@ -1,4 +1,4 @@
-package org.iesharia.ui.components.login
+package org.iesharia.features.auth.ui.components
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Email
@@ -7,8 +7,8 @@ import androidx.compose.material.icons.filled.Person
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
-import org.iesharia.ui.components.LuchaButton
-import org.iesharia.ui.components.LuchaButtonType
+import org.iesharia.core.ui.components.LuchaButton
+import org.iesharia.core.ui.components.LuchaButtonType
 
 @Composable
 fun RegisterForm(

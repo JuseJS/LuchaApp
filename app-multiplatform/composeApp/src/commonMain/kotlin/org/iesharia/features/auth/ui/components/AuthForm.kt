@@ -1,4 +1,4 @@
-package org.iesharia.ui.components.login
+package org.iesharia.features.auth.ui.components
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -10,7 +10,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import org.iesharia.ui.theme.LuchaTheme
+import org.iesharia.core.ui.theme.LuchaTheme
 
 /**
  * Componente base para formularios de autenticación

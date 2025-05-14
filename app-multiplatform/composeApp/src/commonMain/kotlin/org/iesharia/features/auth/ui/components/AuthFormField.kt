@@ -1,10 +1,10 @@
-package org.iesharia.ui.components.login
+package org.iesharia.features.auth.ui.components
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
-import org.iesharia.ui.components.LuchaTextField
+import org.iesharia.core.ui.components.LuchaTextField
 
 /**
  * Estructura para representar un campo de formulario
