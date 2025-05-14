@@ -1,4 +1,4 @@
-package org.iesharia.data.repository
+package org.iesharia.features.competitions.data.repository
 
 import kotlinx.datetime.Clock
 import kotlinx.datetime.DatePeriod
@@ -6,8 +6,17 @@ import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.plus
 import kotlinx.datetime.toLocalDateTime
-import org.iesharia.domain.model.*
-import org.iesharia.domain.repository.CompetitionRepository
+import org.iesharia.core.domain.model.Favorite
+import org.iesharia.core.domain.model.Island
+import org.iesharia.features.competitions.domain.repository.CompetitionRepository
+import org.iesharia.features.competitions.domain.model.AgeCategory
+import org.iesharia.features.competitions.domain.model.Competition
+import org.iesharia.features.competitions.domain.model.DivisionCategory
+import org.iesharia.features.competitions.domain.model.MatchDay
+import org.iesharia.features.teams.domain.model.Match
+import org.iesharia.features.teams.domain.model.Team
+import org.iesharia.features.wrestlers.domain.model.Wrestler
+import org.iesharia.features.wrestlers.domain.model.WrestlerMatchResult
 
 /**
  * Función de extensión para añadir/restar días a un LocalDateTime
