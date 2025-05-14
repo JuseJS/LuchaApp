@@ -1,4 +1,4 @@
-package org.iesharia.ui.components.common
+package org.iesharia.core.ui.components.common
 
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
@@ -9,7 +9,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import org.iesharia.ui.theme.LuchaTheme
+import org.iesharia.core.ui.theme.LuchaTheme
 
 /**
  * Componentes comunes optimizados para su reutilización en la aplicación
