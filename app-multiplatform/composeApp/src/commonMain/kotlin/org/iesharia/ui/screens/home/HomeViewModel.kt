@@ -1,24 +1,15 @@
 package org.iesharia.ui.screens.home
 
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
 import org.iesharia.domain.model.*
 import org.iesharia.domain.usecase.*
+import org.iesharia.ui.base.BaseViewModel
 
 class HomeViewModel(
     private val getCompetitionsUseCase: GetCompetitionsUseCase,
     private val getFavoritesUseCase: GetFavoritesUseCase,
     private val getTeamMatchesUseCase: GetTeamMatchesUseCase,
     private val getWrestlerResultsUseCase: GetWrestlerResultsUseCase
-) : ViewModel() {
-
-    private val _uiState = MutableStateFlow(HomeUiState(isLoading = true))
-    val uiState: StateFlow<HomeUiState> = _uiState.asStateFlow()
+) : BaseViewModel<HomeUiState>(HomeUiState(isLoading = true)) {
 
     // Datos cacheados para acceso rápido
     private var competitions: List<Competition> = emptyList()
@@ -34,21 +25,16 @@ class HomeViewModel(
      * Carga los datos iniciales
      */
     private fun loadData() {
-        viewModelScope.launch {
-            try {
-                competitions = getCompetitionsUseCase()
-                favorites = getFavoritesUseCase()
+        launchSafe {
+            competitions = getCompetitionsUseCase()
+            favorites = getFavoritesUseCase()
 
-                _uiState.update {
-                    it.copy(
-                        isLoading = false,
-                        favorites = favorites,
-                        competitions = competitions
-                    )
-                }
-            } catch (e: Exception) {
-                // Manejar error
-                _uiState.update { it.copy(isLoading = false) }
+            updateState {
+                it.copy(
+                    isLoading = false,
+                    favorites = favorites,
+                    competitions = competitions
+                )
             }
         }
     }
@@ -57,18 +43,18 @@ class HomeViewModel(
      * Cambia el tipo de favorito seleccionado
      */
     fun setFavoriteType(type: FavoriteType) {
-        _uiState.update { it.copy(selectedFavoriteType = type) }
+        updateState { it.copy(selectedFavoriteType = type) }
     }
 
     /**
      * Actualiza los filtros de competición
      */
     fun updateFilters(
-        ageCategory: AgeCategory? = _uiState.value.filters.ageCategory,
-        divisionCategory: DivisionCategory? = _uiState.value.filters.divisionCategory,
-        island: Island? = _uiState.value.filters.island
+        ageCategory: AgeCategory? = uiState.value.filters.ageCategory,
+        divisionCategory: DivisionCategory? = uiState.value.filters.divisionCategory,
+        island: Island? = uiState.value.filters.island
     ) {
-        _uiState.update {
+        updateState {
             it.copy(
                 filters = CompetitionFilters(
                     ageCategory = ageCategory,
@@ -83,7 +69,7 @@ class HomeViewModel(
      * Limpia todos los filtros
      */
     fun clearFilters() {
-        _uiState.update {
+        updateState {
             it.copy(filters = CompetitionFilters())
         }
     }
@@ -92,9 +78,9 @@ class HomeViewModel(
      * Obtiene las competiciones filtradas según los criterios seleccionados
      */
     fun getFilteredCompetitions(): List<Competition> {
-        val filters = _uiState.value.filters
+        val filters = uiState.value.filters
 
-        return _uiState.value.competitions.filter { competition ->
+        return uiState.value.competitions.filter { competition ->
             (filters.ageCategory == null || competition.ageCategory == filters.ageCategory) &&
                     (filters.divisionCategory == null || competition.divisionCategory == filters.divisionCategory) &&
                     (filters.island == null || competition.island == filters.island)
@@ -105,11 +91,11 @@ class HomeViewModel(
      * Obtiene los favoritos filtrados según el tipo seleccionado
      */
     fun getFilteredFavorites(): List<Favorite> {
-        return when (_uiState.value.selectedFavoriteType) {
-            FavoriteType.ALL -> _uiState.value.favorites
-            FavoriteType.COMPETITIONS -> _uiState.value.favorites.filterIsInstance<Favorite.CompetitionFavorite>()
-            FavoriteType.TEAMS -> _uiState.value.favorites.filterIsInstance<Favorite.TeamFavorite>()
-            FavoriteType.WRESTLERS -> _uiState.value.favorites.filterIsInstance<Favorite.WrestlerFavorite>()
+        return when (uiState.value.selectedFavoriteType) {
+            FavoriteType.ALL -> uiState.value.favorites
+            FavoriteType.COMPETITIONS -> uiState.value.favorites.filterIsInstance<Favorite.CompetitionFavorite>()
+            FavoriteType.TEAMS -> uiState.value.favorites.filterIsInstance<Favorite.TeamFavorite>()
+            FavoriteType.WRESTLERS -> uiState.value.favorites.filterIsInstance<Favorite.WrestlerFavorite>()
         }
     }
 
@@ -118,12 +104,8 @@ class HomeViewModel(
      */
     fun getTeamLastMatches(teamId: String): List<Match> {
         if (!teamMatchesCache.containsKey(teamId)) {
-            viewModelScope.launch {
-                try {
-                    teamMatchesCache[teamId] = getTeamMatchesUseCase(teamId)
-                } catch (e: Exception) {
-                    // Manejar error
-                }
+            launchSafe {
+                teamMatchesCache[teamId] = getTeamMatchesUseCase(teamId)
             }
         }
         return teamMatchesCache[teamId]?.first ?: emptyList()
@@ -134,12 +116,8 @@ class HomeViewModel(
      */
     fun getTeamNextMatches(teamId: String): List<Match> {
         if (!teamMatchesCache.containsKey(teamId)) {
-            viewModelScope.launch {
-                try {
-                    teamMatchesCache[teamId] = getTeamMatchesUseCase(teamId)
-                } catch (e: Exception) {
-                    // Manejar error
-                }
+            launchSafe {
+                teamMatchesCache[teamId] = getTeamMatchesUseCase(teamId)
             }
         }
         return teamMatchesCache[teamId]?.second ?: emptyList()
@@ -150,14 +128,19 @@ class HomeViewModel(
      */
     fun getWrestlerResults(wrestlerId: String): List<WrestlerMatchResult> {
         if (!wrestlerResultsCache.containsKey(wrestlerId)) {
-            viewModelScope.launch {
-                try {
-                    wrestlerResultsCache[wrestlerId] = getWrestlerResultsUseCase(wrestlerId)
-                } catch (e: Exception) {
-                    // Manejar error
-                }
+            launchSafe {
+                wrestlerResultsCache[wrestlerId] = getWrestlerResultsUseCase(wrestlerId)
             }
         }
         return wrestlerResultsCache[wrestlerId] ?: emptyList()
+    }
+
+    /**
+     * Sobrescribe el manejo de errores por defecto
+     */
+    override fun handleDefaultError(e: Exception) {
+        // Actualizar el estado para mostrar el error en la UI si es necesario
+        updateState { it.copy(isLoading = false) }
+        println("Error en HomeViewModel: ${e.message}")
     }
 }
