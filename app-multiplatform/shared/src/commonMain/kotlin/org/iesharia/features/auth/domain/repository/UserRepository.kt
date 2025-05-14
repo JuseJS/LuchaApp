@@ -1,4 +1,4 @@
-package org.iesharia.domain.repository
+package org.iesharia.features.auth.domain.repository
 
 interface UserRepository {
     suspend fun login(email: String, password: String): Boolean
