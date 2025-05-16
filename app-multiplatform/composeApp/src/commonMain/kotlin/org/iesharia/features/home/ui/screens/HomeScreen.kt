@@ -114,7 +114,7 @@ private fun HomeContent(
                     // Header de la sección de favoritos
                     FavoritesSectionHeader(
                         selectedType = uiState.selectedFavoriteType,
-                        onTypeSelected = viewModel::setFavoriteType
+                        onTypeSelected = { viewModel.setFavoriteType(it) }
                     )
 
                     // Contenido según el tipo seleccionado
@@ -177,7 +177,7 @@ private fun HomeContent(
 
                                     TeamItem(
                                         team = favorite.team,
-                                        onClick = { /* Navegar al detalle */ },
+                                        onClick = { viewModel.navigateToTeamDetail(favorite.team.id) },
                                         lastMatches = lastMatches.take(2),
                                         nextMatches = nextMatches.take(2)
                                     )
@@ -209,7 +209,7 @@ private fun HomeContent(
 
                                     WrestlerItem(
                                         wrestler = favorite.wrestler,
-                                        onClick = { /* Navegar al detalle */ },
+                                        onClick = { viewModel.navigateToWrestlerDetail(favorite.wrestler.id) },
                                         matchResults = results
                                     )
                                 }

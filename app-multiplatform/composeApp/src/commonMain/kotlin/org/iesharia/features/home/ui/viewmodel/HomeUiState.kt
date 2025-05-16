@@ -40,6 +40,7 @@ data class CompetitionFilters(
  */
 data class HomeUiState(
     val isLoading: Boolean = true,
+    val errorMessage: String? = null,  // Campo para mensajes de error
 
     // Favoritos
     val favorites: List<Favorite> = emptyList(),
