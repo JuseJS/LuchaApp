@@ -9,8 +9,8 @@ import org.koin.dsl.module
 
 // Módulo para ViewModels
 val viewModelModule = module {
-    factory { HomeViewModel(get(), get(), get(), get(), get<NavigationManager>()) }
-    factory { LoginViewModel(get<NavigationManager>()) }
+    factory { HomeViewModel(get(), get(), get(), get(), get<NavigationManager>(), get()) }
+    factory { LoginViewModel(get<NavigationManager>(), get()) }
 }
 
 // Módulo para navegación UI
