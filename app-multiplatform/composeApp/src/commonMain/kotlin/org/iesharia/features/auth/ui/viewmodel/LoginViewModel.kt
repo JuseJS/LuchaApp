@@ -6,6 +6,7 @@ import androidx.compose.runtime.setValue
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
+import org.iesharia.core.resources.AppStrings
 import org.iesharia.core.common.BaseViewModel
 
 class LoginViewModel : BaseViewModel<LoginUiState>(LoginUiState()) {
@@ -79,11 +80,10 @@ class LoginViewModel : BaseViewModel<LoginUiState>(LoginUiState()) {
     fun submitLogin() {
         launchSafe(
             handleError = { e ->
-                // Manejo de error
                 updateState {
                     it.copy(
                         isLoading = false,
-                        loginPasswordError = "Error al iniciar sesión: ${e.message}"
+                        loginPasswordError = AppStrings.Auth.loginError + e.message
                     )
                 }
             }
@@ -96,15 +96,15 @@ class LoginViewModel : BaseViewModel<LoginUiState>(LoginUiState()) {
             var passwordError = ""
 
             if (currentState.loginEmail.isBlank()) {
-                emailError = "El correo electrónico es obligatorio"
+                emailError = AppStrings.Auth.emailRequired
                 isValid = false
             } else if (!isValidEmail(currentState.loginEmail)) {
-                emailError = "Correo electrónico inválido"
+                emailError = AppStrings.Auth.invalidEmail
                 isValid = false
             }
 
             if (currentState.loginPassword.isBlank()) {
-                passwordError = "La contraseña es obligatoria"
+                passwordError = AppStrings.Auth.passwordRequired
                 isValid = false
             }
 
@@ -141,7 +141,7 @@ class LoginViewModel : BaseViewModel<LoginUiState>(LoginUiState()) {
                 updateState {
                     it.copy(
                         isLoading = false,
-                        registerPasswordError = "Error al registrarse: ${e.message}"
+                        registerPasswordError = AppStrings.Auth.registerError + e.message
                     )
                 }
             }
@@ -157,33 +157,33 @@ class LoginViewModel : BaseViewModel<LoginUiState>(LoginUiState()) {
             var confirmPasswordError = ""
 
             if (currentState.registerName.isBlank()) {
-                nameError = "El nombre es obligatorio"
+                nameError = AppStrings.Auth.nameRequired
                 isValid = false
             }
 
             if (currentState.registerSurname.isBlank()) {
-                surnameError = "Los apellidos son obligatorios"
+                surnameError = AppStrings.Auth.surnameRequired
                 isValid = false
             }
 
             if (currentState.registerEmail.isBlank()) {
-                emailError = "El correo electrónico es obligatorio"
+                emailError = AppStrings.Auth.emailRequired
                 isValid = false
             } else if (!isValidEmail(currentState.registerEmail)) {
-                emailError = "Correo electrónico inválido"
+                emailError = AppStrings.Auth.invalidEmail
                 isValid = false
             }
 
             if (currentState.registerPassword.isBlank()) {
-                passwordError = "La contraseña es obligatoria"
+                passwordError = AppStrings.Auth.passwordRequired
                 isValid = false
             } else if (currentState.registerPassword.length < 6) {
-                passwordError = "La contraseña debe tener al menos 6 caracteres"
+                passwordError = AppStrings.Auth.passwordTooShort
                 isValid = false
             }
 
             if (currentState.registerConfirmPassword != currentState.registerPassword) {
-                confirmPasswordError = "Las contraseñas no coinciden"
+                confirmPasswordError = AppStrings.Auth.passwordsDontMatch
                 isValid = false
             }
 
