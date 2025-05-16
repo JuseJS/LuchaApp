@@ -7,6 +7,7 @@ import org.iesharia.features.competitions.domain.model.Competition
 import org.iesharia.features.competitions.domain.model.DivisionCategory
 import org.iesharia.features.teams.domain.model.Match
 import org.iesharia.features.wrestlers.domain.model.WrestlerMatchResult
+import org.iesharia.core.resources.AppStrings
 
 /**
  * Opciones para el tipo de favorito seleccionado
@@ -18,10 +19,10 @@ enum class FavoriteType {
     WRESTLERS;
 
     fun displayName(): String = when(this) {
-        ALL -> "Todos"
-        COMPETITIONS -> "Competiciones"
-        TEAMS -> "Equipos"
-        WRESTLERS -> "Luchadores"
+        ALL -> AppStrings.Home.all
+        COMPETITIONS -> AppStrings.Home.competitions
+        TEAMS -> AppStrings.Home.teams
+        WRESTLERS -> AppStrings.Home.wrestlers
     }
 }
 
