@@ -25,6 +25,7 @@ import org.iesharia.features.auth.ui.components.RegisterForm
 import org.iesharia.core.ui.theme.LuchaTheme
 import org.iesharia.features.auth.ui.viewmodel.LoginViewModel
 import org.jetbrains.compose.resources.painterResource
+import org.iesharia.core.resources.AppStrings
 
 class LoginScreen : AppScreen() {
     @Composable
@@ -59,15 +60,15 @@ class LoginScreen : AppScreen() {
                     // Logo (ahora usando componente global)
                     LuchaAppLogo(
                         painter = painterResource(Res.drawable.app_logo),
-                        contentDescription = "Logo de Lucha Canaria"
+                        contentDescription = AppStrings.Common.appLogoDesc
                     )
 
                     Spacer(modifier = Modifier.height(LuchaTheme.dimensions.spacing_32))
 
                     // Encabezado (ahora usando componente global)
                     LuchaAppHeader(
-                        title = "Lucha Canaria",
-                        subtitle = "Tradición y Deporte"
+                        title = AppStrings.Common.appName,
+                        subtitle = AppStrings.Common.appSubtitle
                     )
 
                     Spacer(modifier = Modifier.height(LuchaTheme.dimensions.spacing_40))
@@ -148,9 +149,9 @@ class LoginScreen : AppScreen() {
                         // Botón para alternar entre login y registro
                         LuchaButton(
                             text = if (uiState.isLoginMode)
-                                "¿No tienes cuenta? Regístrate"
+                                AppStrings.Auth.noAccount
                             else
-                                "¿Ya tienes cuenta? Inicia sesión",
+                                AppStrings.Auth.alreadyHaveAccount,
                             onClick = viewModel::toggleAuthMode,
                             type = LuchaButtonType.TEXT,
                             customColor = MaterialTheme.colorScheme.secondary
