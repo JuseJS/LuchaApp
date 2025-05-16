@@ -2,8 +2,11 @@ package org.iesharia.features.auth.data.repository
 
 import org.iesharia.features.auth.domain.repository.UserRepository
 import kotlinx.coroutines.delay
+import org.iesharia.core.data.mock.MockDataGenerator
 
-class MockUserRepository : UserRepository {
+class MockUserRepository(
+    private val mockDataGenerator: MockDataGenerator
+) : UserRepository {
     private var isLoggedIn = false
 
     override suspend fun login(email: String, password: String): Boolean {
