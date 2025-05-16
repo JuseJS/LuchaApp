@@ -12,12 +12,15 @@ import org.iesharia.features.teams.domain.model.Match
 import org.iesharia.features.teams.domain.usecase.GetTeamMatchesUseCase
 import org.iesharia.features.wrestlers.domain.model.WrestlerMatchResult
 import org.iesharia.features.wrestlers.domain.usecase.GetWrestlerResultsUseCase
+import org.iesharia.core.navigation.NavigationManager
+import org.iesharia.core.navigation.Routes
 
 class HomeViewModel(
     private val getCompetitionsUseCase: GetCompetitionsUseCase,
     private val getFavoritesUseCase: GetFavoritesUseCase,
     private val getTeamMatchesUseCase: GetTeamMatchesUseCase,
-    private val getWrestlerResultsUseCase: GetWrestlerResultsUseCase
+    private val getWrestlerResultsUseCase: GetWrestlerResultsUseCase,
+    private val navigationManager: NavigationManager
 ) : BaseViewModel<HomeUiState>(HomeUiState(isLoading = true)) {
 
     // Datos cacheados para acceso rápido
@@ -142,6 +145,25 @@ class HomeViewModel(
             }
         }
         return wrestlerResultsCache[wrestlerId] ?: emptyList()
+    }
+
+    // Añadir métodos de navegación
+    fun navigateToCompetitionDetail(competitionId: String) {
+        launchSafe {
+            navigationManager.navigateWithParams(Routes.Competition.Detail(), competitionId)
+        }
+    }
+
+    fun navigateToTeamDetail(teamId: String) {
+        launchSafe {
+            navigationManager.navigateWithParams(Routes.Team.Detail(), teamId)
+        }
+    }
+
+    fun navigateToWrestlerDetail(wrestlerId: String) {
+        launchSafe {
+            navigationManager.navigateWithParams(Routes.Wrestler.Detail(), wrestlerId)
+        }
     }
 
     /**
