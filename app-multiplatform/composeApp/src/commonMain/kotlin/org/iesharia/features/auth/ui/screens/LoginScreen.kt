@@ -12,33 +12,31 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import cafe.adriel.voyager.navigator.LocalNavigator
-import cafe.adriel.voyager.navigator.currentOrThrow
 import luchaapp.composeapp.generated.resources.Res
 import luchaapp.composeapp.generated.resources.app_logo
-import org.iesharia.features.home.ui.screens.HomeScreen
-import org.iesharia.di.rememberViewModel
 import org.iesharia.core.navigation.AppScreen
+import org.iesharia.core.navigation.HandleNavigationManager
+import org.iesharia.core.navigation.NavigationManager
+import org.iesharia.core.resources.AppStrings
 import org.iesharia.core.ui.components.*
+import org.iesharia.core.ui.theme.LuchaTheme
+import org.iesharia.di.rememberViewModel
 import org.iesharia.features.auth.ui.components.LoginForm
 import org.iesharia.features.auth.ui.components.RegisterForm
-import org.iesharia.core.ui.theme.LuchaTheme
 import org.iesharia.features.auth.ui.viewmodel.LoginViewModel
 import org.jetbrains.compose.resources.painterResource
-import org.iesharia.core.resources.AppStrings
+import org.koin.compose.koinInject
 
 class LoginScreen : AppScreen() {
     @Composable
     override fun Content() {
         val viewModel = rememberViewModel<LoginViewModel>()
         val uiState by viewModel.uiState.collectAsState()
-        val navigator = LocalNavigator.currentOrThrow
+        val navigator = requireNavigator()
+        val navigationManager = koinInject<NavigationManager>()
 
-        // Observar eventos de navegación
-        if (viewModel.isLoggedIn) {
-            navigator.push(HomeScreen())
-            viewModel.resetLoginState()
-        }
+        // Manejar navegación
+        navigator.HandleNavigationManager(navigationManager)
 
         Surface(
             modifier = Modifier.fillMaxSize(),
