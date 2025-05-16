@@ -16,7 +16,13 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import org.iesharia.features.wrestlers.domain.model.Wrestler
 import org.iesharia.features.wrestlers.domain.model.WrestlerMatchResult
+import org.iesharia.core.ui.components.common.BadgeStatus
+import org.iesharia.core.ui.components.common.InfoBadge
+import org.iesharia.core.ui.components.common.ItemCard
+import org.iesharia.core.ui.components.common.StaticItemCard
+import org.iesharia.core.ui.components.common.StatusBadge
 import org.iesharia.core.ui.theme.LuchaTheme
+import org.iesharia.core.resources.AppStrings
 
 /**
  * Modelo para representar una agarrada en lucha canaria
@@ -36,16 +42,10 @@ fun WrestlerItem(
     modifier: Modifier = Modifier,
     matchResults: List<WrestlerMatchResult> = emptyList()
 ) {
-    Card(
-        modifier = modifier.fillMaxWidth(),
-        shape = LuchaTheme.shapes.cardShape,
-        onClick = onClick
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(LuchaTheme.dimensions.spacing_16)
-        ) {
+    ItemCard(
+        onClick = onClick,
+        modifier = modifier,
+        title = {
             // Cabecera del luchador
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -94,43 +94,37 @@ fun WrestlerItem(
 
                         // Logros/Clasificación del luchador - mostramos solo si hay logros adicionales
                         wrestler.achievements.firstOrNull()?.let {
-                            Surface(
-                                shape = LuchaTheme.shapes.small,
-                                color = MaterialTheme.colorScheme.secondaryContainer,
-                                contentColor = MaterialTheme.colorScheme.onSecondaryContainer
-                            ) {
-                                Text(
-                                    text = it,
-                                    style = MaterialTheme.typography.labelSmall,
-                                    modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
-                                )
-                            }
+                            InfoBadge(
+                                text = it,
+                                color = MaterialTheme.colorScheme.onSecondaryContainer,
+                                backgroundColor = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.3f)
+                            )
                         }
                     }
                 }
             }
+        }
+    ) {
+        // Resultados de enfrentamientos
+        if (matchResults.isNotEmpty()) {
+            Spacer(modifier = Modifier.height(LuchaTheme.dimensions.spacing_16))
 
-            // Resultados de enfrentamientos
-            if (matchResults.isNotEmpty()) {
-                Spacer(modifier = Modifier.height(LuchaTheme.dimensions.spacing_16))
+            Text(
+                text = AppStrings.Wrestlers.recentMatches,
+                style = MaterialTheme.typography.titleSmall,
+                color = MaterialTheme.colorScheme.secondary,
+                fontWeight = FontWeight.Bold
+            )
 
-                Text(
-                    text = "Últimos enfrentamientos",
-                    style = MaterialTheme.typography.titleSmall,
-                    color = MaterialTheme.colorScheme.secondary,
-                    fontWeight = FontWeight.Bold
+            Spacer(modifier = Modifier.height(LuchaTheme.dimensions.spacing_8))
+
+            // Lista de resultados
+            matchResults.forEach { result ->
+                WrestlerMatchResultView(
+                    result = result,
+                    luchador = wrestler
                 )
-
                 Spacer(modifier = Modifier.height(LuchaTheme.dimensions.spacing_8))
-
-                // Lista de resultados
-                matchResults.forEach { result ->
-                    WrestlerMatchResultView(
-                        result = result,
-                        luchador = wrestler
-                    )
-                    Spacer(modifier = Modifier.height(LuchaTheme.dimensions.spacing_8))
-                }
             }
         }
     }
@@ -144,13 +138,11 @@ fun WrestlerMatchResultView(
     result: WrestlerMatchResult,
     luchador: Wrestler
 ) {
-    Card(
+    StaticItemCard(
         modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant
-        )
-    ) {
-        Column(modifier = Modifier.padding(LuchaTheme.dimensions.spacing_12)) {
+        containerColor = MaterialTheme.colorScheme.surfaceVariant,
+        contentPadding = PaddingValues(LuchaTheme.dimensions.spacing_12),
+        title = {
             // Fecha y resultado
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -163,92 +155,92 @@ fun WrestlerMatchResultView(
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
 
-                // Badge de resultado
-                Surface(
-                    shape = LuchaTheme.shapes.small,
-                    color = result.result.color().copy(alpha = 0.3f),
-                    contentColor = result.result.color()
-                ) {
-                    Text(
-                        text = result.result.displayName(),
-                        style = MaterialTheme.typography.labelMedium,
-                        fontWeight = FontWeight.Medium,
-                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
-                    )
-                }
-            }
-
-            Spacer(modifier = Modifier.height(LuchaTheme.dimensions.spacing_12))
-
-            // Enfrentamiento entre luchadores
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                // Luchador principal - CORREGIDO: Usar position en lugar de achievements
-                WrestlerInfoColumn(
-                    nombre = luchador.fullName,
-                    clasificacion = luchador.position, // CORREGIDO: usar position en lugar de achievements
-                    faltas = result.fouls,
-                    modifier = Modifier.weight(1f)
-                )
-
-                // Separador central
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    modifier = Modifier.padding(horizontal = 8.dp)
-                ) {
-                    Text(
-                        text = "VS",
-                        style = MaterialTheme.typography.bodyMedium,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.primary
-                    )
-
-                    // Categoría (Regional/Juvenil)
-                    Spacer(modifier = Modifier.height(4.dp))
-                    Text(
-                        text = result.category,
-                        style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        textAlign = TextAlign.Center
-                    )
+                // Badge de resultado usando el componente StatusBadge
+                val status = when(result.result) {
+                    WrestlerMatchResult.Result.WIN -> BadgeStatus.SUCCESS
+                    WrestlerMatchResult.Result.LOSS -> BadgeStatus.ERROR
+                    WrestlerMatchResult.Result.DRAW -> BadgeStatus.WARNING
+                    WrestlerMatchResult.Result.EXPELLED,
+                    WrestlerMatchResult.Result.SEPARATED -> BadgeStatus.NEUTRAL
                 }
 
-                // Oponente
-                WrestlerInfoColumn(
-                    nombre = result.opponentName,
-                    clasificacion = result.classification, // Esto ya usa el valor correcto del WrestlerMatchResult
-                    faltas = result.opponentFouls,
-                    modifier = Modifier.weight(1f)
+                StatusBadge(
+                    text = result.result.displayName(),
+                    status = status
                 )
             }
+        }
+    ) {
+        Spacer(modifier = Modifier.height(LuchaTheme.dimensions.spacing_12))
 
-            // Agarradas
-            Spacer(modifier = Modifier.height(LuchaTheme.dimensions.spacing_12))
-
-            // Obtenemos las agarradas del resultado
-            val agarradas = getAgarradasFromResult(result, luchador.fullName)
-
-            Text(
-                text = "Agarradas",
-                style = MaterialTheme.typography.labelMedium,
-                fontWeight = FontWeight.Medium,
-                color = MaterialTheme.colorScheme.primary
+        // Enfrentamiento entre luchadores
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            // Luchador principal
+            WrestlerInfoColumn(
+                nombre = luchador.fullName,
+                clasificacion = luchador.position,
+                faltas = result.fouls,
+                modifier = Modifier.weight(1f)
             )
 
-            Spacer(modifier = Modifier.height(8.dp))
-
-            // Mostrar agarradas
-            agarradas.forEachIndexed { index, agarrada ->
-                AgarradaItem(
-                    agarrada = agarrada,
-                    numeroAgarrada = index + 1
+            // Separador central
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier.padding(horizontal = 8.dp)
+            ) {
+                Text(
+                    text = AppStrings.Wrestlers.vs,
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.primary
                 )
 
-                if (index < agarradas.size - 1) {
-                    Spacer(modifier = Modifier.height(4.dp))
-                }
+                // Categoría (Regional/Juvenil)
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    text = result.category,
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    textAlign = TextAlign.Center
+                )
+            }
+
+            // Oponente
+            WrestlerInfoColumn(
+                nombre = result.opponentName,
+                clasificacion = result.classification,
+                faltas = result.opponentFouls,
+                modifier = Modifier.weight(1f)
+            )
+        }
+
+        // Agarradas
+        Spacer(modifier = Modifier.height(LuchaTheme.dimensions.spacing_12))
+
+        // Obtenemos las agarradas del resultado
+        val agarradas = getAgarradasFromResult(result, luchador.fullName)
+
+        Text(
+            text = AppStrings.Wrestlers.agarradas,
+            style = MaterialTheme.typography.labelMedium,
+            fontWeight = FontWeight.Medium,
+            color = MaterialTheme.colorScheme.primary
+        )
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        // Mostrar agarradas
+        agarradas.forEachIndexed { index, agarrada ->
+            AgarradaItem(
+                agarrada = agarrada,
+                numeroAgarrada = index + 1
+            )
+
+            if (index < agarradas.size - 1) {
+                Spacer(modifier = Modifier.height(4.dp))
             }
         }
     }
@@ -280,42 +272,24 @@ private fun WrestlerInfoColumn(
 
         Spacer(modifier = Modifier.height(4.dp))
 
-        // Clasificación
-        Surface(
-            shape = LuchaTheme.shapes.small,
-            color = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.3f),
-            contentColor = MaterialTheme.colorScheme.secondary
-        ) {
-            Text(
-                text = clasificacion,
-                style = MaterialTheme.typography.labelSmall,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-                modifier = Modifier.padding(horizontal = 4.dp, vertical = 2.dp),
-                textAlign = TextAlign.Center
-            )
-        }
+        // Clasificación usando InfoBadge
+        InfoBadge(
+            text = clasificacion,
+            color = MaterialTheme.colorScheme.secondary,
+            backgroundColor = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.3f)
+        )
 
         Spacer(modifier = Modifier.height(4.dp))
 
-        // Faltas
-        Surface(
-            shape = LuchaTheme.shapes.small,
-            color = if (faltas > 0)
+        // Faltas usando InfoBadge con colores condicionales
+        InfoBadge(
+            text = AppStrings.Wrestlers.foulsFormat.format(faltas),
+            color = if (faltas > 0) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurfaceVariant,
+            backgroundColor = if (faltas > 0)
                 MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.3f)
             else
-                MaterialTheme.colorScheme.surfaceVariant,
-            contentColor = if (faltas > 0)
-                MaterialTheme.colorScheme.error
-            else
-                MaterialTheme.colorScheme.onSurfaceVariant
-        ) {
-            Text(
-                text = "$faltas faltas",
-                style = MaterialTheme.typography.labelSmall,
-                modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
-            )
-        }
+                MaterialTheme.colorScheme.surfaceVariant
+        )
     }
 }
 
@@ -357,7 +331,7 @@ private fun AgarradaItem(
             // Información de la agarrada
             if (agarrada.esSeparada) {
                 Text(
-                    text = "Separada",
+                    text = AppStrings.Wrestlers.separated,
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.tertiary,
                     fontWeight = FontWeight.Medium
@@ -370,7 +344,7 @@ private fun AgarradaItem(
                 )
             } else {
                 Text(
-                    text = "Sin resultado",
+                    text = AppStrings.Wrestlers.noResult,
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
