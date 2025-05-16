@@ -13,10 +13,8 @@ import androidx.compose.ui.text.style.TextAlign
 import org.iesharia.features.teams.domain.model.Match
 import org.iesharia.features.competitions.domain.model.MatchDay
 import org.iesharia.core.ui.theme.LuchaTheme
+import org.iesharia.core.resources.AppStrings
 
-/**
- * Sección para mostrar una jornada con sus enfrentamientos
- */
 @Composable
 fun MatchDaySection(
     matchDay: MatchDay,
@@ -45,9 +43,6 @@ fun MatchDaySection(
     }
 }
 
-/**
- * Item para un enfrentamiento
- */
 @Composable
 fun MatchItem(
     match: Match,
@@ -82,7 +77,7 @@ fun MatchItem(
 
                 // Separador
                 Text(
-                    text = "vs",
+                    text = AppStrings.Teams.vs,
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.padding(horizontal = LuchaTheme.dimensions.spacing_8)
@@ -123,9 +118,6 @@ fun MatchItem(
     }
 }
 
-/**
- * Muestra el nombre y puntuación de un equipo
- */
 @Composable
 private fun TeamScore(
     teamName: String,
