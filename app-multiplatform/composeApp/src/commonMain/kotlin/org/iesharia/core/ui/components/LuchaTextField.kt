@@ -25,6 +25,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import org.iesharia.core.ui.theme.LuchaTheme
+import org.iesharia.core.resources.AppStrings
 
 /**
  * Campo de texto personalizado para la aplicación de Lucha Canaria
@@ -117,7 +118,10 @@ private fun PasswordVisibilityToggle(
     IconButton(onClick = onTogglePasswordVisibility) {
         Icon(
             imageVector = icon,
-            contentDescription = if (passwordVisible) "Ocultar contraseña" else "Mostrar contraseña"
+            contentDescription = if (passwordVisible)
+                AppStrings.Auth.hidePassword
+            else
+                AppStrings.Auth.showPassword
         )
     }
 }
