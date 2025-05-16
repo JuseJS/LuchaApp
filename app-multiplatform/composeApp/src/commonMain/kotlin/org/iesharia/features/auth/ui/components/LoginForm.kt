@@ -6,6 +6,7 @@ import androidx.compose.material.icons.filled.Lock
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
+import org.iesharia.core.resources.AppStrings
 import org.iesharia.core.ui.components.LuchaButton
 import org.iesharia.core.ui.components.LuchaButtonType
 
@@ -24,7 +25,7 @@ fun LoginForm(
         FormField(
             value = email,
             onValueChange = onEmailChange,
-            label = "Correo electrónico",
+            label = AppStrings.Auth.email,
             error = emailError,
             leadingIcon = Icons.Filled.Email,
             keyboardType = KeyboardType.Email
@@ -32,7 +33,7 @@ fun LoginForm(
         FormField(
             value = password,
             onValueChange = onPasswordChange,
-            label = "Contraseña",
+            label = AppStrings.Auth.password,
             error = passwordError,
             leadingIcon = Icons.Filled.Lock,
             isPassword = true,
@@ -41,10 +42,10 @@ fun LoginForm(
     )
 
     AuthForm(
-        title = "Iniciar Sesión",
+        title = AppStrings.Auth.login,
         fields = fields,
         onSubmit = onSubmit,
-        submitButtonText = "Iniciar Sesión",
+        submitButtonText = AppStrings.Auth.login,
         isLoading = isLoading,
         renderButton = { text, onClick, enabled ->
             LuchaButton(
