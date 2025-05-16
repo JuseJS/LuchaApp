@@ -7,6 +7,7 @@ import androidx.compose.material.icons.filled.Person
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
+import org.iesharia.core.resources.AppStrings
 import org.iesharia.core.ui.components.LuchaButton
 import org.iesharia.core.ui.components.LuchaButtonType
 
@@ -34,21 +35,21 @@ fun RegisterForm(
         FormField(
             value = name,
             onValueChange = onNameChange,
-            label = "Nombre",
+            label = AppStrings.Auth.name,
             error = nameError,
             leadingIcon = Icons.Filled.Person
         ),
         FormField(
             value = surname,
             onValueChange = onSurnameChange,
-            label = "Apellidos",
+            label = AppStrings.Auth.surname,
             error = surnameError,
             leadingIcon = Icons.Filled.Person
         ),
         FormField(
             value = email,
             onValueChange = onEmailChange,
-            label = "Correo electrónico",
+            label = AppStrings.Auth.email,
             error = emailError,
             leadingIcon = Icons.Filled.Email,
             keyboardType = KeyboardType.Email
@@ -56,7 +57,7 @@ fun RegisterForm(
         FormField(
             value = password,
             onValueChange = onPasswordChange,
-            label = "Contraseña",
+            label = AppStrings.Auth.password,
             error = passwordError,
             leadingIcon = Icons.Filled.Lock,
             isPassword = true
@@ -64,7 +65,7 @@ fun RegisterForm(
         FormField(
             value = confirmPassword,
             onValueChange = onConfirmPasswordChange,
-            label = "Confirmar contraseña",
+            label = AppStrings.Auth.confirmPassword,
             error = confirmPasswordError,
             leadingIcon = Icons.Filled.Lock,
             isPassword = true,
@@ -73,10 +74,10 @@ fun RegisterForm(
     )
 
     AuthForm(
-        title = "Crear Cuenta",
+        title = AppStrings.Auth.createAccount,
         fields = fields,
         onSubmit = onSubmit,
-        submitButtonText = "Registrarse",
+        submitButtonText = AppStrings.Auth.register,
         isLoading = isLoading,
         renderButton = { text, onClick, enabled ->
             LuchaButton(
