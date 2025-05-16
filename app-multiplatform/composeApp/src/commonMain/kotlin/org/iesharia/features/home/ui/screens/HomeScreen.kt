@@ -8,6 +8,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
 import org.iesharia.core.domain.model.Favorite
 import org.iesharia.core.navigation.AppScreen
 import org.iesharia.core.ui.components.LuchaLoadingOverlay
@@ -27,6 +28,7 @@ import org.iesharia.features.home.ui.viewmodel.HomeUiState
 import org.iesharia.features.home.ui.viewmodel.HomeViewModel
 import org.iesharia.features.teams.ui.components.TeamItem
 import org.iesharia.features.wrestlers.ui.components.WrestlerItem
+import org.iesharia.core.resources.AppStrings
 
 /**
  * Pantalla principal de la aplicación, optimizada para mostrar secciones responsivas
@@ -63,9 +65,22 @@ class HomeScreen : AppScreen() {
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun HomeTopBar() {
-    // ... Sin cambios
+    CenterAlignedTopAppBar(
+        title = {
+            Text(
+                text = AppStrings.Common.appName,
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.Bold
+            )
+        },
+        colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+            containerColor = MaterialTheme.colorScheme.surface,
+            titleContentColor = MaterialTheme.colorScheme.primary
+        )
+    )
 }
 
 /**
@@ -108,7 +123,7 @@ private fun HomeContent(
                         // Sección de competiciones
                         if (competitions.isNotEmpty() && shouldShowCompetitions(uiState.selectedFavoriteType)) {
                             SectionSubtitle(
-                                subtitle = "Competiciones Favoritas",
+                                subtitle = AppStrings.Competitions.favoriteCompetitions,
                                 modifier = Modifier.padding(horizontal = LuchaTheme.dimensions.spacing_16)
                             )
 
@@ -136,7 +151,7 @@ private fun HomeContent(
                         // Sección de equipos
                         if (teams.isNotEmpty() && shouldShowTeams(uiState.selectedFavoriteType)) {
                             SectionSubtitle(
-                                subtitle = "Equipos Favoritos",
+                                subtitle = AppStrings.Teams.favoriteTeams,
                                 modifier = Modifier.padding(horizontal = LuchaTheme.dimensions.spacing_16)
                             )
 
@@ -169,7 +184,7 @@ private fun HomeContent(
                         // Sección de luchadores
                         if (wrestlers.isNotEmpty() && shouldShowWrestlers(uiState.selectedFavoriteType)) {
                             SectionSubtitle(
-                                subtitle = "Luchadores Favoritos",
+                                subtitle = AppStrings.Wrestlers.favoriteWrestlers,
                                 modifier = Modifier.padding(horizontal = LuchaTheme.dimensions.spacing_16)
                             )
 
