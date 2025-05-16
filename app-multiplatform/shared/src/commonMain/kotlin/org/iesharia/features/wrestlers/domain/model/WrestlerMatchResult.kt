@@ -1,10 +1,8 @@
 package org.iesharia.features.wrestlers.domain.model
 
 import androidx.compose.ui.graphics.Color
+import org.iesharia.core.resources.AppStrings
 
-/**
- * Modelo para representar los resultados de un luchador en un enfrentamiento
- */
 data class WrestlerMatchResult(
     val opponentName: String,
     val result: Result,
@@ -18,11 +16,11 @@ data class WrestlerMatchResult(
         WIN, LOSS, DRAW, EXPELLED, SEPARATED;
 
         fun displayName(): String = when(this) {
-            WIN -> "Victoria"
-            LOSS -> "Derrota"
-            DRAW -> "Empate"
-            EXPELLED -> "Expulsión por faltas"
-            SEPARATED -> "Separación"
+            WIN -> AppStrings.Wrestlers.Results.win
+            LOSS -> AppStrings.Wrestlers.Results.loss
+            DRAW -> AppStrings.Wrestlers.Results.draw
+            EXPELLED -> AppStrings.Wrestlers.Results.expelled
+            SEPARATED -> AppStrings.Wrestlers.Results.separated
         }
 
         fun color(): Color = when(this) {
