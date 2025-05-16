@@ -16,11 +16,8 @@ import org.iesharia.core.ui.theme.LuchaTheme
 import org.iesharia.features.competitions.domain.model.AgeCategory
 import org.iesharia.features.competitions.domain.model.Competition
 import org.iesharia.features.competitions.domain.model.DivisionCategory
+import org.iesharia.core.resources.AppStrings
 
-/**
- * Sección de competiciones activas en la pantalla de inicio
- * Adaptada para funcionar dentro de un LazyColumn
- */
 @Composable
 fun CompetitionsSection(
     competitions: List<Competition>,
@@ -29,7 +26,7 @@ fun CompetitionsSection(
     onClearFilters: () -> Unit,
     onCompetitionClick: (Competition) -> Unit,
     modifier: Modifier = Modifier,
-    showEmptyState: Boolean = true // Nuevo parámetro para controlar si se muestra el estado vacío
+    showEmptyState: Boolean = true
 ) {
     Column(
         modifier = modifier
@@ -66,9 +63,6 @@ fun CompetitionsSection(
     }
 }
 
-/**
- * Cabecera de la sección de competiciones
- */
 @Composable
 private fun CompetitionSectionHeader(
     hasActiveFilters: Boolean,
@@ -84,7 +78,7 @@ private fun CompetitionSectionHeader(
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Text(
-            text = "Competiciones Activas",
+            text = AppStrings.Competitions.activeCompetitions,
             style = MaterialTheme.typography.titleLarge,
             fontWeight = FontWeight.Bold
         )
@@ -100,22 +94,19 @@ private fun CompetitionSectionHeader(
                 ) {
                     Icon(
                         imageVector = Icons.Default.FilterList,
-                        contentDescription = "Filtrar competiciones"
+                        contentDescription = AppStrings.Competitions.filterCompetitions
                     )
                 }
             } else {
                 Icon(
                     imageVector = Icons.Default.FilterList,
-                    contentDescription = "Filtrar competiciones"
+                    contentDescription = AppStrings.Competitions.filterCompetitions
                 )
             }
         }
     }
 }
 
-/**
- * Diálogo de filtros para competiciones
- */
 @Composable
 fun FiltersDialog(
     currentFilters: CompetitionFilters,
@@ -129,12 +120,12 @@ fun FiltersDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Filtrar competiciones") },
+        title = { Text(AppStrings.Competitions.filterCompetitions) },
         text = {
             Column(modifier = Modifier.fillMaxWidth()) {
                 // Filtro de categoría por edad
                 Text(
-                    text = "Categoría",
+                    text = AppStrings.Competitions.category,
                     style = MaterialTheme.typography.titleMedium,
                     modifier = Modifier.padding(vertical = LuchaTheme.dimensions.spacing_8)
                 )
@@ -158,7 +149,7 @@ fun FiltersDialog(
 
                 // Filtro de división
                 Text(
-                    text = "División",
+                    text = AppStrings.Competitions.division,
                     style = MaterialTheme.typography.titleMedium,
                     modifier = Modifier.padding(vertical = LuchaTheme.dimensions.spacing_8)
                 )
@@ -182,7 +173,7 @@ fun FiltersDialog(
 
                 // Filtro de isla
                 Text(
-                    text = "Isla",
+                    text = AppStrings.Competitions.island,
                     style = MaterialTheme.typography.titleMedium,
                     modifier = Modifier.padding(vertical = LuchaTheme.dimensions.spacing_8)
                 )
@@ -210,7 +201,7 @@ fun FiltersDialog(
                     onDismiss()
                 }
             ) {
-                Text("Aplicar")
+                Text(AppStrings.Common.apply)
             }
         },
         dismissButton = {
@@ -220,15 +211,12 @@ fun FiltersDialog(
                     onDismiss()
                 }
             ) {
-                Text("Limpiar filtros")
+                Text(AppStrings.Competitions.clearFilters)
             }
         }
     )
 }
 
-/**
- * Mensaje para cuando no hay competiciones
- */
 @Composable
 fun EmptyCompetitions() {
     Box(
@@ -237,6 +225,6 @@ fun EmptyCompetitions() {
             .height(200.dp),
         contentAlignment = Alignment.Center
     ) {
-        EmptyStateMessage("No hay competiciones activas con los filtros seleccionados")
+        EmptyStateMessage(AppStrings.Home.noCompetitionsWithFilter)
     }
 }
