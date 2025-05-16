@@ -8,21 +8,22 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
 import org.iesharia.core.resources.AppStrings
 import org.iesharia.core.common.BaseViewModel
+import org.iesharia.core.navigation.NavigationManager
+import org.iesharia.core.navigation.Routes
 
-class LoginViewModel : BaseViewModel<LoginUiState>(LoginUiState()) {
+class LoginViewModel(
+    private val navigationManager: NavigationManager
+) : BaseViewModel<LoginUiState>(LoginUiState()) {
 
-    // Estado para controlar la navegación
-    var isLoggedIn by mutableStateOf(false)
-        private set
+    private fun navigateToHome() {
+        launchSafe {
+            navigationManager.navigate(Routes.Home.Main)
+        }
+    }
 
     // Cambiar entre modos login/registro
     fun toggleAuthMode() {
         updateState { it.copy(isLoginMode = !it.isLoginMode) }
-    }
-
-    // Método para resetear el estado de login (después de navegar)
-    fun resetLoginState() {
-        isLoggedIn = false
     }
 
     // Métodos para actualizar campos del login
@@ -130,7 +131,7 @@ class LoginViewModel : BaseViewModel<LoginUiState>(LoginUiState()) {
 
             // Login exitoso - ahora navegamos a la pantalla de inicio
             updateState { it.copy(isLoading = false) }
-            isLoggedIn = true
+            navigateToHome()
         }
     }
 
@@ -212,7 +213,7 @@ class LoginViewModel : BaseViewModel<LoginUiState>(LoginUiState()) {
 
             // Registro exitoso
             updateState { it.copy(isLoading = false) }
-            isLoggedIn = true
+            navigateToHome()
         }
     }
 
