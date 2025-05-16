@@ -29,6 +29,9 @@ import org.iesharia.features.home.ui.viewmodel.HomeViewModel
 import org.iesharia.features.teams.ui.components.TeamItem
 import org.iesharia.features.wrestlers.ui.components.WrestlerItem
 import org.iesharia.core.resources.AppStrings
+import org.iesharia.core.navigation.NavigationManager
+import org.iesharia.core.navigation.HandleNavigationManager
+import org.koin.compose.koinInject
 
 /**
  * Pantalla principal de la aplicación, optimizada para mostrar secciones responsivas
@@ -38,6 +41,11 @@ class HomeScreen : AppScreen() {
     override fun Content() {
         val viewModel = rememberViewModel<HomeViewModel>()
         val uiState by viewModel.uiState.collectAsState()
+        val navigator = requireNavigator()
+        val navigationManager = koinInject<NavigationManager>()
+
+        // Manejar navegación
+        navigator.HandleNavigationManager(navigationManager)
 
         Scaffold(
             topBar = {
@@ -136,7 +144,7 @@ private fun HomeContent(
                                 competitions.forEach { favorite ->
                                     CompetitionItem(
                                         competition = favorite.competition,
-                                        onClick = { /* Navegar al detalle */ },
+                                        onClick = { viewModel.navigateToCompetitionDetail(favorite.competition.id) },
                                         showMatchDays = true
                                     )
                                 }
@@ -248,7 +256,7 @@ private fun HomeContent(
             items(filteredCompetitions) { competition ->
                 CompetitionItem(
                     competition = competition,
-                    onClick = { /* Navegar al detalle de la competición */ },
+                    onClick = { viewModel.navigateToCompetitionDetail(competition.id) },
                     modifier = Modifier.padding(
                         horizontal = LuchaTheme.dimensions.spacing_16,
                         vertical = LuchaTheme.dimensions.spacing_8
