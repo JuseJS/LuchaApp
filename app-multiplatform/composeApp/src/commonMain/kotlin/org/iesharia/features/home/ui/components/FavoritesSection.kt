@@ -15,10 +15,8 @@ import org.iesharia.core.ui.components.common.EmptyStateMessage
 import org.iesharia.core.ui.components.common.SectionTitle
 import org.iesharia.features.home.ui.viewmodel.FavoriteType
 import org.iesharia.core.ui.theme.LuchaTheme
+import org.iesharia.core.resources.AppStrings
 
-/**
- * Cabecera para la sección de favoritos con título y chips de filtro
- */
 @Composable
 fun FavoritesSectionHeader(
     selectedType: FavoriteType,
@@ -32,7 +30,7 @@ fun FavoritesSectionHeader(
     ) {
         // Título de la sección
         SectionTitle(
-            title = "Favoritos"
+            title = AppStrings.Home.favorites
         )
 
         Spacer(modifier = Modifier.height(LuchaTheme.dimensions.spacing_12))
@@ -56,9 +54,6 @@ fun FavoritesSectionHeader(
     }
 }
 
-/**
- * Mensaje para cuando no hay favoritos
- */
 @Composable
 fun EmptyFavorites(selectedType: FavoriteType) {
     Box(
@@ -68,14 +63,11 @@ fun EmptyFavorites(selectedType: FavoriteType) {
         contentAlignment = Alignment.Center
     ) {
         EmptyStateMessage(
-            "No tienes ${selectedType.displayName().lowercase()} en favoritos"
+            AppStrings.Home.noFavorites.format(selectedType.displayName().lowercase())
         )
     }
 }
 
-/**
- * Separador visual con espaciado para usar entre secciones
- */
 @Composable
 fun FavoritesSectionDivider() {
     Column(modifier = Modifier.fillMaxWidth()) {
@@ -85,23 +77,14 @@ fun FavoritesSectionDivider() {
     }
 }
 
-/**
- * Ayuda a determinar si se deben mostrar competiciones basado en el tipo de favorito seleccionado
- */
 fun shouldShowCompetitions(selectedType: FavoriteType): Boolean {
     return selectedType == FavoriteType.ALL || selectedType == FavoriteType.COMPETITIONS
 }
 
-/**
- * Ayuda a determinar si se deben mostrar equipos basado en el tipo de favorito seleccionado
- */
 fun shouldShowTeams(selectedType: FavoriteType): Boolean {
     return selectedType == FavoriteType.ALL || selectedType == FavoriteType.TEAMS
 }
 
-/**
- * Ayuda a determinar si se deben mostrar luchadores basado en el tipo de favorito seleccionado
- */
 fun shouldShowWrestlers(selectedType: FavoriteType): Boolean {
     return selectedType == FavoriteType.ALL || selectedType == FavoriteType.WRESTLERS
 }
