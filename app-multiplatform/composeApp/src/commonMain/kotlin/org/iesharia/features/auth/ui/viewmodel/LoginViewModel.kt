@@ -1,19 +1,19 @@
 package org.iesharia.features.auth.ui.viewmodel
 
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
 import org.iesharia.core.resources.AppStrings
 import org.iesharia.core.common.BaseViewModel
+import org.iesharia.core.common.ErrorHandler
+import org.iesharia.core.domain.model.AppError
 import org.iesharia.core.navigation.NavigationManager
 import org.iesharia.core.navigation.Routes
 
 class LoginViewModel(
-    private val navigationManager: NavigationManager
-) : BaseViewModel<LoginUiState>(LoginUiState()) {
+    private val navigationManager: NavigationManager,
+    errorHandler: ErrorHandler
+) : BaseViewModel<LoginUiState>(LoginUiState(), errorHandler) {
 
     private fun navigateToHome() {
         launchSafe {
@@ -80,44 +80,44 @@ class LoginViewModel(
     // Validación y envío de login
     fun submitLogin() {
         launchSafe(
-            handleError = { e ->
-                updateState {
-                    it.copy(
-                        isLoading = false,
-                        loginPasswordError = AppStrings.Auth.loginError + e.message
-                    )
+            handleAppError = { error ->
+                // Actualizar UI según el tipo de error
+                when (error) {
+                    is AppError.ValidationError -> {
+                        updateState {
+                            it.copy(
+                                isLoading = false,
+                                loginEmailError = (if (error.field == "email") error.message else it.loginEmailError).toString(),
+                                loginPasswordError = (if (error.field == "password") error.message else it.loginPasswordError).toString()
+                            )
+                        }
+                    }
+                    is AppError.AuthError -> {
+                        updateState {
+                            it.copy(
+                                isLoading = false,
+                                loginPasswordError = error.message.toString()
+                            )
+                        }
+                    }
+                    else -> {
+                        // Para otros tipos de errores, simplemente actualizamos el estado
+                        updateState { it.copy(isLoading = false) }
+                    }
                 }
             }
         ) {
             val currentState = uiState.value
 
             // Validar campos
-            var isValid = true
-            var emailError = ""
-            var passwordError = ""
-
             if (currentState.loginEmail.isBlank()) {
-                emailError = AppStrings.Auth.emailRequired
-                isValid = false
+                throw AppError.ValidationError(field = "email", message = AppStrings.Auth.emailRequired)
             } else if (!isValidEmail(currentState.loginEmail)) {
-                emailError = AppStrings.Auth.invalidEmail
-                isValid = false
+                throw AppError.ValidationError(field = "email", message = AppStrings.Auth.invalidEmail)
             }
 
             if (currentState.loginPassword.isBlank()) {
-                passwordError = AppStrings.Auth.passwordRequired
-                isValid = false
-            }
-
-            // Actualizar errores si hay
-            if (!isValid) {
-                updateState {
-                    it.copy(
-                        loginEmailError = emailError,
-                        loginPasswordError = passwordError
-                    )
-                }
-                return@launchSafe
+                throw AppError.ValidationError(field = "password", message = AppStrings.Auth.passwordRequired)
             }
 
             // Iniciar carga
@@ -127,6 +127,11 @@ class LoginViewModel(
             withContext(Dispatchers.IO) {
                 // Aquí iría la lógica real para hacer login con el backend
                 delay(1000)
+
+                // Simulamos una falla ocasional (en un entorno real, esto vendría del backend)
+                if (currentState.loginEmail == "error@test.com") {
+                    throw AppError.AuthError(message = AppStrings.Auth.loginError)
+                }
             }
 
             // Login exitoso - ahora navegamos a la pantalla de inicio
@@ -138,68 +143,70 @@ class LoginViewModel(
     // Validación y envío de registro
     fun submitRegister() {
         launchSafe(
-            handleError = { e ->
-                updateState {
-                    it.copy(
-                        isLoading = false,
-                        registerPasswordError = AppStrings.Auth.registerError + e.message
-                    )
+            handleAppError = { error ->
+                // Actualizar UI según el tipo de error
+                when (error) {
+                    is AppError.ValidationError -> {
+                        // Si es un error específico de un campo, actualizamos ese campo
+                        val field = error.field
+                        val errorMessage = error.message // Garantizado no-nulo
+
+                        updateState {
+                            when (field) {
+                                "email" -> it.copy(isLoading = false, registerEmailError = errorMessage.toString())
+                                "password" -> it.copy(isLoading = false, registerPasswordError = errorMessage.toString())
+                                "name" -> it.copy(isLoading = false, registerNameError = errorMessage.toString())
+                                "surname" -> it.copy(isLoading = false, registerSurnameError = errorMessage.toString())
+                                "confirmPassword" -> it.copy(isLoading = false, registerConfirmPasswordError = errorMessage.toString())
+                                else -> it.copy(
+                                    isLoading = false,
+                                    registerPasswordError = errorMessage.toString()
+                                )
+                            }
+                        }
+                    }
+                    is AppError.ServerError -> {
+                        // Aseguramos que el mensaje nunca sea nulo
+                        val errorMessage = error.message
+                        updateState {
+                            it.copy(
+                                isLoading = false,
+                                registerEmailError = errorMessage.toString()
+                            )
+                        }
+                    }
+                    else -> {
+                        // Para otros tipos de errores, capturamos el mensaje de manera segura
+                        updateState { it.copy(isLoading = false) }
+                    }
                 }
             }
         ) {
             val currentState = uiState.value
 
-            // Validación de campos...
-            var isValid = true
-            var nameError = ""
-            var surnameError = ""
-            var emailError = ""
-            var passwordError = ""
-            var confirmPasswordError = ""
-
+            // Validación de campos
             if (currentState.registerName.isBlank()) {
-                nameError = AppStrings.Auth.nameRequired
-                isValid = false
+                throw AppError.ValidationError(field = "name", message = AppStrings.Auth.nameRequired)
             }
 
             if (currentState.registerSurname.isBlank()) {
-                surnameError = AppStrings.Auth.surnameRequired
-                isValid = false
+                throw AppError.ValidationError(field = "surname", message = AppStrings.Auth.surnameRequired)
             }
 
             if (currentState.registerEmail.isBlank()) {
-                emailError = AppStrings.Auth.emailRequired
-                isValid = false
+                throw AppError.ValidationError(field = "email", message = AppStrings.Auth.emailRequired)
             } else if (!isValidEmail(currentState.registerEmail)) {
-                emailError = AppStrings.Auth.invalidEmail
-                isValid = false
+                throw AppError.ValidationError(field = "email", message = AppStrings.Auth.invalidEmail)
             }
 
             if (currentState.registerPassword.isBlank()) {
-                passwordError = AppStrings.Auth.passwordRequired
-                isValid = false
+                throw AppError.ValidationError(field = "password", message = AppStrings.Auth.passwordRequired)
             } else if (currentState.registerPassword.length < 6) {
-                passwordError = AppStrings.Auth.passwordTooShort
-                isValid = false
+                throw AppError.ValidationError(field = "password", message = AppStrings.Auth.passwordTooShort)
             }
 
             if (currentState.registerConfirmPassword != currentState.registerPassword) {
-                confirmPasswordError = AppStrings.Auth.passwordsDontMatch
-                isValid = false
-            }
-
-            // Actualizar errores si hay
-            if (!isValid) {
-                updateState {
-                    it.copy(
-                        registerNameError = nameError,
-                        registerSurnameError = surnameError,
-                        registerEmailError = emailError,
-                        registerPasswordError = passwordError,
-                        registerConfirmPasswordError = confirmPasswordError
-                    )
-                }
-                return@launchSafe
+                throw AppError.ValidationError(field = "confirmPassword", message = AppStrings.Auth.passwordsDontMatch)
             }
 
             // Iniciar carga
@@ -209,6 +216,11 @@ class LoginViewModel(
             withContext(Dispatchers.IO) {
                 // Simular el registro
                 delay(1000)
+
+                // Simulamos una falla ocasional (en un entorno real, esto vendría del backend)
+                if (currentState.registerEmail == "error@test.com") {
+                    throw AppError.ServerError(message = AppStrings.Auth.registerError)
+                }
             }
 
             // Registro exitoso
