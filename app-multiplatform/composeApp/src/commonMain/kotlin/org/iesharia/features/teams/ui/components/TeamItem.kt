@@ -1,21 +1,21 @@
 package org.iesharia.features.teams.ui.components
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.material3.*
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import org.iesharia.core.ui.components.common.ItemCard
+import org.iesharia.core.ui.components.common.SubSectionList
+import org.iesharia.core.ui.theme.LuchaTheme
 import org.iesharia.features.teams.domain.model.Match
 import org.iesharia.features.teams.domain.model.Team
-import org.iesharia.core.ui.components.common.SectionSubtitle
-import org.iesharia.core.ui.theme.LuchaTheme
+import org.iesharia.core.resources.AppStrings
 
-/**
- * Item para mostrar un equipo con sus últimos y próximos enfrentamientos
- */
 @Composable
 fun TeamItem(
     team: Team,
@@ -24,29 +24,17 @@ fun TeamItem(
     lastMatches: List<Match> = emptyList(),
     nextMatches: List<Match> = emptyList()
 ) {
-    Card(
-        modifier = modifier.fillMaxWidth(),
-        shape = LuchaTheme.shapes.cardShape,
-        onClick = onClick
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(LuchaTheme.dimensions.spacing_16)
-        ) {
-            // Cabecera del equipo
+    ItemCard(
+        onClick = onClick,
+        modifier = modifier,
+        title = {
+            // Logo e información del equipo
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                // Logo del equipo (si hay)
-                if (team.imageUrl.isNotEmpty()) {
-                    // Implementar carga de imagen
-                    Spacer(modifier = Modifier.width(LuchaTheme.dimensions.spacing_16))
-                }
-
+                // Aquí iría el logo si está disponible
                 Column(modifier = Modifier.weight(1f)) {
-                    // Nombre del equipo
                     Text(
                         text = team.name,
                         style = MaterialTheme.typography.titleLarge,
@@ -55,63 +43,62 @@ fun TeamItem(
 
                     Spacer(modifier = Modifier.height(LuchaTheme.dimensions.spacing_4))
 
-                    // Isla
                     Text(
-                        text = "Isla: ${team.island.displayName()}",
+                        text = AppStrings.Teams.islandLabel.format(team.island.displayName()),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
             }
+        }
+    ) {
+        // Solo mostrar secciones si hay enfrentamientos
+        if (lastMatches.isNotEmpty() || nextMatches.isNotEmpty()) {
+            Spacer(modifier = Modifier.height(LuchaTheme.dimensions.spacing_16))
 
-            // Solo mostrar secciones si hay enfrentamientos
-            if (lastMatches.isNotEmpty() || nextMatches.isNotEmpty()) {
-                Spacer(modifier = Modifier.height(LuchaTheme.dimensions.spacing_16))
-
-                // Últimos enfrentamientos
-                if (lastMatches.isNotEmpty()) {
-                    SectionSubtitle(
-                        subtitle = "Últimos Enfrentamientos",
-                        modifier = Modifier.padding(horizontal = 0.dp)
+            // Mostrar últimos enfrentamientos usando SubSectionList
+            if (lastMatches.isNotEmpty()) {
+                SubSectionList(
+                    items = lastMatches.take(2),
+                    subtitle = AppStrings.Teams.lastMatches,
+                    emptyContent = {},
+                    contentPadding = PaddingValues(0.dp)
+                ) { match ->
+                    MatchItem(
+                        match = match,
+                        modifier = Modifier.padding(vertical = LuchaTheme.dimensions.spacing_8)
                     )
-
-                    lastMatches.take(2).forEach { match ->
-                        MatchItem(
-                            match = match,
-                            modifier = Modifier.padding(vertical = LuchaTheme.dimensions.spacing_8)
-                        )
-                    }
-
-                    if (nextMatches.isNotEmpty()) {
-                        Spacer(modifier = Modifier.height(LuchaTheme.dimensions.spacing_16))
-                    }
                 }
 
-                // Próximos enfrentamientos
                 if (nextMatches.isNotEmpty()) {
-                    SectionSubtitle(
-                        subtitle = "Próximos Enfrentamientos",
-                        modifier = Modifier.padding(horizontal = 0.dp)
-                    )
-
-                    nextMatches.take(2).forEach { match ->
-                        MatchItem(
-                            match = match,
-                            modifier = Modifier.padding(vertical = LuchaTheme.dimensions.spacing_8)
-                        )
-                    }
+                    Spacer(modifier = Modifier.height(LuchaTheme.dimensions.spacing_16))
                 }
-            } else {
-                Spacer(modifier = Modifier.height(LuchaTheme.dimensions.spacing_16))
-
-                Text(
-                    text = "No hay enfrentamientos recientes",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.fillMaxWidth()
-                )
             }
+
+            // Mostrar próximos enfrentamientos usando SubSectionList
+            if (nextMatches.isNotEmpty()) {
+                SubSectionList(
+                    items = nextMatches.take(2),
+                    subtitle = AppStrings.Teams.nextMatches,
+                    emptyContent = {},
+                    contentPadding = PaddingValues(0.dp)
+                ) { match ->
+                    MatchItem(
+                        match = match,
+                        modifier = Modifier.padding(vertical = LuchaTheme.dimensions.spacing_8)
+                    )
+                }
+            }
+        } else {
+            Spacer(modifier = Modifier.height(LuchaTheme.dimensions.spacing_16))
+
+            Text(
+                text = AppStrings.Teams.noRecentMatches,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.fillMaxWidth()
+            )
         }
     }
 }
