@@ -1,5 +1,6 @@
 package org.iesharia.di
 
+import org.iesharia.core.data.mock.MockDataGenerator
 import org.iesharia.features.competitions.data.repository.MockCompetitionRepository
 import org.iesharia.features.auth.data.repository.MockUserRepository
 import org.iesharia.features.competitions.domain.repository.CompetitionRepository
@@ -19,8 +20,9 @@ import org.iesharia.core.navigation.NavigationManager
  * Módulo para los repositorios
  */
 private val repositoryModule = module {
-    single<CompetitionRepository> { MockCompetitionRepository() }
-    single<UserRepository> { MockUserRepository() }
+    single { MockDataGenerator() }
+    single<CompetitionRepository> { MockCompetitionRepository(get()) }
+    single<UserRepository> { MockUserRepository(get()) }
 }
 
 /**
