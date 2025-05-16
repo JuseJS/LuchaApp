@@ -1,5 +1,7 @@
 package org.iesharia.di
 
+import org.iesharia.core.common.DefaultErrorHandler
+import org.iesharia.core.common.ErrorHandler
 import org.iesharia.core.data.mock.MockDataGenerator
 import org.iesharia.features.competitions.data.repository.MockCompetitionRepository
 import org.iesharia.features.auth.data.repository.MockUserRepository
@@ -15,6 +17,14 @@ import org.koin.core.context.startKoin
 import org.koin.core.module.Module
 import org.koin.dsl.module
 import org.iesharia.core.navigation.NavigationManager
+
+/**
+ * Módulo para servicios comunes
+ */
+private val commonModule = module {
+    // Registrar el ErrorHandler
+    single<ErrorHandler> { DefaultErrorHandler() }
+}
 
 /**
  * Módulo para los repositorios
@@ -44,6 +54,7 @@ private val navigationModule = module {
  * Lista de todos los módulos del paquete shared
  */
 internal val sharedModules = listOf(
+    commonModule, // Añadir el módulo común
     repositoryModule,
     useCaseModule,
     navigationModule
