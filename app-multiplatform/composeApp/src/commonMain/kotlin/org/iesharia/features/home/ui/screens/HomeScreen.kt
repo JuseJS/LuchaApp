@@ -11,6 +11,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import org.iesharia.core.domain.model.Favorite
 import org.iesharia.core.navigation.AppScreen
+import org.iesharia.core.navigation.HandleNavigationManager
+import org.iesharia.core.navigation.NavigationManager
 import org.iesharia.core.ui.components.LuchaLoadingOverlay
 import org.iesharia.core.ui.components.common.SectionSubtitle
 import org.iesharia.core.ui.theme.LuchaTheme
@@ -29,8 +31,6 @@ import org.iesharia.features.home.ui.viewmodel.HomeViewModel
 import org.iesharia.features.teams.ui.components.TeamItem
 import org.iesharia.features.wrestlers.ui.components.WrestlerItem
 import org.iesharia.core.resources.AppStrings
-import org.iesharia.core.navigation.NavigationManager
-import org.iesharia.core.navigation.HandleNavigationManager
 import org.koin.compose.koinInject
 
 /**
@@ -38,7 +38,7 @@ import org.koin.compose.koinInject
  */
 class HomeScreen : AppScreen() {
     @Composable
-    override fun Content() {
+    override fun ScreenContent() {
         val viewModel = rememberViewModel<HomeViewModel>()
         val uiState by viewModel.uiState.collectAsState()
         val navigator = requireNavigator()
