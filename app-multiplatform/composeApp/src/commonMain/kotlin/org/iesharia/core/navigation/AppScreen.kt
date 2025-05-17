@@ -4,7 +4,6 @@ import androidx.compose.runtime.Composable
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import org.koin.compose.koinInject
 
 /**
  * Clase base para todas las pantallas de la aplicación
@@ -17,23 +16,18 @@ abstract class AppScreen : Screen {
     protected fun requireNavigator() = LocalNavigator.currentOrThrow
 
     /**
-     * Navega a una ruta específica.
+     * Contenido específico de la pantalla a implementar por las subclases
      */
     @Composable
-    protected fun navigateTo(route: NavigationRoute) {
-        val navigator = requireNavigator()
-        val navigationFactory: NavigationFactory = koinInject()
-
-        val screen = navigationFactory.createScreen(route)
-        navigator.push(screen)
-    }
+    protected abstract fun ScreenContent()
 
     /**
-     * Navega hacia atrás.
+     * Implementación final del método Content de Screen
+     * Este método no puede ser sobrescrito por las subclases
      */
     @Composable
-    protected fun navigateBack() {
-        val navigator = requireNavigator()
-        navigator.pop()
+    final override fun Content() {
+        // Llamar al contenido específico de la pantalla
+        ScreenContent()
     }
 }
