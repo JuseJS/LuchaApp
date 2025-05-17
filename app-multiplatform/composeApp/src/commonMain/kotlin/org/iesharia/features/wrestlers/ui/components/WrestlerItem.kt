@@ -21,13 +21,13 @@ import org.iesharia.core.ui.components.common.InfoBadge
 import org.iesharia.core.ui.components.common.ItemCard
 import org.iesharia.core.ui.components.common.StaticItemCard
 import org.iesharia.core.ui.components.common.StatusBadge
-import org.iesharia.core.ui.theme.LuchaTheme
+import org.iesharia.core.ui.theme.WrestlingTheme
 import org.iesharia.core.resources.AppStrings
 
 /**
  * Modelo para representar una agarrada en lucha canaria
  */
-data class Agarrada(
+data class Grip(
     val ganador: String = "", // Nombre completo del ganador
     val esSeparada: Boolean = false // Indica si la agarrada fue separada
 )
@@ -72,7 +72,7 @@ fun WrestlerItem(
                     }
                 }
 
-                Spacer(modifier = Modifier.width(LuchaTheme.dimensions.spacing_12))
+                Spacer(modifier = Modifier.width(WrestlingTheme.dimensions.spacing_12))
 
                 // Información básica del luchador
                 Column(modifier = Modifier.weight(1f)) {
@@ -107,7 +107,7 @@ fun WrestlerItem(
     ) {
         // Resultados de enfrentamientos
         if (matchResults.isNotEmpty()) {
-            Spacer(modifier = Modifier.height(LuchaTheme.dimensions.spacing_16))
+            Spacer(modifier = Modifier.height(WrestlingTheme.dimensions.spacing_16))
 
             Text(
                 text = AppStrings.Wrestlers.recentMatches,
@@ -116,7 +116,7 @@ fun WrestlerItem(
                 fontWeight = FontWeight.Bold
             )
 
-            Spacer(modifier = Modifier.height(LuchaTheme.dimensions.spacing_8))
+            Spacer(modifier = Modifier.height(WrestlingTheme.dimensions.spacing_8))
 
             // Lista de resultados
             matchResults.forEach { result ->
@@ -124,7 +124,7 @@ fun WrestlerItem(
                     result = result,
                     luchador = wrestler
                 )
-                Spacer(modifier = Modifier.height(LuchaTheme.dimensions.spacing_8))
+                Spacer(modifier = Modifier.height(WrestlingTheme.dimensions.spacing_8))
             }
         }
     }
@@ -141,7 +141,7 @@ fun WrestlerMatchResultView(
     StaticItemCard(
         modifier = Modifier.fillMaxWidth(),
         containerColor = MaterialTheme.colorScheme.surfaceVariant,
-        contentPadding = PaddingValues(LuchaTheme.dimensions.spacing_12),
+        contentPadding = PaddingValues(WrestlingTheme.dimensions.spacing_12),
         title = {
             // Fecha y resultado
             Row(
@@ -171,7 +171,7 @@ fun WrestlerMatchResultView(
             }
         }
     ) {
-        Spacer(modifier = Modifier.height(LuchaTheme.dimensions.spacing_12))
+        Spacer(modifier = Modifier.height(WrestlingTheme.dimensions.spacing_12))
 
         // Enfrentamiento entre luchadores
         Row(
@@ -218,10 +218,10 @@ fun WrestlerMatchResultView(
         }
 
         // Agarradas
-        Spacer(modifier = Modifier.height(LuchaTheme.dimensions.spacing_12))
+        Spacer(modifier = Modifier.height(WrestlingTheme.dimensions.spacing_12))
 
         // Obtenemos las agarradas del resultado
-        val agarradas = getAgarradasFromResult(result, luchador.fullName)
+        val agarradas = getGripsFromResult(result, luchador.fullName)
 
         Text(
             text = AppStrings.Wrestlers.agarradas,
@@ -235,7 +235,7 @@ fun WrestlerMatchResultView(
         // Mostrar agarradas
         agarradas.forEachIndexed { index, agarrada ->
             AgarradaItem(
-                agarrada = agarrada,
+                grip = agarrada,
                 numeroAgarrada = index + 1
             )
 
@@ -298,11 +298,11 @@ private fun WrestlerInfoColumn(
  */
 @Composable
 private fun AgarradaItem(
-    agarrada: Agarrada,
+    grip: Grip,
     numeroAgarrada: Int
 ) {
     Surface(
-        shape = LuchaTheme.shapes.small,
+        shape = WrestlingTheme.shapes.small,
         color = MaterialTheme.colorScheme.surface
     ) {
         Row(
@@ -329,16 +329,16 @@ private fun AgarradaItem(
             Spacer(modifier = Modifier.width(8.dp))
 
             // Información de la agarrada
-            if (agarrada.esSeparada) {
+            if (grip.esSeparada) {
                 Text(
                     text = AppStrings.Wrestlers.separated,
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.tertiary,
                     fontWeight = FontWeight.Medium
                 )
-            } else if (agarrada.ganador.isNotEmpty()) {
+            } else if (grip.ganador.isNotEmpty()) {
                 Text(
-                    text = agarrada.ganador,
+                    text = grip.ganador,
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurface
                 )
@@ -356,39 +356,39 @@ private fun AgarradaItem(
 /**
  * Obtiene las agarradas a partir de un resultado
  */
-private fun getAgarradasFromResult(result: WrestlerMatchResult, luchadorNombre: String): List<Agarrada> {
-    val agarradas = mutableListOf<Agarrada>()
+private fun getGripsFromResult(result: WrestlerMatchResult, luchadorNombre: String): List<Grip> {
+    val grips = mutableListOf<Grip>()
 
     when (result.result) {
         WrestlerMatchResult.Result.WIN -> {
             // Victoria, el luchador gana 2-3 agarradas
-            agarradas.add(Agarrada(ganador = luchadorNombre))
-            agarradas.add(Agarrada(ganador = result.opponentName))
-            agarradas.add(Agarrada(ganador = luchadorNombre))
+            grips.add(Grip(ganador = luchadorNombre))
+            grips.add(Grip(ganador = result.opponentName))
+            grips.add(Grip(ganador = luchadorNombre))
         }
         WrestlerMatchResult.Result.LOSS -> {
             // Derrota, el oponente gana 2-3 agarradas
-            agarradas.add(Agarrada(ganador = result.opponentName))
-            agarradas.add(Agarrada(ganador = luchadorNombre))
-            agarradas.add(Agarrada(ganador = result.opponentName))
+            grips.add(Grip(ganador = result.opponentName))
+            grips.add(Grip(ganador = luchadorNombre))
+            grips.add(Grip(ganador = result.opponentName))
         }
         WrestlerMatchResult.Result.DRAW -> {
             // Empate, normalmente 2-2
-            agarradas.add(Agarrada(ganador = luchadorNombre))
-            agarradas.add(Agarrada(ganador = result.opponentName))
-            agarradas.add(Agarrada(ganador = luchadorNombre))
-            agarradas.add(Agarrada(ganador = result.opponentName))
+            grips.add(Grip(ganador = luchadorNombre))
+            grips.add(Grip(ganador = result.opponentName))
+            grips.add(Grip(ganador = luchadorNombre))
+            grips.add(Grip(ganador = result.opponentName))
         }
         WrestlerMatchResult.Result.EXPELLED -> {
             // Expulsión, una agarrada y luego expulsión
-            agarradas.add(Agarrada(ganador = result.opponentName))
-            agarradas.add(Agarrada(esSeparada = true))
+            grips.add(Grip(ganador = result.opponentName))
+            grips.add(Grip(esSeparada = true))
         }
         WrestlerMatchResult.Result.SEPARATED -> {
             // Separación, normalmente una agarrada y luego separación
-            agarradas.add(Agarrada(ganador = luchadorNombre))
-            agarradas.add(Agarrada(esSeparada = true))
+            grips.add(Grip(ganador = luchadorNombre))
+            grips.add(Grip(esSeparada = true))
         }
     }
-    return agarradas
+    return grips
 }
