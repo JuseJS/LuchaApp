@@ -10,7 +10,6 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.EmojiEvents
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
@@ -19,7 +18,6 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -30,13 +28,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.times
-import org.iesharia.core.navigation.AppScreen
-import org.iesharia.core.navigation.HandleNavigationManager
-import org.iesharia.core.navigation.NavigationManager
-import org.iesharia.core.ui.components.ErrorSnackbarHost
-import org.iesharia.core.ui.components.ViewModelErrorHandler
-import org.iesharia.core.ui.components.WrestlingLoadingOverlay
 import org.iesharia.core.ui.components.common.EmptyStateMessage
+import org.iesharia.core.ui.screens.BaseContentScreen
 import org.iesharia.core.ui.theme.WrestlingTheme
 import org.iesharia.di.rememberViewModel
 import org.iesharia.features.competitions.domain.model.Competition
@@ -45,87 +38,60 @@ import org.iesharia.features.competitions.ui.viewmodel.CompetitionDetailUiState
 import org.iesharia.features.competitions.ui.viewmodel.CompetitionDetailViewModel
 import org.iesharia.features.teams.domain.model.Team
 import org.iesharia.features.teams.ui.components.MatchDaySection
-import org.koin.compose.koinInject
 import org.koin.core.parameter.parametersOf
 
-class CompetitionDetailScreen(private val competitionId: String) : AppScreen() {
-    @OptIn(ExperimentalMaterial3Api::class)
+class CompetitionDetailScreen(private val competitionId: String) : BaseContentScreen() {
+
+    private lateinit var viewModel: CompetitionDetailViewModel
+
     @Composable
-    override fun ScreenContent() {
-        val viewModel = rememberViewModel<CompetitionDetailViewModel> { parametersOf(competitionId) }
+    override fun SetupViewModel() {
+        viewModel = rememberViewModel<CompetitionDetailViewModel> { parametersOf(competitionId) }
+    }
+
+    @Composable
+    override fun ScreenTitle(): String {
         val uiState by viewModel.uiState.collectAsState()
-        val navigator = requireNavigator()
-        val navigationManager = koinInject<NavigationManager>()
+        return uiState.competition?.name ?: "Detalle de Competición"
+    }
 
-        // Configurar manejo de errores
-        val snackbarHostState = remember { SnackbarHostState() }
-        ViewModelErrorHandler(
-            viewModel = viewModel,
-            snackbarHostState = snackbarHostState
-        )
+    @Composable
+    override fun OnNavigateBack(): () -> Unit {
+        return { viewModel.navigateBack() }
+    }
 
-        // Manejar navegación
-        navigator.HandleNavigationManager(navigationManager)
+    @Composable
+    override fun TopBarActions() {
+        val uiState by viewModel.uiState.collectAsState()
 
-        Scaffold(
-            topBar = {
-                CenterAlignedTopAppBar(
-                    title = {
-                        Text(
-                            text = uiState.competition?.name ?: "Detalle de Competición",
-                            style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.Bold
-                        )
-                    },
-                    navigationIcon = {
-                        IconButton(onClick = { viewModel.navigateBack() }) {
-                            Icon(
-                                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                                contentDescription = "Volver"
-                            )
-                        }
-                    },
-                    actions = {
-                        IconButton(onClick = { viewModel.toggleFavorite() }) {
-                            Icon(
-                                imageVector = if (uiState.isFavorite) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
-                                contentDescription = if (uiState.isFavorite) "Quitar de favoritos" else "Agregar a favoritos",
-                                tint = if (uiState.isFavorite) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                        }
-                    },
-                    colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                        containerColor = MaterialTheme.colorScheme.surface,
-                        titleContentColor = MaterialTheme.colorScheme.primary
-                    )
-                )
-            },
-            snackbarHost = {
-                ErrorSnackbarHost(snackbarHostState)
-            }
-        ) { paddingValues ->
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(paddingValues)
-            ) {
-                when {
-                    uiState.isLoading -> {
-                        WrestlingLoadingOverlay()
-                    }
-                    uiState.competition == null -> {
-                        EmptyStateMessage(
-                            message = uiState.errorMessage ?: "No se encontró la competición"
-                        )
-                    }
-                    else -> {
-                        CompetitionDetailContent(
-                            uiState = uiState,
-                            onTeamClick = { /* Navegación a detalles del equipo (placeholder) */ }
-                        )
-                    }
-                }
-            }
+        IconButton(onClick = { viewModel.toggleFavorite() }) {
+            Icon(
+                imageVector = if (uiState.isFavorite) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
+                contentDescription = if (uiState.isFavorite) "Quitar de favoritos" else "Agregar a favoritos",
+                tint = if (uiState.isFavorite) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+    }
+
+    @Composable
+    override fun IsLoading(): Boolean {
+        val uiState by viewModel.uiState.collectAsState()
+        return uiState.isLoading
+    }
+
+    @Composable
+    override fun ContentImpl() {
+        val uiState by viewModel.uiState.collectAsState()
+
+        if (uiState.competition == null && !uiState.isLoading) {
+            EmptyStateMessage(
+                message = uiState.errorMessage ?: "No se encontró la competición"
+            )
+        } else if (!uiState.isLoading) {
+            CompetitionDetailContent(
+                uiState = uiState,
+                onTeamClick = { /* Navegación a detalles del equipo (placeholder) */ }
+            )
         }
     }
 }
