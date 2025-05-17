@@ -9,70 +9,58 @@ import androidx.compose.ui.graphics.Color
 import org.iesharia.core.ui.theme.WrestlingTheme
 
 /**
- * Componente Card base para elementos con estructura común
+ * Componente Card unificado con opción clickable/no-clickable
  */
 @Composable
 fun ItemCard(
-    onClick: () -> Unit,
     modifier: Modifier = Modifier,
     title: @Composable () -> Unit,
     subtitle: @Composable (() -> Unit)? = null,
+    onClick: (() -> Unit)? = null,
     contentPadding: PaddingValues = PaddingValues(WrestlingTheme.dimensions.spacing_16),
     containerColor: Color = Color.Unspecified,
-    content: @Composable ColumnScope.() -> Unit
+    content: @Composable ColumnScope.() -> Unit = {}
 ) {
-    Card(
-        modifier = modifier.fillMaxWidth(),
-        shape = WrestlingTheme.shapes.cardShape,
-        onClick = onClick,
-        colors = if(containerColor != Color.Unspecified)
-            CardDefaults.cardColors(containerColor = containerColor)
-        else CardDefaults.cardColors()
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(contentPadding)
+    val cardColors = if (containerColor != Color.Unspecified) {
+        CardDefaults.cardColors(containerColor = containerColor)
+    } else {
+        CardDefaults.cardColors()
+    }
+
+    if (onClick != null) {
+        Card(
+            modifier = modifier.fillMaxWidth(),
+            shape = WrestlingTheme.shapes.cardShape,
+            onClick = onClick,
+            colors = cardColors
         ) {
-            // Título
-            title()
-
-            // Subtítulo opcional
-            subtitle?.invoke()
-
-            // Contenido principal
-            content()
+            CardContent(title, subtitle, contentPadding, content)
+        }
+    } else {
+        Card(
+            modifier = modifier.fillMaxWidth(),
+            shape = WrestlingTheme.shapes.cardShape,
+            colors = cardColors
+        ) {
+            CardContent(title, subtitle, contentPadding, content)
         }
     }
 }
 
-/**
- * Variante de ItemCard sin evento onClick para elementos no clicables
- */
 @Composable
-fun StaticItemCard(
-    modifier: Modifier = Modifier,
+private fun CardContent(
     title: @Composable () -> Unit,
-    subtitle: @Composable (() -> Unit)? = null,
-    contentPadding: PaddingValues = PaddingValues(WrestlingTheme.dimensions.spacing_16),
-    containerColor: Color = Color.Unspecified,
+    subtitle: @Composable (() -> Unit)?,
+    contentPadding: PaddingValues,
     content: @Composable ColumnScope.() -> Unit
 ) {
-    Card(
-        modifier = modifier.fillMaxWidth(),
-        shape = WrestlingTheme.shapes.cardShape,
-        colors = if(containerColor != Color.Unspecified)
-            CardDefaults.cardColors(containerColor = containerColor)
-        else CardDefaults.cardColors()
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(contentPadding)
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(contentPadding)
-        ) {
-            title()
-            subtitle?.invoke()
-            content()
-        }
+        title()
+        subtitle?.invoke()
+        content()
     }
 }
