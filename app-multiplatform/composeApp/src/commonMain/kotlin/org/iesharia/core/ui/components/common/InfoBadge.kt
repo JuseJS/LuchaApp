@@ -8,67 +8,67 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
 import org.iesharia.core.ui.theme.WrestlingTheme
 
 /**
- * Componente para mostrar etiquetas/badges informativos
+ * Tipos de estado para badges
+ */
+enum class BadgeStatus {
+    SUCCESS, WARNING, ERROR, NEUTRAL
+}
+
+/**
+ * Badge unificado para información y estados
  */
 @Composable
 fun InfoBadge(
     text: String,
+    modifier: Modifier = Modifier,
+    // Parámetros para uso con BadgeStatus
+    status: BadgeStatus? = null,
+    // Parámetros para colores personalizados (se usan si status == null)
     color: Color = MaterialTheme.colorScheme.primary,
     backgroundColor: Color = color.copy(alpha = 0.1f),
-    modifier: Modifier = Modifier,
-    fontWeight: FontWeight = FontWeight.Normal
+    fontWeight: FontWeight = FontWeight.Medium
 ) {
+    // Determinar colores según el modo
+    val (contentColor, bgColor) = if (status != null) {
+        when (status) {
+            BadgeStatus.SUCCESS -> Pair(
+                MaterialTheme.colorScheme.primary,
+                MaterialTheme.colorScheme.primary.copy(alpha = 0.1f)
+            )
+            BadgeStatus.WARNING -> Pair(
+                MaterialTheme.colorScheme.tertiary,
+                MaterialTheme.colorScheme.tertiary.copy(alpha = 0.1f)
+            )
+            BadgeStatus.ERROR -> Pair(
+                MaterialTheme.colorScheme.error,
+                MaterialTheme.colorScheme.error.copy(alpha = 0.1f)
+            )
+            BadgeStatus.NEUTRAL -> Pair(
+                MaterialTheme.colorScheme.secondary,
+                MaterialTheme.colorScheme.secondary.copy(alpha = 0.1f)
+            )
+        }
+    } else {
+        Pair(color, backgroundColor)
+    }
+
     Surface(
         shape = WrestlingTheme.shapes.small,
-        color = backgroundColor,
-        contentColor = color,
+        color = bgColor,
+        contentColor = contentColor,
         modifier = modifier
     ) {
         Text(
             text = text,
             style = MaterialTheme.typography.labelSmall,
             fontWeight = fontWeight,
-            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+            modifier = Modifier.padding(
+                horizontal = WrestlingTheme.dimensions.spacing_8,
+                vertical = WrestlingTheme.dimensions.spacing_4
+            )
         )
     }
-}
-
-/**
- * Variante para mostrar estados (victoria, derrota, etc.)
- */
-@Composable
-fun StatusBadge(
-    text: String,
-    status: BadgeStatus = BadgeStatus.NEUTRAL,
-    modifier: Modifier = Modifier
-) {
-    val (color, bgColor) = when (status) {
-        BadgeStatus.SUCCESS -> MaterialTheme.colorScheme.primary to
-                MaterialTheme.colorScheme.primary.copy(alpha = 0.1f)
-        BadgeStatus.WARNING -> MaterialTheme.colorScheme.tertiary to
-                MaterialTheme.colorScheme.tertiary.copy(alpha = 0.1f)
-        BadgeStatus.ERROR -> MaterialTheme.colorScheme.error to
-                MaterialTheme.colorScheme.error.copy(alpha = 0.1f)
-        BadgeStatus.NEUTRAL -> MaterialTheme.colorScheme.secondary to
-                MaterialTheme.colorScheme.secondary.copy(alpha = 0.1f)
-    }
-
-    InfoBadge(
-        text = text,
-        color = color,
-        backgroundColor = bgColor,
-        modifier = modifier,
-        fontWeight = FontWeight.Medium
-    )
-}
-
-/**
- * Estados para el componente StatusBadge
- */
-enum class BadgeStatus {
-    SUCCESS, WARNING, ERROR, NEUTRAL
 }
