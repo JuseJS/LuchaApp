@@ -5,7 +5,10 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Person
-import androidx.compose.material3.*
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -14,15 +17,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import org.iesharia.features.wrestlers.domain.model.Wrestler
-import org.iesharia.features.wrestlers.domain.model.WrestlerMatchResult
+import org.iesharia.core.resources.AppStrings
 import org.iesharia.core.ui.components.common.BadgeStatus
 import org.iesharia.core.ui.components.common.InfoBadge
 import org.iesharia.core.ui.components.common.ItemCard
-import org.iesharia.core.ui.components.common.StaticItemCard
-import org.iesharia.core.ui.components.common.StatusBadge
 import org.iesharia.core.ui.theme.WrestlingTheme
-import org.iesharia.core.resources.AppStrings
+import org.iesharia.features.wrestlers.domain.model.Wrestler
+import org.iesharia.features.wrestlers.domain.model.WrestlerMatchResult
 
 /**
  * Modelo para representar una agarrada en lucha canaria
@@ -138,7 +139,7 @@ fun WrestlerMatchResultView(
     result: WrestlerMatchResult,
     luchador: Wrestler
 ) {
-    StaticItemCard(
+    ItemCard(
         modifier = Modifier.fillMaxWidth(),
         containerColor = MaterialTheme.colorScheme.surfaceVariant,
         contentPadding = PaddingValues(WrestlingTheme.dimensions.spacing_12),
@@ -155,7 +156,7 @@ fun WrestlerMatchResultView(
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
 
-                // Badge de resultado usando el componente StatusBadge
+                // Badge de resultado usando InfoBadge con status
                 val status = when(result.result) {
                     WrestlerMatchResult.Result.WIN -> BadgeStatus.SUCCESS
                     WrestlerMatchResult.Result.LOSS -> BadgeStatus.ERROR
@@ -164,7 +165,7 @@ fun WrestlerMatchResultView(
                     WrestlerMatchResult.Result.SEPARATED -> BadgeStatus.NEUTRAL
                 }
 
-                StatusBadge(
+                InfoBadge(
                     text = result.result.displayName(),
                     status = status
                 )
