@@ -6,7 +6,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import org.iesharia.core.ui.theme.LuchaTheme
+import org.iesharia.core.ui.theme.WrestlingTheme
 
 /**
  * Componente Card base para elementos con estructura común
@@ -17,13 +17,13 @@ fun ItemCard(
     modifier: Modifier = Modifier,
     title: @Composable () -> Unit,
     subtitle: @Composable (() -> Unit)? = null,
-    contentPadding: PaddingValues = PaddingValues(LuchaTheme.dimensions.spacing_16),
+    contentPadding: PaddingValues = PaddingValues(WrestlingTheme.dimensions.spacing_16),
     containerColor: Color = Color.Unspecified,
     content: @Composable ColumnScope.() -> Unit
 ) {
     Card(
         modifier = modifier.fillMaxWidth(),
-        shape = LuchaTheme.shapes.cardShape,
+        shape = WrestlingTheme.shapes.cardShape,
         onClick = onClick,
         colors = if(containerColor != Color.Unspecified)
             CardDefaults.cardColors(containerColor = containerColor)
@@ -54,13 +54,13 @@ fun StaticItemCard(
     modifier: Modifier = Modifier,
     title: @Composable () -> Unit,
     subtitle: @Composable (() -> Unit)? = null,
-    contentPadding: PaddingValues = PaddingValues(LuchaTheme.dimensions.spacing_16),
+    contentPadding: PaddingValues = PaddingValues(WrestlingTheme.dimensions.spacing_16),
     containerColor: Color = Color.Unspecified,
     content: @Composable ColumnScope.() -> Unit
 ) {
     Card(
         modifier = modifier.fillMaxWidth(),
-        shape = LuchaTheme.shapes.cardShape,
+        shape = WrestlingTheme.shapes.cardShape,
         colors = if(containerColor != Color.Unspecified)
             CardDefaults.cardColors(containerColor = containerColor)
         else CardDefaults.cardColors()

@@ -9,7 +9,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import org.iesharia.core.ui.theme.LuchaTheme
+import org.iesharia.core.ui.theme.WrestlingTheme
 
 /**
  * Componente para mostrar etiquetas/badges informativos
@@ -23,7 +23,7 @@ fun InfoBadge(
     fontWeight: FontWeight = FontWeight.Normal
 ) {
     Surface(
-        shape = LuchaTheme.shapes.small,
+        shape = WrestlingTheme.shapes.small,
         color = backgroundColor,
         contentColor = color,
         modifier = modifier

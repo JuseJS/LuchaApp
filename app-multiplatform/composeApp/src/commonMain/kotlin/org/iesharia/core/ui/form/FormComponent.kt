@@ -19,9 +19,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
-import org.iesharia.core.ui.components.LuchaButton
-import org.iesharia.core.ui.components.LuchaTextField
-import org.iesharia.core.ui.theme.LuchaTheme
+import org.iesharia.core.ui.components.WrestlingButton
+import org.iesharia.core.ui.components.WrestlingTextField
+import org.iesharia.core.ui.theme.WrestlingTheme
 
 /**
  * Componente universal de formulario que se adapta a cualquier definición
@@ -110,7 +110,7 @@ fun FormComponent(
             text = formDefinition.title,
             style = MaterialTheme.typography.headlineSmall,
             fontWeight = FontWeight.SemiBold,
-            modifier = Modifier.padding(bottom = LuchaTheme.dimensions.spacing_24)
+            modifier = Modifier.padding(bottom = WrestlingTheme.dimensions.spacing_24)
         )
 
         // Renderizar campos dinámicamente
@@ -119,7 +119,7 @@ fun FormComponent(
             val error = errors[field.key] ?: ""
             val isLastField = index == formDefinition.fields.size - 1
 
-            LuchaTextField(
+            WrestlingTextField(
                 value = value,
                 onValueChange = { newValue ->
                     values[field.key] = newValue
@@ -137,10 +137,10 @@ fun FormComponent(
             )
         }
 
-        Spacer(modifier = Modifier.height(LuchaTheme.dimensions.spacing_16))
+        Spacer(modifier = Modifier.height(WrestlingTheme.dimensions.spacing_16))
 
         // Botón de envío
-        LuchaButton(
+        WrestlingButton(
             text = formDefinition.submitButton.text,
             onClick = {
                 if (validateAll()) {
