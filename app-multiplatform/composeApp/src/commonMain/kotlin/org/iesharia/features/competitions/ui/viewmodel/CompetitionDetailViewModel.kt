@@ -22,42 +22,35 @@ class CompetitionDetailViewModel(
 
     private fun loadCompetition() {
         launchSafe(
-            handleAppError = { appError ->
+            errorHandler = { error ->
                 updateState {
                     it.copy(
                         isLoading = false,
-                        errorMessage = appError.message
+                        errorMessage = error.message
                     )
                 }
             }
         ) {
-            try {
-                // Obtener la competición específica
-                val competition = competitionRepository.getCompetition(competitionId)
+            // Obtener la competición específica
+            val competition = competitionRepository.getCompetition(competitionId)
+                ?: throw AppError.UnknownError(message = "No se encontró la competición")
 
-                if (competition == null) {
-                    throw AppError.UnknownError(message = "No se encontró la competición")
-                }
+            // Comprobar si esta competición es favorita
+            val favorites = getFavoritesUseCase()
+            val isFavorite = favorites.any {
+                it is Favorite.CompetitionFavorite && it.competition.id == competitionId
+            }
 
-                // Comprobar si esta competición es favorita
-                val favorites = getFavoritesUseCase()
-                val isFavorite = favorites.any {
-                    it is Favorite.CompetitionFavorite && it.competition.id == competitionId
-                }
-
-                // Actualizar el estado
-                updateState {
-                    it.copy(
-                        isLoading = false,
-                        errorMessage = null,
-                        competition = competition,
-                        isFavorite = isFavorite,
-                        matchDays = competition.matchDays.sortedBy { it.number },
-                        teams = competition.teams
-                    )
-                }
-            } catch (e: Exception) {
-                throw errorHandler?.convertException(e) ?: AppError.UnknownError(e)
+            // Actualizar el estado
+            updateState {
+                it.copy(
+                    isLoading = false,
+                    errorMessage = null,
+                    competition = competition,
+                    isFavorite = isFavorite,
+                    matchDays = competition.matchDays.sortedBy { it.number },
+                    teams = competition.teams
+                )
             }
         }
     }
@@ -68,8 +61,7 @@ class CompetitionDetailViewModel(
         }
     }
 
-    // Esta función es un placeholder - asumimos que la funcionalidad completa
-    // de favoritos se implementará más adelante
+    // Esta función es un placeholder para la funcionalidad de favoritos
     fun toggleFavorite() {
         // Por ahora, solo actualizamos el estado UI
         updateState {

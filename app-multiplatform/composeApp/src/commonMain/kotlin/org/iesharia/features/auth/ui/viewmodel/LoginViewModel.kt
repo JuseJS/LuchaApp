@@ -1,14 +1,11 @@
 package org.iesharia.features.auth.ui.viewmodel
 
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.withContext
-import org.iesharia.core.resources.AppStrings
 import org.iesharia.core.common.BaseViewModel
 import org.iesharia.core.common.ErrorHandler
 import org.iesharia.core.domain.model.AppError
 import org.iesharia.core.navigation.NavigationManager
 import org.iesharia.core.navigation.Routes
+import org.iesharia.core.resources.AppStrings
 
 class LoginViewModel(
     private val navigationManager: NavigationManager,
@@ -80,15 +77,14 @@ class LoginViewModel(
     // Validación y envío de login
     fun submitLogin() {
         launchSafe(
-            handleAppError = { error ->
-                // Actualizar UI según el tipo de error
+            errorHandler = { error ->
                 when (error) {
                     is AppError.ValidationError -> {
                         updateState {
                             it.copy(
                                 isLoading = false,
-                                loginEmailError = (if (error.field == "email") error.message else it.loginEmailError).toString(),
-                                loginPasswordError = (if (error.field == "password") error.message else it.loginPasswordError).toString()
+                                loginEmailError = if (error.field == "email") error.message else it.loginEmailError,
+                                loginPasswordError = if (error.field == "password") error.message else it.loginPasswordError
                             )
                         }
                     }
@@ -96,12 +92,11 @@ class LoginViewModel(
                         updateState {
                             it.copy(
                                 isLoading = false,
-                                loginPasswordError = error.message.toString()
+                                loginPasswordError = error.message
                             )
                         }
                     }
                     else -> {
-                        // Para otros tipos de errores, simplemente actualizamos el estado
                         updateState { it.copy(isLoading = false) }
                     }
                 }
@@ -123,18 +118,15 @@ class LoginViewModel(
             // Iniciar carga
             updateState { it.copy(isLoading = true) }
 
-            // Procesamiento de login en hilo de IO
-            withContext(Dispatchers.IO) {
-                // Aquí iría la lógica real para hacer login con el backend
-                delay(1000)
+            // Simulación de login con delay
+            kotlinx.coroutines.delay(1000)
 
-                // Simulamos una falla ocasional (en un entorno real, esto vendría del backend)
-                if (currentState.loginEmail == "error@test.com") {
-                    throw AppError.AuthError(message = AppStrings.Auth.loginError)
-                }
+            // Simulamos una falla ocasional
+            if (currentState.loginEmail == "error@test.com") {
+                throw AppError.AuthError(message = AppStrings.Auth.loginError)
             }
 
-            // Login exitoso - ahora navegamos a la pantalla de inicio
+            // Login exitoso
             updateState { it.copy(isLoading = false) }
             navigateToHome()
         }
@@ -143,40 +135,33 @@ class LoginViewModel(
     // Validación y envío de registro
     fun submitRegister() {
         launchSafe(
-            handleAppError = { error ->
-                // Actualizar UI según el tipo de error
+            // Manejador de errores personalizado
+            errorHandler = { error ->
                 when (error) {
                     is AppError.ValidationError -> {
-                        // Si es un error específico de un campo, actualizamos ese campo
                         val field = error.field
-                        val errorMessage = error.message // Garantizado no-nulo
+                        val errorMessage = error.message
 
                         updateState {
                             when (field) {
-                                "email" -> it.copy(isLoading = false, registerEmailError = errorMessage.toString())
-                                "password" -> it.copy(isLoading = false, registerPasswordError = errorMessage.toString())
-                                "name" -> it.copy(isLoading = false, registerNameError = errorMessage.toString())
-                                "surname" -> it.copy(isLoading = false, registerSurnameError = errorMessage.toString())
-                                "confirmPassword" -> it.copy(isLoading = false, registerConfirmPasswordError = errorMessage.toString())
-                                else -> it.copy(
-                                    isLoading = false,
-                                    registerPasswordError = errorMessage.toString()
-                                )
+                                "email" -> it.copy(isLoading = false, registerEmailError = errorMessage)
+                                "password" -> it.copy(isLoading = false, registerPasswordError = errorMessage)
+                                "name" -> it.copy(isLoading = false, registerNameError = errorMessage)
+                                "surname" -> it.copy(isLoading = false, registerSurnameError = errorMessage)
+                                "confirmPassword" -> it.copy(isLoading = false, registerConfirmPasswordError = errorMessage)
+                                else -> it.copy(isLoading = false, registerPasswordError = errorMessage)
                             }
                         }
                     }
                     is AppError.ServerError -> {
-                        // Aseguramos que el mensaje nunca sea nulo
-                        val errorMessage = error.message
                         updateState {
                             it.copy(
                                 isLoading = false,
-                                registerEmailError = errorMessage.toString()
+                                registerEmailError = error.message
                             )
                         }
                     }
                     else -> {
-                        // Para otros tipos de errores, capturamos el mensaje de manera segura
                         updateState { it.copy(isLoading = false) }
                     }
                 }
@@ -212,15 +197,12 @@ class LoginViewModel(
             // Iniciar carga
             updateState { it.copy(isLoading = true) }
 
-            // Procesamiento de registro en hilo de IO
-            withContext(Dispatchers.IO) {
-                // Simular el registro
-                delay(1000)
+            // Simulación de registro
+            kotlinx.coroutines.delay(1000)
 
-                // Simulamos una falla ocasional (en un entorno real, esto vendría del backend)
-                if (currentState.registerEmail == "error@test.com") {
-                    throw AppError.ServerError(message = AppStrings.Auth.registerError)
-                }
+            // Simulamos una falla ocasional
+            if (currentState.registerEmail == "error@test.com") {
+                throw AppError.ServerError(message = AppStrings.Auth.registerError)
             }
 
             // Registro exitoso

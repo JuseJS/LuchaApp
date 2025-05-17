@@ -2,9 +2,10 @@ package org.iesharia.features.home.ui.viewmodel
 
 import org.iesharia.core.common.BaseViewModel
 import org.iesharia.core.common.ErrorHandler
-import org.iesharia.core.domain.model.AppError
 import org.iesharia.core.domain.model.Favorite
 import org.iesharia.core.domain.model.Island
+import org.iesharia.core.navigation.NavigationManager
+import org.iesharia.core.navigation.Routes
 import org.iesharia.features.common.domain.usecase.GetFavoritesUseCase
 import org.iesharia.features.competitions.domain.model.AgeCategory
 import org.iesharia.features.competitions.domain.model.Competition
@@ -14,8 +15,6 @@ import org.iesharia.features.teams.domain.model.Match
 import org.iesharia.features.teams.domain.usecase.GetTeamMatchesUseCase
 import org.iesharia.features.wrestlers.domain.model.WrestlerMatchResult
 import org.iesharia.features.wrestlers.domain.usecase.GetWrestlerResultsUseCase
-import org.iesharia.core.navigation.NavigationManager
-import org.iesharia.core.navigation.Routes
 
 class HomeViewModel(
     private val getCompetitionsUseCase: GetCompetitionsUseCase,
@@ -40,31 +39,17 @@ class HomeViewModel(
      * Carga los datos iniciales
      */
     private fun loadData() {
-        launchSafe(
-            handleAppError = { appError ->
-                updateState {
-                    it.copy(
-                        isLoading = false,
-                        errorMessage = appError.message
-                    )
-                }
-            }
-        ) {
-            try {
-                competitions = getCompetitionsUseCase()
-                favorites = getFavoritesUseCase()
+        launchSafe {
+            competitions = getCompetitionsUseCase()
+            favorites = getFavoritesUseCase()
 
-                updateState {
-                    it.copy(
-                        isLoading = false,
-                        favorites = favorites,
-                        competitions = competitions,
-                        errorMessage = null
-                    )
-                }
-            } catch (e: Exception) {
-                // Cualquier excepción que no sea AppError se convierte
-                throw errorHandler?.convertException(e) ?: AppError.UnknownError(e)
+            updateState {
+                it.copy(
+                    isLoading = false,
+                    favorites = favorites,
+                    competitions = competitions,
+                    errorMessage = null
+                )
             }
         }
     }
@@ -134,17 +119,8 @@ class HomeViewModel(
      */
     fun getTeamLastMatches(teamId: String): List<Match> {
         if (!teamMatchesCache.containsKey(teamId)) {
-            launchSafe(
-                handleAppError = { appError ->
-                    // Manejar error de carga de enfrentamientos
-                    println("Error al cargar enfrentamientos: ${appError.message}")
-                }
-            ) {
-                try {
-                    teamMatchesCache[teamId] = getTeamMatchesUseCase(teamId)
-                } catch (e: Exception) {
-                    throw errorHandler?.convertException(e) ?: AppError.UnknownError(e)
-                }
+            launchIO {
+                teamMatchesCache[teamId] = getTeamMatchesUseCase(teamId)
             }
         }
         return teamMatchesCache[teamId]?.first ?: emptyList()
@@ -155,17 +131,8 @@ class HomeViewModel(
      */
     fun getTeamNextMatches(teamId: String): List<Match> {
         if (!teamMatchesCache.containsKey(teamId)) {
-            launchSafe(
-                handleAppError = { appError ->
-                    // Manejar error de carga de enfrentamientos
-                    println("Error al cargar enfrentamientos: ${appError.message}")
-                }
-            ) {
-                try {
-                    teamMatchesCache[teamId] = getTeamMatchesUseCase(teamId)
-                } catch (e: Exception) {
-                    throw errorHandler?.convertException(e) ?: AppError.UnknownError(e)
-                }
+            launchIO {
+                teamMatchesCache[teamId] = getTeamMatchesUseCase(teamId)
             }
         }
         return teamMatchesCache[teamId]?.second ?: emptyList()
@@ -176,58 +143,34 @@ class HomeViewModel(
      */
     fun getWrestlerResults(wrestlerId: String): List<WrestlerMatchResult> {
         if (!wrestlerResultsCache.containsKey(wrestlerId)) {
-            launchSafe(
-                handleAppError = { appError ->
-                    // Manejar error de carga de resultados
-                    println("Error al cargar resultados: ${appError.message}")
-                }
-            ) {
-                try {
-                    wrestlerResultsCache[wrestlerId] = getWrestlerResultsUseCase(wrestlerId)
-                } catch (e: Exception) {
-                    throw errorHandler?.convertException(e) ?: AppError.UnknownError(e)
-                }
+            launchIO {
+                wrestlerResultsCache[wrestlerId] = getWrestlerResultsUseCase(wrestlerId)
             }
         }
         return wrestlerResultsCache[wrestlerId] ?: emptyList()
     }
 
-    // Añadir métodos de navegación
+    // Métodos de navegación
     fun navigateToCompetitionDetail(competitionId: String) {
-        launchSafe(
-            handleAppError = { appError ->
-                // Mostrar error de navegación si ocurre
-                updateState { it.copy(errorMessage = appError.message) }
-            }
-        ) {
+        launchSafe {
             navigationManager.navigateWithParams(Routes.Competition.Detail(), competitionId)
         }
     }
 
     fun navigateToTeamDetail(teamId: String) {
-        launchSafe(
-            handleAppError = { appError ->
-                // Mostrar error de navegación si ocurre
-                updateState { it.copy(errorMessage = appError.message) }
-            }
-        ) {
+        launchSafe {
             navigationManager.navigateWithParams(Routes.Team.Detail(), teamId)
         }
     }
 
     fun navigateToWrestlerDetail(wrestlerId: String) {
-        launchSafe(
-            handleAppError = { appError ->
-                // Mostrar error de navegación si ocurre
-                updateState { it.copy(errorMessage = appError.message) }
-            }
-        ) {
+        launchSafe {
             navigationManager.navigateWithParams(Routes.Wrestler.Detail(), wrestlerId)
         }
     }
 
     /**
-     * Recarga los datos (puede ser llamado por la UI en caso de error)
+     * Recarga los datos
      */
     fun reloadData() {
         updateState { it.copy(isLoading = true, errorMessage = null) }
