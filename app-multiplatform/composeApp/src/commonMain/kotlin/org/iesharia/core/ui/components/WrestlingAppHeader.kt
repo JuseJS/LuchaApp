@@ -9,13 +9,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
-import org.iesharia.core.ui.theme.LuchaTheme
+import org.iesharia.core.ui.theme.WrestlingTheme
 
 /**
  * Encabezado de la aplicación con título y subtítulo
  */
 @Composable
-fun LuchaAppHeader(
+fun WrestlingAppHeader(
     title: String,
     subtitle: String
 ) {
@@ -27,7 +27,7 @@ fun LuchaAppHeader(
             color = MaterialTheme.colorScheme.primary
         )
 
-        Spacer(modifier = Modifier.height(LuchaTheme.dimensions.spacing_8))
+        Spacer(modifier = Modifier.height(WrestlingTheme.dimensions.spacing_8))
 
         Text(
             text = subtitle,
