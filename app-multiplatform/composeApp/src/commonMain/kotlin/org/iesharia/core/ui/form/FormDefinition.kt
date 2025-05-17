@@ -1,11 +1,10 @@
 package org.iesharia.core.ui.form
 
-import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
-import org.iesharia.core.ui.components.LuchaButtonType
+import org.iesharia.core.ui.components.WrestlingButtonType
 
 /**
  * Definición completa de un formulario
@@ -35,7 +34,7 @@ data class FormDefinition(
     @Stable
     data class SubmitButtonConfig(
         val text: String,
-        val type: LuchaButtonType
+        val type: WrestlingButtonType
     )
 
     sealed class ValidationResult {
