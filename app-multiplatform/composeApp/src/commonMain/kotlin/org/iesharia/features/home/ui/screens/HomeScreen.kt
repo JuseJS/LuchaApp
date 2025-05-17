@@ -7,6 +7,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import org.iesharia.core.domain.model.Favorite
@@ -31,6 +32,8 @@ import org.iesharia.features.home.ui.viewmodel.HomeViewModel
 import org.iesharia.features.teams.ui.components.TeamItem
 import org.iesharia.features.wrestlers.ui.components.WrestlerItem
 import org.iesharia.core.resources.AppStrings
+import org.iesharia.core.ui.components.ErrorSnackbarHost
+import org.iesharia.core.ui.components.ViewModelErrorHandler
 import org.koin.compose.koinInject
 
 /**
@@ -44,12 +47,24 @@ class HomeScreen : AppScreen() {
         val navigator = requireNavigator()
         val navigationManager = koinInject<NavigationManager>()
 
+        // Crear el SnackbarHostState aquí, separado del ViewModelErrorHandler
+        val snackbarHostState = remember { SnackbarHostState() }
+
+        // Configurar manejo de errores pasando el SnackbarHostState
+        ViewModelErrorHandler(
+            viewModel = viewModel,
+            snackbarHostState = snackbarHostState
+        )
+
         // Manejar navegación
         navigator.HandleNavigationManager(navigationManager)
 
         Scaffold(
             topBar = {
                 HomeTopBar()
+            },
+            snackbarHost = {
+                ErrorSnackbarHost(snackbarHostState)
             }
         ) { paddingValues ->
             Box(

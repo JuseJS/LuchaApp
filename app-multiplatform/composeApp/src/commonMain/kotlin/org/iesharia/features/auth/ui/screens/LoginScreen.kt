@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -35,6 +36,13 @@ class LoginScreen : AppScreen() {
         val uiState by viewModel.uiState.collectAsState()
         val navigator = requireNavigator()
         val navigationManager = koinInject<NavigationManager>()
+
+        // Configurar manejo de errores
+        val snackbarHostState = remember { SnackbarHostState() }
+        ViewModelErrorHandler(
+            viewModel = viewModel,
+            snackbarHostState = snackbarHostState
+        )
 
         // Manejar navegación
         navigator.HandleNavigationManager(navigationManager)
@@ -212,6 +220,12 @@ class LoginScreen : AppScreen() {
                 ) {
                     WrestlingLoadingOverlay()
                 }
+
+                // Snackbar para errores
+                ErrorSnackbarHost(
+                    snackbarHostState = snackbarHostState,
+                    modifier = Modifier.align(Alignment.BottomCenter)
+                )
             }
         }
     }

@@ -19,6 +19,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -32,6 +33,8 @@ import androidx.compose.ui.unit.times
 import org.iesharia.core.navigation.AppScreen
 import org.iesharia.core.navigation.HandleNavigationManager
 import org.iesharia.core.navigation.NavigationManager
+import org.iesharia.core.ui.components.ErrorSnackbarHost
+import org.iesharia.core.ui.components.ViewModelErrorHandler
 import org.iesharia.core.ui.components.WrestlingLoadingOverlay
 import org.iesharia.core.ui.components.common.EmptyStateMessage
 import org.iesharia.core.ui.theme.WrestlingTheme
@@ -53,6 +56,13 @@ class CompetitionDetailScreen(private val competitionId: String) : AppScreen() {
         val uiState by viewModel.uiState.collectAsState()
         val navigator = requireNavigator()
         val navigationManager = koinInject<NavigationManager>()
+
+        // Configurar manejo de errores
+        val snackbarHostState = remember { SnackbarHostState() }
+        ViewModelErrorHandler(
+            viewModel = viewModel,
+            snackbarHostState = snackbarHostState
+        )
 
         // Manejar navegación
         navigator.HandleNavigationManager(navigationManager)
@@ -89,6 +99,9 @@ class CompetitionDetailScreen(private val competitionId: String) : AppScreen() {
                         titleContentColor = MaterialTheme.colorScheme.primary
                     )
                 )
+            },
+            snackbarHost = {
+                ErrorSnackbarHost(snackbarHostState)
             }
         ) { paddingValues ->
             Box(
