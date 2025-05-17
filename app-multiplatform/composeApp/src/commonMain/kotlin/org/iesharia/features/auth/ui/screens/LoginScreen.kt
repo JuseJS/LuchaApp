@@ -30,7 +30,7 @@ import org.koin.compose.koinInject
 
 class LoginScreen : AppScreen() {
     @Composable
-    override fun Content() {
+    override fun ScreenContent() {
         val viewModel = rememberViewModel<LoginViewModel>()
         val uiState by viewModel.uiState.collectAsState()
         val navigator = requireNavigator()
