@@ -6,7 +6,7 @@ import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.ui.text.input.KeyboardType
 import org.iesharia.core.resources.AppStrings
-import org.iesharia.core.ui.components.LuchaButtonType
+import org.iesharia.core.ui.components.WrestlingButtonType
 import org.iesharia.core.ui.form.FormDefinition
 import org.iesharia.core.ui.form.FormDefinition.ValidationResult
 
@@ -77,7 +77,7 @@ object AuthForms {
         ),
         submitButton = FormDefinition.SubmitButtonConfig(
             text = AppStrings.Auth.login,
-            type = LuchaButtonType.PRIMARY
+            type = WrestlingButtonType.PRIMARY
         )
     )
 
@@ -122,7 +122,7 @@ object AuthForms {
         ),
         submitButton = FormDefinition.SubmitButtonConfig(
             text = AppStrings.Auth.register,
-            type = LuchaButtonType.SECONDARY
+            type = WrestlingButtonType.SECONDARY
         )
     )
 

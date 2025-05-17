@@ -14,7 +14,7 @@ import androidx.compose.ui.unit.dp
 import org.iesharia.core.ui.components.common.EmptyStateMessage
 import org.iesharia.core.ui.components.common.SectionTitle
 import org.iesharia.features.home.ui.viewmodel.FavoriteType
-import org.iesharia.core.ui.theme.LuchaTheme
+import org.iesharia.core.ui.theme.WrestlingTheme
 import org.iesharia.core.resources.AppStrings
 
 @Composable
@@ -26,28 +26,28 @@ fun FavoritesSectionHeader(
     Column(
         modifier = modifier
             .fillMaxWidth()
-            .padding(vertical = LuchaTheme.dimensions.spacing_16)
+            .padding(vertical = WrestlingTheme.dimensions.spacing_16)
     ) {
         // Título de la sección
         SectionTitle(
             title = AppStrings.Home.favorites
         )
 
-        Spacer(modifier = Modifier.height(LuchaTheme.dimensions.spacing_12))
+        Spacer(modifier = Modifier.height(WrestlingTheme.dimensions.spacing_12))
 
         // Filtros de tipo de favorito
         Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .horizontalScroll(rememberScrollState())
-                .padding(horizontal = LuchaTheme.dimensions.spacing_16)
+                .padding(horizontal = WrestlingTheme.dimensions.spacing_16)
         ) {
             FavoriteType.entries.forEach { type ->
                 FilterChip(
                     selected = type == selectedType,
                     onClick = { onTypeSelected(type) },
                     label = { Text(type.displayName()) },
-                    modifier = Modifier.padding(end = LuchaTheme.dimensions.spacing_8)
+                    modifier = Modifier.padding(end = WrestlingTheme.dimensions.spacing_8)
                 )
             }
         }
@@ -71,9 +71,9 @@ fun EmptyFavorites(selectedType: FavoriteType) {
 @Composable
 fun FavoritesSectionDivider() {
     Column(modifier = Modifier.fillMaxWidth()) {
-        Spacer(modifier = Modifier.height(LuchaTheme.dimensions.spacing_16))
+        Spacer(modifier = Modifier.height(WrestlingTheme.dimensions.spacing_16))
         HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f))
-        Spacer(modifier = Modifier.height(LuchaTheme.dimensions.spacing_16))
+        Spacer(modifier = Modifier.height(WrestlingTheme.dimensions.spacing_16))
     }
 }
 

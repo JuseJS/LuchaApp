@@ -11,7 +11,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import org.iesharia.core.ui.components.common.ItemCard
 import org.iesharia.core.ui.components.common.SubSectionList
-import org.iesharia.core.ui.theme.LuchaTheme
+import org.iesharia.core.ui.theme.WrestlingTheme
 import org.iesharia.features.teams.domain.model.Match
 import org.iesharia.features.teams.domain.model.Team
 import org.iesharia.core.resources.AppStrings
@@ -41,7 +41,7 @@ fun TeamItem(
                         fontWeight = FontWeight.Bold
                     )
 
-                    Spacer(modifier = Modifier.height(LuchaTheme.dimensions.spacing_4))
+                    Spacer(modifier = Modifier.height(WrestlingTheme.dimensions.spacing_4))
 
                     Text(
                         text = AppStrings.Teams.islandLabel.format(team.island.displayName()),
@@ -54,7 +54,7 @@ fun TeamItem(
     ) {
         // Solo mostrar secciones si hay enfrentamientos
         if (lastMatches.isNotEmpty() || nextMatches.isNotEmpty()) {
-            Spacer(modifier = Modifier.height(LuchaTheme.dimensions.spacing_16))
+            Spacer(modifier = Modifier.height(WrestlingTheme.dimensions.spacing_16))
 
             // Mostrar últimos enfrentamientos usando SubSectionList
             if (lastMatches.isNotEmpty()) {
@@ -66,12 +66,12 @@ fun TeamItem(
                 ) { match ->
                     MatchItem(
                         match = match,
-                        modifier = Modifier.padding(vertical = LuchaTheme.dimensions.spacing_8)
+                        modifier = Modifier.padding(vertical = WrestlingTheme.dimensions.spacing_8)
                     )
                 }
 
                 if (nextMatches.isNotEmpty()) {
-                    Spacer(modifier = Modifier.height(LuchaTheme.dimensions.spacing_16))
+                    Spacer(modifier = Modifier.height(WrestlingTheme.dimensions.spacing_16))
                 }
             }
 
@@ -85,12 +85,12 @@ fun TeamItem(
                 ) { match ->
                     MatchItem(
                         match = match,
-                        modifier = Modifier.padding(vertical = LuchaTheme.dimensions.spacing_8)
+                        modifier = Modifier.padding(vertical = WrestlingTheme.dimensions.spacing_8)
                     )
                 }
             }
         } else {
-            Spacer(modifier = Modifier.height(LuchaTheme.dimensions.spacing_16))
+            Spacer(modifier = Modifier.height(WrestlingTheme.dimensions.spacing_16))
 
             Text(
                 text = AppStrings.Teams.noRecentMatches,

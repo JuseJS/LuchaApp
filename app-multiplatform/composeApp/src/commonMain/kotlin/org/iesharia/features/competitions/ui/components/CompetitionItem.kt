@@ -10,7 +10,7 @@ import androidx.compose.ui.unit.dp
 import org.iesharia.features.competitions.domain.model.Competition
 import org.iesharia.core.ui.components.common.ItemCard
 import org.iesharia.core.ui.components.common.SectionSubtitle
-import org.iesharia.core.ui.theme.LuchaTheme
+import org.iesharia.core.ui.theme.WrestlingTheme
 import org.iesharia.core.resources.AppStrings
 import org.iesharia.features.teams.ui.components.MatchDaySection
 
@@ -32,7 +32,7 @@ fun CompetitionItem(
             )
         },
         subtitle = {
-            Spacer(modifier = Modifier.height(LuchaTheme.dimensions.spacing_4))
+            Spacer(modifier = Modifier.height(WrestlingTheme.dimensions.spacing_4))
 
             Text(
                 text = "${competition.ageCategory.displayName()} - ${competition.divisionCategory.displayName()} - ${competition.island.displayName()}",
@@ -49,7 +49,7 @@ fun CompetitionItem(
     ) {
         // Si se deben mostrar las jornadas y hay jornadas para mostrar
         if (showMatchDays && (competition.lastCompletedMatchDay != null || competition.nextMatchDay != null)) {
-            Spacer(modifier = Modifier.height(LuchaTheme.dimensions.spacing_16))
+            Spacer(modifier = Modifier.height(WrestlingTheme.dimensions.spacing_16))
 
             // Última jornada completada
             competition.lastCompletedMatchDay?.let { matchDay ->
@@ -58,7 +58,7 @@ fun CompetitionItem(
                     modifier = Modifier.padding(horizontal = 0.dp)
                 )
                 MatchDaySection(matchDay = matchDay)
-                Spacer(modifier = Modifier.height(LuchaTheme.dimensions.spacing_16))
+                Spacer(modifier = Modifier.height(WrestlingTheme.dimensions.spacing_16))
             }
 
             // Próxima jornada

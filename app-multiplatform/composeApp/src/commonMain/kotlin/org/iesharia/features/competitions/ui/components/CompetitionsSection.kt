@@ -12,7 +12,7 @@ import androidx.compose.ui.unit.dp
 import org.iesharia.core.domain.model.Island
 import org.iesharia.core.ui.components.common.EmptyStateMessage
 import org.iesharia.features.home.ui.viewmodel.CompetitionFilters
-import org.iesharia.core.ui.theme.LuchaTheme
+import org.iesharia.core.ui.theme.WrestlingTheme
 import org.iesharia.features.competitions.domain.model.AgeCategory
 import org.iesharia.features.competitions.domain.model.Competition
 import org.iesharia.features.competitions.domain.model.DivisionCategory
@@ -31,7 +31,7 @@ fun CompetitionsSection(
     Column(
         modifier = modifier
             .fillMaxWidth()
-            .padding(vertical = LuchaTheme.dimensions.spacing_16)
+            .padding(vertical = WrestlingTheme.dimensions.spacing_16)
     ) {
         // Título y botón de filtro
         CompetitionSectionHeader(
@@ -43,7 +43,7 @@ fun CompetitionsSection(
             }
         )
 
-        Spacer(modifier = Modifier.height(LuchaTheme.dimensions.spacing_16))
+        Spacer(modifier = Modifier.height(WrestlingTheme.dimensions.spacing_16))
 
         // Diálogo de filtros
         val showFiltersDialog = remember { mutableStateOf(false) }
@@ -73,7 +73,7 @@ private fun CompetitionSectionHeader(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = LuchaTheme.dimensions.spacing_16),
+            .padding(horizontal = WrestlingTheme.dimensions.spacing_16),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
@@ -127,12 +127,12 @@ fun FiltersDialog(
                 Text(
                     text = AppStrings.Competitions.category,
                     style = MaterialTheme.typography.titleMedium,
-                    modifier = Modifier.padding(vertical = LuchaTheme.dimensions.spacing_8)
+                    modifier = Modifier.padding(vertical = WrestlingTheme.dimensions.spacing_8)
                 )
 
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(LuchaTheme.dimensions.spacing_8)
+                    horizontalArrangement = Arrangement.spacedBy(WrestlingTheme.dimensions.spacing_8)
                 ) {
                     AgeCategory.entries.forEach { category ->
                         FilterChip(
@@ -145,18 +145,18 @@ fun FiltersDialog(
                     }
                 }
 
-                Spacer(modifier = Modifier.height(LuchaTheme.dimensions.spacing_16))
+                Spacer(modifier = Modifier.height(WrestlingTheme.dimensions.spacing_16))
 
                 // Filtro de división
                 Text(
                     text = AppStrings.Competitions.division,
                     style = MaterialTheme.typography.titleMedium,
-                    modifier = Modifier.padding(vertical = LuchaTheme.dimensions.spacing_8)
+                    modifier = Modifier.padding(vertical = WrestlingTheme.dimensions.spacing_8)
                 )
 
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(LuchaTheme.dimensions.spacing_8)
+                    horizontalArrangement = Arrangement.spacedBy(WrestlingTheme.dimensions.spacing_8)
                 ) {
                     DivisionCategory.entries.forEach { division ->
                         FilterChip(
@@ -169,18 +169,18 @@ fun FiltersDialog(
                     }
                 }
 
-                Spacer(modifier = Modifier.height(LuchaTheme.dimensions.spacing_16))
+                Spacer(modifier = Modifier.height(WrestlingTheme.dimensions.spacing_16))
 
                 // Filtro de isla
                 Text(
                     text = AppStrings.Competitions.island,
                     style = MaterialTheme.typography.titleMedium,
-                    modifier = Modifier.padding(vertical = LuchaTheme.dimensions.spacing_8)
+                    modifier = Modifier.padding(vertical = WrestlingTheme.dimensions.spacing_8)
                 )
 
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(LuchaTheme.dimensions.spacing_8)
+                    horizontalArrangement = Arrangement.spacedBy(WrestlingTheme.dimensions.spacing_8)
                 ) {
                     Island.entries.forEach { island ->
                         FilterChip(

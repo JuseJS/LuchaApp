@@ -12,7 +12,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import org.iesharia.features.teams.domain.model.Match
 import org.iesharia.features.competitions.domain.model.MatchDay
-import org.iesharia.core.ui.theme.LuchaTheme
+import org.iesharia.core.ui.theme.WrestlingTheme
 import org.iesharia.core.resources.AppStrings
 
 @Composable
@@ -31,13 +31,13 @@ fun MatchDaySection(
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
 
-        Spacer(modifier = Modifier.height(LuchaTheme.dimensions.spacing_8))
+        Spacer(modifier = Modifier.height(WrestlingTheme.dimensions.spacing_8))
 
         // Lista de enfrentamientos
         matchDay.matches.forEach { match ->
             MatchItem(
                 match = match,
-                modifier = Modifier.padding(bottom = LuchaTheme.dimensions.spacing_8)
+                modifier = Modifier.padding(bottom = WrestlingTheme.dimensions.spacing_8)
             )
         }
     }
@@ -50,7 +50,7 @@ fun MatchItem(
 ) {
     Card(
         modifier = modifier.fillMaxWidth(),
-        shape = LuchaTheme.shapes.cardShape,
+        shape = WrestlingTheme.shapes.cardShape,
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
         )
@@ -58,7 +58,7 @@ fun MatchItem(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(LuchaTheme.dimensions.spacing_12)
+                .padding(WrestlingTheme.dimensions.spacing_12)
         ) {
             // Equipos y resultado
             Row(
@@ -80,7 +80,7 @@ fun MatchItem(
                     text = AppStrings.Teams.vs,
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.padding(horizontal = LuchaTheme.dimensions.spacing_8)
+                    modifier = Modifier.padding(horizontal = WrestlingTheme.dimensions.spacing_8)
                 )
 
                 // Equipo visitante
@@ -93,7 +93,7 @@ fun MatchItem(
                 )
             }
 
-            Spacer(modifier = Modifier.height(LuchaTheme.dimensions.spacing_8))
+            Spacer(modifier = Modifier.height(WrestlingTheme.dimensions.spacing_8))
 
             // Información adicional
             Row(
