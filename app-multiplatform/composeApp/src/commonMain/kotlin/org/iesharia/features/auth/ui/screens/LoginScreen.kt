@@ -10,6 +10,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import luchaapp.composeapp.generated.resources.Res
@@ -19,10 +20,10 @@ import org.iesharia.core.navigation.HandleNavigationManager
 import org.iesharia.core.navigation.NavigationManager
 import org.iesharia.core.resources.AppStrings
 import org.iesharia.core.ui.components.*
+import org.iesharia.core.ui.form.FormComponent
 import org.iesharia.core.ui.theme.LuchaTheme
 import org.iesharia.di.rememberViewModel
-import org.iesharia.features.auth.ui.components.LoginForm
-import org.iesharia.features.auth.ui.components.RegisterForm
+import org.iesharia.features.auth.ui.components.AuthForms
 import org.iesharia.features.auth.ui.viewmodel.LoginViewModel
 import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.koinInject
@@ -109,35 +110,79 @@ class LoginScreen : AppScreen() {
                             label = "Auth Form Animation"
                         ) { isLoginMode ->
                             if (isLoginMode) {
-                                LoginForm(
-                                    email = uiState.loginEmail,
-                                    password = uiState.loginPassword,
-                                    emailError = uiState.loginEmailError,
-                                    passwordError = uiState.loginPasswordError,
-                                    onEmailChange = viewModel::updateLoginEmail,
-                                    onPasswordChange = viewModel::updateLoginPassword,
-                                    onSubmit = viewModel::submitLogin,
-                                    isLoading = uiState.isLoading
+                                // LOGIN FORM - Usando el componente genérico
+                                val initialValues = remember(uiState.loginEmail, uiState.loginPassword) {
+                                    mapOf(
+                                        AuthForms.KEY_EMAIL to uiState.loginEmail,
+                                        AuthForms.KEY_PASSWORD to uiState.loginPassword
+                                    )
+                                }
+
+                                val errors = remember(uiState.loginEmailError, uiState.loginPasswordError) {
+                                    mapOf(
+                                        AuthForms.KEY_EMAIL to uiState.loginEmailError,
+                                        AuthForms.KEY_PASSWORD to uiState.loginPasswordError
+                                    ).filterValues { it.isNotEmpty() }
+                                }
+
+                                FormComponent(
+                                    formDefinition = AuthForms.loginForm,
+                                    initialValues = initialValues,
+                                    externalErrors = errors,
+                                    isSubmitting = uiState.isLoading,
+                                    onValueChange = { key, value ->
+                                        when (key) {
+                                            AuthForms.KEY_EMAIL -> viewModel.updateLoginEmail(value)
+                                            AuthForms.KEY_PASSWORD -> viewModel.updateLoginPassword(value)
+                                        }
+                                    },
+                                    onSubmit = { viewModel.submitLogin() }
                                 )
                             } else {
-                                RegisterForm(
-                                    name = uiState.registerName,
-                                    surname = uiState.registerSurname,
-                                    email = uiState.registerEmail,
-                                    password = uiState.registerPassword,
-                                    confirmPassword = uiState.registerConfirmPassword,
-                                    nameError = uiState.registerNameError,
-                                    surnameError = uiState.registerSurnameError,
-                                    emailError = uiState.registerEmailError,
-                                    passwordError = uiState.registerPasswordError,
-                                    confirmPasswordError = uiState.registerConfirmPasswordError,
-                                    onNameChange = viewModel::updateRegisterName,
-                                    onSurnameChange = viewModel::updateRegisterSurname,
-                                    onEmailChange = viewModel::updateRegisterEmail,
-                                    onPasswordChange = viewModel::updateRegisterPassword,
-                                    onConfirmPasswordChange = viewModel::updateRegisterConfirmPassword,
-                                    onSubmit = viewModel::submitRegister,
-                                    isLoading = uiState.isLoading
+                                // REGISTER FORM - Usando el componente genérico
+                                val initialValues = remember(
+                                    uiState.registerName, uiState.registerSurname,
+                                    uiState.registerEmail, uiState.registerPassword,
+                                    uiState.registerConfirmPassword
+                                ) {
+                                    mapOf(
+                                        AuthForms.KEY_NAME to uiState.registerName,
+                                        AuthForms.KEY_SURNAME to uiState.registerSurname,
+                                        AuthForms.KEY_EMAIL to uiState.registerEmail,
+                                        AuthForms.KEY_PASSWORD to uiState.registerPassword,
+                                        AuthForms.KEY_CONFIRM_PASSWORD to uiState.registerConfirmPassword
+                                    )
+                                }
+
+                                val errors = remember(
+                                    uiState.registerNameError, uiState.registerSurnameError,
+                                    uiState.registerEmailError, uiState.registerPasswordError,
+                                    uiState.registerConfirmPasswordError
+                                ) {
+                                    mapOf(
+                                        AuthForms.KEY_NAME to uiState.registerNameError,
+                                        AuthForms.KEY_SURNAME to uiState.registerSurnameError,
+                                        AuthForms.KEY_EMAIL to uiState.registerEmailError,
+                                        AuthForms.KEY_PASSWORD to uiState.registerPasswordError,
+                                        AuthForms.KEY_CONFIRM_PASSWORD to uiState.registerConfirmPasswordError
+                                    ).filterValues { it.isNotEmpty() }
+                                }
+
+                                FormComponent(
+                                    formDefinition = AuthForms.registerForm,
+                                    initialValues = initialValues,
+                                    externalErrors = errors,
+                                    isSubmitting = uiState.isLoading,
+                                    onValueChange = { key, value ->
+                                        when (key) {
+                                            AuthForms.KEY_NAME -> viewModel.updateRegisterName(value)
+                                            AuthForms.KEY_SURNAME -> viewModel.updateRegisterSurname(value)
+                                            AuthForms.KEY_EMAIL -> viewModel.updateRegisterEmail(value)
+                                            AuthForms.KEY_PASSWORD -> viewModel.updateRegisterPassword(value)
+                                            AuthForms.KEY_CONFIRM_PASSWORD -> viewModel.updateRegisterConfirmPassword(value)
+                                        }
+                                    },
+                                    onSubmit = { viewModel.submitRegister() }
                                 )
                             }
                         }
