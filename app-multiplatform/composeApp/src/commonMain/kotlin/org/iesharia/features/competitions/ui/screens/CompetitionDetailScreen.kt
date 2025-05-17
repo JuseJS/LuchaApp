@@ -32,9 +32,9 @@ import androidx.compose.ui.unit.times
 import org.iesharia.core.navigation.AppScreen
 import org.iesharia.core.navigation.HandleNavigationManager
 import org.iesharia.core.navigation.NavigationManager
-import org.iesharia.core.ui.components.LuchaLoadingOverlay
+import org.iesharia.core.ui.components.WrestlingLoadingOverlay
 import org.iesharia.core.ui.components.common.EmptyStateMessage
-import org.iesharia.core.ui.theme.LuchaTheme
+import org.iesharia.core.ui.theme.WrestlingTheme
 import org.iesharia.di.rememberViewModel
 import org.iesharia.features.competitions.domain.model.Competition
 import org.iesharia.features.competitions.domain.model.MatchDay
@@ -98,7 +98,7 @@ class CompetitionDetailScreen(private val competitionId: String) : AppScreen() {
             ) {
                 when {
                     uiState.isLoading -> {
-                        LuchaLoadingOverlay()
+                        WrestlingLoadingOverlay()
                     }
                     uiState.competition == null -> {
                         EmptyStateMessage(
@@ -138,14 +138,14 @@ private fun CompetitionDetailContent(
                 modifier = Modifier
                     .fillMaxWidth()
                     .background(Color.Black)
-                    .padding(vertical = LuchaTheme.dimensions.spacing_8)
+                    .padding(vertical = WrestlingTheme.dimensions.spacing_8)
             ) {
                 Text(
                     text = "Equipos Participantes",
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold,
                     color = Color.White,
-                    modifier = Modifier.padding(horizontal = LuchaTheme.dimensions.spacing_16)
+                    modifier = Modifier.padding(horizontal = WrestlingTheme.dimensions.spacing_16)
                 )
             }
         }
@@ -158,11 +158,11 @@ private fun CompetitionDetailContent(
                 LazyVerticalGrid(
                     columns = GridCells.Fixed(2),
                     contentPadding = PaddingValues(
-                        horizontal = LuchaTheme.dimensions.spacing_16,
-                        vertical = LuchaTheme.dimensions.spacing_8
+                        horizontal = WrestlingTheme.dimensions.spacing_16,
+                        vertical = WrestlingTheme.dimensions.spacing_8
                     ),
-                    horizontalArrangement = Arrangement.spacedBy(LuchaTheme.dimensions.spacing_8),
-                    verticalArrangement = Arrangement.spacedBy(LuchaTheme.dimensions.spacing_8),
+                    horizontalArrangement = Arrangement.spacedBy(WrestlingTheme.dimensions.spacing_8),
+                    verticalArrangement = Arrangement.spacedBy(WrestlingTheme.dimensions.spacing_8),
                     modifier = Modifier
                         .fillMaxWidth()
                         .height((uiState.teams.size / 2f).toInt() * 72.dp + 16.dp)
@@ -183,14 +183,14 @@ private fun CompetitionDetailContent(
                 modifier = Modifier
                     .fillMaxWidth()
                     .background(Color.Black)
-                    .padding(vertical = LuchaTheme.dimensions.spacing_8)
+                    .padding(vertical = WrestlingTheme.dimensions.spacing_8)
             ) {
                 Text(
                     text = "Jornadas",
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold,
                     color = Color.White,
-                    modifier = Modifier.padding(horizontal = LuchaTheme.dimensions.spacing_16)
+                    modifier = Modifier.padding(horizontal = WrestlingTheme.dimensions.spacing_16)
                 )
             }
         }
@@ -205,8 +205,8 @@ private fun CompetitionDetailContent(
                 MatchDayCard(
                     matchDay = matchDay,
                     modifier = Modifier.padding(
-                        horizontal = LuchaTheme.dimensions.spacing_16,
-                        vertical = LuchaTheme.dimensions.spacing_8
+                        horizontal = WrestlingTheme.dimensions.spacing_16,
+                        vertical = WrestlingTheme.dimensions.spacing_8
                     )
                 )
             }
@@ -214,7 +214,7 @@ private fun CompetitionDetailContent(
 
         // Espacio al final
         item {
-            Spacer(modifier = Modifier.height(LuchaTheme.dimensions.spacing_16))
+            Spacer(modifier = Modifier.height(WrestlingTheme.dimensions.spacing_16))
         }
     }
 }
@@ -228,7 +228,7 @@ private fun CompetitionBanner(competition: Competition) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(top = LuchaTheme.dimensions.spacing_16),
+                .padding(top = WrestlingTheme.dimensions.spacing_16),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             // Logo/Trofeo
@@ -247,7 +247,7 @@ private fun CompetitionBanner(competition: Competition) {
                 )
             }
 
-            Spacer(modifier = Modifier.height(LuchaTheme.dimensions.spacing_12))
+            Spacer(modifier = Modifier.height(WrestlingTheme.dimensions.spacing_12))
 
             // Nombre de la competición
             Text(
@@ -275,17 +275,17 @@ private fun CompetitionBanner(competition: Competition) {
                 text = "Temporada $season",
                 style = MaterialTheme.typography.titleMedium,
                 color = Color.White.copy(alpha = 0.8f),
-                modifier = Modifier.padding(vertical = LuchaTheme.dimensions.spacing_4)
+                modifier = Modifier.padding(vertical = WrestlingTheme.dimensions.spacing_4)
             )
 
-            Spacer(modifier = Modifier.height(LuchaTheme.dimensions.spacing_16))
+            Spacer(modifier = Modifier.height(WrestlingTheme.dimensions.spacing_16))
 
             // Valores mostrados en forma de chips en la parte inferior
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
                     .background(Color(0x33000000))
-                    .padding(horizontal = LuchaTheme.dimensions.spacing_8, vertical = LuchaTheme.dimensions.spacing_12),
+                    .padding(horizontal = WrestlingTheme.dimensions.spacing_8, vertical = WrestlingTheme.dimensions.spacing_12),
                 horizontalArrangement = Arrangement.SpaceEvenly
             ) {
                 // Primera
@@ -354,12 +354,12 @@ private fun TeamCard(
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
         ),
-        shape = LuchaTheme.shapes.medium
+        shape = WrestlingTheme.shapes.medium
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = LuchaTheme.dimensions.spacing_8, vertical = LuchaTheme.dimensions.spacing_12),
+                .padding(horizontal = WrestlingTheme.dimensions.spacing_8, vertical = WrestlingTheme.dimensions.spacing_12),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             // Avatar o logo por defecto
@@ -378,7 +378,7 @@ private fun TeamCard(
                 )
             }
 
-            Spacer(modifier = Modifier.height(LuchaTheme.dimensions.spacing_8))
+            Spacer(modifier = Modifier.height(WrestlingTheme.dimensions.spacing_8))
 
             // Nombre del equipo
             Text(
@@ -401,13 +401,13 @@ private fun MatchDayCard(
 ) {
     Surface(
         color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
-        shape = LuchaTheme.shapes.medium,
+        shape = WrestlingTheme.shapes.medium,
         modifier = modifier.fillMaxWidth()
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(LuchaTheme.dimensions.spacing_16)
+                .padding(WrestlingTheme.dimensions.spacing_16)
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -429,7 +429,7 @@ private fun MatchDayCard(
                 )
             }
 
-            Spacer(modifier = Modifier.height(LuchaTheme.dimensions.spacing_8))
+            Spacer(modifier = Modifier.height(WrestlingTheme.dimensions.spacing_8))
 
             MatchDaySection(
                 matchDay = matchDay

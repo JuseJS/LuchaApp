@@ -13,9 +13,9 @@ import org.iesharia.core.domain.model.Favorite
 import org.iesharia.core.navigation.AppScreen
 import org.iesharia.core.navigation.HandleNavigationManager
 import org.iesharia.core.navigation.NavigationManager
-import org.iesharia.core.ui.components.LuchaLoadingOverlay
+import org.iesharia.core.ui.components.WrestlingLoadingOverlay
 import org.iesharia.core.ui.components.common.SectionSubtitle
-import org.iesharia.core.ui.theme.LuchaTheme
+import org.iesharia.core.ui.theme.WrestlingTheme
 import org.iesharia.di.rememberViewModel
 import org.iesharia.features.competitions.ui.components.CompetitionItem
 import org.iesharia.features.competitions.ui.components.CompetitionsSection
@@ -59,7 +59,7 @@ class HomeScreen : AppScreen() {
             ) {
                 when {
                     uiState.isLoading -> {
-                        LuchaLoadingOverlay()
+                        WrestlingLoadingOverlay()
                     }
                     else -> {
                         HomeContent(
@@ -101,14 +101,14 @@ private fun HomeContent(
 ) {
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
-        contentPadding = PaddingValues(vertical = LuchaTheme.dimensions.spacing_16)
+        contentPadding = PaddingValues(vertical = WrestlingTheme.dimensions.spacing_16)
     ) {
         // Sección de favoritos - Header con filtros
         item {
             Surface(
                 color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
-                shape = LuchaTheme.shapes.medium,
-                modifier = Modifier.padding(horizontal = LuchaTheme.dimensions.spacing_16)
+                shape = WrestlingTheme.shapes.medium,
+                modifier = Modifier.padding(horizontal = WrestlingTheme.dimensions.spacing_16)
             ) {
                 Column(modifier = Modifier.fillMaxWidth()) {
                     // Header de la sección de favoritos
@@ -132,14 +132,14 @@ private fun HomeContent(
                         if (competitions.isNotEmpty() && shouldShowCompetitions(uiState.selectedFavoriteType)) {
                             SectionSubtitle(
                                 subtitle = AppStrings.Competitions.favoriteCompetitions,
-                                modifier = Modifier.padding(horizontal = LuchaTheme.dimensions.spacing_16)
+                                modifier = Modifier.padding(horizontal = WrestlingTheme.dimensions.spacing_16)
                             )
 
-                            Spacer(modifier = Modifier.height(LuchaTheme.dimensions.spacing_8))
+                            Spacer(modifier = Modifier.height(WrestlingTheme.dimensions.spacing_8))
 
                             Column(
-                                modifier = Modifier.padding(horizontal = LuchaTheme.dimensions.spacing_16),
-                                verticalArrangement = Arrangement.spacedBy(LuchaTheme.dimensions.spacing_12)
+                                modifier = Modifier.padding(horizontal = WrestlingTheme.dimensions.spacing_16),
+                                verticalArrangement = Arrangement.spacedBy(WrestlingTheme.dimensions.spacing_12)
                             ) {
                                 competitions.forEach { favorite ->
                                     CompetitionItem(
@@ -160,14 +160,14 @@ private fun HomeContent(
                         if (teams.isNotEmpty() && shouldShowTeams(uiState.selectedFavoriteType)) {
                             SectionSubtitle(
                                 subtitle = AppStrings.Teams.favoriteTeams,
-                                modifier = Modifier.padding(horizontal = LuchaTheme.dimensions.spacing_16)
+                                modifier = Modifier.padding(horizontal = WrestlingTheme.dimensions.spacing_16)
                             )
 
-                            Spacer(modifier = Modifier.height(LuchaTheme.dimensions.spacing_8))
+                            Spacer(modifier = Modifier.height(WrestlingTheme.dimensions.spacing_8))
 
                             Column(
-                                modifier = Modifier.padding(horizontal = LuchaTheme.dimensions.spacing_16),
-                                verticalArrangement = Arrangement.spacedBy(LuchaTheme.dimensions.spacing_12)
+                                modifier = Modifier.padding(horizontal = WrestlingTheme.dimensions.spacing_16),
+                                verticalArrangement = Arrangement.spacedBy(WrestlingTheme.dimensions.spacing_12)
                             ) {
                                 teams.forEach { favorite ->
                                     // Obtener datos de enfrentamientos para equipos
@@ -193,14 +193,14 @@ private fun HomeContent(
                         if (wrestlers.isNotEmpty() && shouldShowWrestlers(uiState.selectedFavoriteType)) {
                             SectionSubtitle(
                                 subtitle = AppStrings.Wrestlers.favoriteWrestlers,
-                                modifier = Modifier.padding(horizontal = LuchaTheme.dimensions.spacing_16)
+                                modifier = Modifier.padding(horizontal = WrestlingTheme.dimensions.spacing_16)
                             )
 
-                            Spacer(modifier = Modifier.height(LuchaTheme.dimensions.spacing_8))
+                            Spacer(modifier = Modifier.height(WrestlingTheme.dimensions.spacing_8))
 
                             Column(
-                                modifier = Modifier.padding(horizontal = LuchaTheme.dimensions.spacing_16),
-                                verticalArrangement = Arrangement.spacedBy(LuchaTheme.dimensions.spacing_12)
+                                modifier = Modifier.padding(horizontal = WrestlingTheme.dimensions.spacing_16),
+                                verticalArrangement = Arrangement.spacedBy(WrestlingTheme.dimensions.spacing_12)
                             ) {
                                 wrestlers.forEach { favorite ->
                                     // Obtener resultados para luchadores
@@ -218,20 +218,20 @@ private fun HomeContent(
                     }
 
                     // Espaciado final
-                    Spacer(modifier = Modifier.height(LuchaTheme.dimensions.spacing_16))
+                    Spacer(modifier = Modifier.height(WrestlingTheme.dimensions.spacing_16))
                 }
             }
 
-            Spacer(modifier = Modifier.height(LuchaTheme.dimensions.spacing_16))
+            Spacer(modifier = Modifier.height(WrestlingTheme.dimensions.spacing_16))
 
             HorizontalDivider(
                 modifier = Modifier.padding(
-                    horizontal = LuchaTheme.dimensions.spacing_16,
+                    horizontal = WrestlingTheme.dimensions.spacing_16,
                 ),
                 color = MaterialTheme.colorScheme.outlineVariant
             )
 
-            Spacer(modifier = Modifier.height(LuchaTheme.dimensions.spacing_16))
+            Spacer(modifier = Modifier.height(WrestlingTheme.dimensions.spacing_16))
         }
 
         // Sección de competiciones - Header y filtros
@@ -258,8 +258,8 @@ private fun HomeContent(
                     competition = competition,
                     onClick = { viewModel.navigateToCompetitionDetail(competition.id) },
                     modifier = Modifier.padding(
-                        horizontal = LuchaTheme.dimensions.spacing_16,
-                        vertical = LuchaTheme.dimensions.spacing_8
+                        horizontal = WrestlingTheme.dimensions.spacing_16,
+                        vertical = WrestlingTheme.dimensions.spacing_8
                     )
                 )
             }
@@ -267,7 +267,7 @@ private fun HomeContent(
 
         // Espacio al final para evitar que el último elemento quede cortado
         item {
-            Spacer(modifier = Modifier.height(LuchaTheme.dimensions.spacing_16))
+            Spacer(modifier = Modifier.height(WrestlingTheme.dimensions.spacing_16))
         }
     }
 }

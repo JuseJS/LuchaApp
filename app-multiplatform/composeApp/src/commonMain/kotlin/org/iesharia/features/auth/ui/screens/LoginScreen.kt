@@ -21,7 +21,7 @@ import org.iesharia.core.navigation.NavigationManager
 import org.iesharia.core.resources.AppStrings
 import org.iesharia.core.ui.components.*
 import org.iesharia.core.ui.form.FormComponent
-import org.iesharia.core.ui.theme.LuchaTheme
+import org.iesharia.core.ui.theme.WrestlingTheme
 import org.iesharia.di.rememberViewModel
 import org.iesharia.features.auth.ui.components.AuthForms
 import org.iesharia.features.auth.ui.viewmodel.LoginViewModel
@@ -49,7 +49,7 @@ class LoginScreen : AppScreen() {
                     modifier = Modifier
                         .fillMaxSize()
                         .verticalScroll(rememberScrollState())
-                        .padding(LuchaTheme.dimensions.spacing_24),
+                        .padding(WrestlingTheme.dimensions.spacing_24),
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Center
                 ) {
@@ -57,25 +57,25 @@ class LoginScreen : AppScreen() {
                     Spacer(modifier = Modifier.weight(0.1f))
 
                     // Logo (ahora usando componente global)
-                    LuchaAppLogo(
+                    WrestlingAppLogo(
                         painter = painterResource(Res.drawable.app_logo),
                         contentDescription = AppStrings.Common.appLogoDesc
                     )
 
-                    Spacer(modifier = Modifier.height(LuchaTheme.dimensions.spacing_32))
+                    Spacer(modifier = Modifier.height(WrestlingTheme.dimensions.spacing_32))
 
                     // Encabezado (ahora usando componente global)
-                    LuchaAppHeader(
+                    WrestlingAppHeader(
                         title = AppStrings.Common.appName,
                         subtitle = AppStrings.Common.appSubtitle
                     )
 
-                    Spacer(modifier = Modifier.height(LuchaTheme.dimensions.spacing_40))
+                    Spacer(modifier = Modifier.height(WrestlingTheme.dimensions.spacing_40))
 
                     // Contenedor del formulario
                     Column(
                         modifier = Modifier
-                            .widthIn(max = LuchaTheme.dimensions.login_form_max_width)
+                            .widthIn(max = WrestlingTheme.dimensions.login_form_max_width)
                             .fillMaxWidth(),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
@@ -187,16 +187,16 @@ class LoginScreen : AppScreen() {
                             }
                         }
 
-                        Spacer(modifier = Modifier.height(LuchaTheme.dimensions.spacing_16))
+                        Spacer(modifier = Modifier.height(WrestlingTheme.dimensions.spacing_16))
 
                         // Botón para alternar entre login y registro
-                        LuchaButton(
+                        WrestlingButton(
                             text = if (uiState.isLoginMode)
                                 AppStrings.Auth.noAccount
                             else
                                 AppStrings.Auth.alreadyHaveAccount,
                             onClick = viewModel::toggleAuthMode,
-                            type = LuchaButtonType.TEXT,
+                            type = WrestlingButtonType.TEXT,
                             customColor = MaterialTheme.colorScheme.secondary
                         )
                     }
@@ -210,7 +210,7 @@ class LoginScreen : AppScreen() {
                     enter = fadeIn(),
                     exit = fadeOut()
                 ) {
-                    LuchaLoadingOverlay()
+                    WrestlingLoadingOverlay()
                 }
             }
         }
