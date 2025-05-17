@@ -3,107 +3,70 @@ package org.iesharia.features.home.ui.screens
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.*
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
 import org.iesharia.core.domain.model.Favorite
-import org.iesharia.core.navigation.AppScreen
-import org.iesharia.core.navigation.HandleNavigationManager
-import org.iesharia.core.navigation.NavigationManager
-import org.iesharia.core.ui.components.WrestlingLoadingOverlay
+import org.iesharia.core.resources.AppStrings
 import org.iesharia.core.ui.components.common.SectionSubtitle
+import org.iesharia.core.ui.screens.BaseContentScreen
 import org.iesharia.core.ui.theme.WrestlingTheme
 import org.iesharia.di.rememberViewModel
 import org.iesharia.features.competitions.ui.components.CompetitionItem
 import org.iesharia.features.competitions.ui.components.CompetitionsSection
 import org.iesharia.features.competitions.ui.components.EmptyCompetitions
-import org.iesharia.features.home.ui.components.EmptyFavorites
-import org.iesharia.features.home.ui.components.FavoritesSectionDivider
-import org.iesharia.features.home.ui.components.FavoritesSectionHeader
-import org.iesharia.features.home.ui.components.shouldShowCompetitions
-import org.iesharia.features.home.ui.components.shouldShowTeams
-import org.iesharia.features.home.ui.components.shouldShowWrestlers
+import org.iesharia.features.home.ui.components.*
 import org.iesharia.features.home.ui.viewmodel.HomeUiState
 import org.iesharia.features.home.ui.viewmodel.HomeViewModel
 import org.iesharia.features.teams.ui.components.TeamItem
 import org.iesharia.features.wrestlers.ui.components.WrestlerItem
-import org.iesharia.core.resources.AppStrings
-import org.iesharia.core.ui.components.ErrorSnackbarHost
-import org.iesharia.core.ui.components.ViewModelErrorHandler
-import org.koin.compose.koinInject
 
 /**
  * Pantalla principal de la aplicación, optimizada para mostrar secciones responsivas
  */
-class HomeScreen : AppScreen() {
+class HomeScreen : BaseContentScreen() {
+
+    private lateinit var viewModel: HomeViewModel
+
     @Composable
-    override fun ScreenContent() {
-        val viewModel = rememberViewModel<HomeViewModel>()
-        val uiState by viewModel.uiState.collectAsState()
-        val navigator = requireNavigator()
-        val navigationManager = koinInject<NavigationManager>()
-
-        // Crear el SnackbarHostState aquí, separado del ViewModelErrorHandler
-        val snackbarHostState = remember { SnackbarHostState() }
-
-        // Configurar manejo de errores pasando el SnackbarHostState
-        ViewModelErrorHandler(
-            viewModel = viewModel,
-            snackbarHostState = snackbarHostState
-        )
-
-        // Manejar navegación
-        navigator.HandleNavigationManager(navigationManager)
-
-        Scaffold(
-            topBar = {
-                HomeTopBar()
-            },
-            snackbarHost = {
-                ErrorSnackbarHost(snackbarHostState)
-            }
-        ) { paddingValues ->
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(paddingValues)
-            ) {
-                when {
-                    uiState.isLoading -> {
-                        WrestlingLoadingOverlay()
-                    }
-                    else -> {
-                        HomeContent(
-                            uiState = uiState,
-                            viewModel = viewModel
-                        )
-                    }
-                }
-            }
-        }
+    override fun SetupViewModel() {
+        viewModel = rememberViewModel<HomeViewModel>()
     }
-}
 
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun HomeTopBar() {
-    CenterAlignedTopAppBar(
-        title = {
-            Text(
-                text = AppStrings.Common.appName,
-                style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.Bold
-            )
-        },
-        colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-            containerColor = MaterialTheme.colorScheme.surface,
-            titleContentColor = MaterialTheme.colorScheme.primary
+    @Composable
+    override fun ScreenTitle(): String {
+        return AppStrings.Common.appName
+    }
+
+    @Composable
+    override fun OnNavigateBack(): (() -> Unit)? {
+        return null // No hay navegación hacia atrás en la pantalla principal
+    }
+
+    @Composable
+    override fun TopBarActions() {
+        // Sin acciones en la barra superior para esta pantalla
+    }
+
+    @Composable
+    override fun IsLoading(): Boolean {
+        val uiState by viewModel.uiState.collectAsState()
+        return uiState.isLoading
+    }
+
+    @Composable
+    override fun ContentImpl() {
+        val uiState by viewModel.uiState.collectAsState()
+
+        HomeContent(
+            uiState = uiState,
+            viewModel = viewModel
         )
-    )
+    }
 }
 
 /**
