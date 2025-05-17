@@ -9,13 +9,13 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import org.iesharia.core.ui.theme.LuchaTheme
+import org.iesharia.core.ui.theme.WrestlingTheme
 
 /**
  * Overlay de carga global para la aplicación
  */
 @Composable
-fun LuchaLoadingOverlay() {
+fun WrestlingLoadingOverlay() {
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -23,7 +23,7 @@ fun LuchaLoadingOverlay() {
         contentAlignment = Alignment.Center
     ) {
         CircularProgressIndicator(
-            modifier = Modifier.size(LuchaTheme.dimensions.icon_size_large),
+            modifier = Modifier.size(WrestlingTheme.dimensions.icon_size_large),
             color = MaterialTheme.colorScheme.primary
         )
     }

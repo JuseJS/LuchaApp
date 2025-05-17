@@ -12,12 +12,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
-import org.iesharia.core.ui.theme.LuchaTheme
+import org.iesharia.core.ui.theme.WrestlingTheme
 
 /**
  * Tipos de botones disponibles en la aplicación
  */
-enum class LuchaButtonType {
+enum class WrestlingButtonType {
     PRIMARY,
     SECONDARY,
     TEXT
@@ -27,24 +27,24 @@ enum class LuchaButtonType {
  * Botón universal personalizado para la aplicación de Lucha Canaria
  */
 @Composable
-fun LuchaButton(
+fun WrestlingButton(
     text: String,
     onClick: () -> Unit,
-    type: LuchaButtonType = LuchaButtonType.PRIMARY,
+    type: WrestlingButtonType = WrestlingButtonType.PRIMARY,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     customColor: Color? = null // Solo usado para botones de tipo TEXT
 ) {
     when (type) {
-        LuchaButtonType.PRIMARY, LuchaButtonType.SECONDARY -> {
+        WrestlingButtonType.PRIMARY, WrestlingButtonType.SECONDARY -> {
             val colors = when (type) {
-                LuchaButtonType.PRIMARY -> ButtonDefaults.buttonColors(
+                WrestlingButtonType.PRIMARY -> ButtonDefaults.buttonColors(
                     containerColor = MaterialTheme.colorScheme.primary,
                     contentColor = MaterialTheme.colorScheme.onPrimary,
                     disabledContainerColor = MaterialTheme.colorScheme.surfaceVariant,
                     disabledContentColor = MaterialTheme.colorScheme.onSurfaceVariant
                 )
-                LuchaButtonType.SECONDARY -> ButtonDefaults.buttonColors(
+                WrestlingButtonType.SECONDARY -> ButtonDefaults.buttonColors(
                     containerColor = MaterialTheme.colorScheme.secondary,
                     contentColor = MaterialTheme.colorScheme.onSecondary,
                     disabledContainerColor = MaterialTheme.colorScheme.surfaceVariant,
@@ -57,10 +57,10 @@ fun LuchaButton(
                 onClick = onClick,
                 modifier = modifier
                     .fillMaxWidth()
-                    .height(LuchaTheme.dimensions.button_height)
-                    .padding(vertical = LuchaTheme.dimensions.spacing_8),
+                    .height(WrestlingTheme.dimensions.button_height)
+                    .padding(vertical = WrestlingTheme.dimensions.spacing_8),
                 enabled = enabled,
-                shape = LuchaTheme.shapes.buttonShape,
+                shape = WrestlingTheme.shapes.buttonShape,
                 colors = colors
             ) {
                 Text(
@@ -70,13 +70,13 @@ fun LuchaButton(
                 )
             }
         }
-        LuchaButtonType.TEXT -> {
+        WrestlingButtonType.TEXT -> {
             val color = customColor ?: MaterialTheme.colorScheme.primary
             TextButton(
                 onClick = onClick,
                 modifier = modifier
                     .fillMaxWidth()
-                    .padding(vertical = LuchaTheme.dimensions.spacing_4),
+                    .padding(vertical = WrestlingTheme.dimensions.spacing_4),
                 enabled = enabled
             ) {
                 Text(

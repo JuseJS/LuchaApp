@@ -24,14 +24,14 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
-import org.iesharia.core.ui.theme.LuchaTheme
+import org.iesharia.core.ui.theme.WrestlingTheme
 import org.iesharia.core.resources.AppStrings
 
 /**
  * Campo de texto personalizado para la aplicación de Lucha Canaria
  */
 @Composable
-fun LuchaTextField(
+fun WrestlingTextField(
     value: String,
     onValueChange: (String) -> Unit,
     modifier: Modifier = Modifier,
@@ -57,7 +57,7 @@ fun LuchaTextField(
         onValueChange = onValueChange,
         modifier = modifier
             .fillMaxWidth()
-            .padding(bottom = LuchaTheme.dimensions.spacing_16),
+            .padding(bottom = WrestlingTheme.dimensions.spacing_16),
         label = { Text(label) },
         placeholder = { Text(placeholder) },
         leadingIcon = if (leadingIcon != null) {
@@ -94,7 +94,7 @@ fun LuchaTextField(
         singleLine = singleLine,
         maxLines = maxLines,
         enabled = enabled,
-        shape = LuchaTheme.shapes.inputFieldShape,
+        shape = WrestlingTheme.shapes.inputFieldShape,
         supportingText = if (isError && errorMessage.isNotEmpty()) {
             { Text(errorMessage) }
         } else null
