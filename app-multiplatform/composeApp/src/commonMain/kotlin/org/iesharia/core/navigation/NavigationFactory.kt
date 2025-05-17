@@ -2,6 +2,7 @@ package org.iesharia.core.navigation
 
 import cafe.adriel.voyager.core.screen.Screen
 import org.iesharia.features.auth.ui.screens.LoginScreen
+import org.iesharia.features.competitions.ui.screens.CompetitionDetailScreen
 import org.iesharia.features.home.ui.screens.HomeScreen
 
 /**
@@ -19,9 +20,7 @@ class NavigationFactory {
             // Competiciones
             is Routes.Competition.Detail -> {
                 val competitionId = getLastPathSegment(navigationRoute.route)
-                // Por ahora retornamos HomeScreen
-                // TODO: Implementar pantalla de detalle de competición
-                HomeScreen()
+                CompetitionDetailScreen(competitionId)
             }
 
             // Equipos
