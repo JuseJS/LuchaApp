@@ -83,7 +83,7 @@ private val LightColorScheme = lightColorScheme(
 /**
  * Objeto para acceder al tema globalmente
  */
-object LuchaTheme {
+object WrestlingTheme {
     val dimensions: Dimensions
         @Composable
         @ReadOnlyComposable
@@ -96,7 +96,7 @@ object LuchaTheme {
 }
 
 @Composable
-fun LuchaAppTheme(
+fun WrestlingAppTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     dynamicColor: Boolean = false, // No usamos colores dinámicos en esta versión
     content: @Composable () -> Unit
