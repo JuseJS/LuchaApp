@@ -9,7 +9,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import org.iesharia.core.ui.theme.LuchaTheme
+import org.iesharia.core.ui.theme.WrestlingTheme
 
 /**
  * Componentes comunes optimizados para su reutilización en la aplicación
@@ -27,7 +27,7 @@ fun SectionTitle(
         text = title,
         style = MaterialTheme.typography.titleLarge,
         fontWeight = FontWeight.Bold,
-        modifier = modifier.padding(horizontal = LuchaTheme.dimensions.spacing_16)
+        modifier = modifier.padding(horizontal = WrestlingTheme.dimensions.spacing_16)
     )
 }
 
@@ -44,9 +44,9 @@ fun SectionSubtitle(
         style = MaterialTheme.typography.titleMedium,
         color = MaterialTheme.colorScheme.secondary,
         fontWeight = FontWeight.Bold,
-        modifier = modifier.padding(horizontal = LuchaTheme.dimensions.spacing_16)
+        modifier = modifier.padding(horizontal = WrestlingTheme.dimensions.spacing_16)
     )
-    Spacer(modifier = Modifier.height(LuchaTheme.dimensions.spacing_8))
+    Spacer(modifier = Modifier.height(WrestlingTheme.dimensions.spacing_8))
 }
 
 /**
@@ -62,7 +62,7 @@ fun EmptyStateMessage(
         style = MaterialTheme.typography.bodyMedium,
         color = MaterialTheme.colorScheme.onSurfaceVariant,
         textAlign = TextAlign.Center,
-        modifier = modifier.padding(horizontal = LuchaTheme.dimensions.spacing_16)
+        modifier = modifier.padding(horizontal = WrestlingTheme.dimensions.spacing_16)
     )
 }
 
