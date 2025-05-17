@@ -9,12 +9,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import org.iesharia.core.resources.AppStrings
 import org.iesharia.core.ui.components.common.ItemCard
-import org.iesharia.core.ui.components.common.SubSectionList
+import org.iesharia.core.ui.components.common.SectionList
+import org.iesharia.core.ui.components.common.SectionType
 import org.iesharia.core.ui.theme.WrestlingTheme
 import org.iesharia.features.teams.domain.model.Match
 import org.iesharia.features.teams.domain.model.Team
-import org.iesharia.core.resources.AppStrings
 
 @Composable
 fun TeamItem(
@@ -56,12 +57,12 @@ fun TeamItem(
         if (lastMatches.isNotEmpty() || nextMatches.isNotEmpty()) {
             Spacer(modifier = Modifier.height(WrestlingTheme.dimensions.spacing_16))
 
-            // Mostrar últimos enfrentamientos usando SubSectionList
+            // Mostrar últimos enfrentamientos
             if (lastMatches.isNotEmpty()) {
-                SubSectionList(
+                SectionList(
                     items = lastMatches.take(2),
-                    subtitle = AppStrings.Teams.lastMatches,
-                    emptyContent = {},
+                    title = AppStrings.Teams.lastMatches,
+                    type = SectionType.SECONDARY,
                     contentPadding = PaddingValues(0.dp)
                 ) { match ->
                     MatchItem(
@@ -75,12 +76,12 @@ fun TeamItem(
                 }
             }
 
-            // Mostrar próximos enfrentamientos usando SubSectionList
+            // Mostrar próximos enfrentamientos
             if (nextMatches.isNotEmpty()) {
-                SubSectionList(
+                SectionList(
                     items = nextMatches.take(2),
-                    subtitle = AppStrings.Teams.nextMatches,
-                    emptyContent = {},
+                    title = AppStrings.Teams.nextMatches,
+                    type = SectionType.SECONDARY,
                     contentPadding = PaddingValues(0.dp)
                 ) { match ->
                     MatchItem(
