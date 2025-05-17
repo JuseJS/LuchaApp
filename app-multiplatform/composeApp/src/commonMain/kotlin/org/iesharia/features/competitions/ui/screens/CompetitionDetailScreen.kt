@@ -1,4 +1,3 @@
-// composeApp/src/commonMain/kotlin/org/iesharia/features/competitions/ui/screens/CompetitionDetailScreen.kt
 package org.iesharia.features.competitions.ui.screens
 
 import androidx.compose.foundation.Image
@@ -11,7 +10,7 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.EmojiEvents
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
@@ -49,11 +48,11 @@ import org.koin.core.parameter.parametersOf
 class CompetitionDetailScreen(private val competitionId: String) : AppScreen() {
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
-    override fun Content() {
-        val navigationManager = koinInject<NavigationManager>()
+    override fun ScreenContent() {
         val viewModel = rememberViewModel<CompetitionDetailViewModel> { parametersOf(competitionId) }
         val uiState by viewModel.uiState.collectAsState()
         val navigator = requireNavigator()
+        val navigationManager = koinInject<NavigationManager>()
 
         // Manejar navegación
         navigator.HandleNavigationManager(navigationManager)
@@ -71,7 +70,7 @@ class CompetitionDetailScreen(private val competitionId: String) : AppScreen() {
                     navigationIcon = {
                         IconButton(onClick = { viewModel.navigateBack() }) {
                             Icon(
-                                imageVector = Icons.Default.ArrowBack,
+                                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                                 contentDescription = "Volver"
                             )
                         }
