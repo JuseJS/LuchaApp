@@ -4,6 +4,7 @@ import cafe.adriel.voyager.core.screen.Screen
 import org.iesharia.features.auth.ui.screens.LoginScreen
 import org.iesharia.features.competitions.ui.screens.CompetitionDetailScreen
 import org.iesharia.features.home.ui.screens.HomeScreen
+import org.iesharia.features.teams.ui.screens.TeamDetailScreen
 
 /**
  * Factory que convierte rutas de navegación en pantallas de Voyager.
@@ -26,9 +27,7 @@ class NavigationFactory {
             // Equipos
             is Routes.Team.Detail -> {
                 val teamId = getLastPathSegment(navigationRoute.route)
-                // Por ahora retornamos HomeScreen
-                // TODO: Implementar pantalla de detalle de equipo
-                HomeScreen()
+                TeamDetailScreen(teamId)
             }
 
             // Luchadores
