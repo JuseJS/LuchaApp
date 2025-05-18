@@ -12,7 +12,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.EmojiEvents
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
-import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -22,13 +21,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.times
 import org.iesharia.core.ui.components.common.EmptyStateMessage
-import org.iesharia.core.ui.components.common.EntityHeader
-import org.iesharia.core.ui.components.common.EntityHeaderChips
 import org.iesharia.core.ui.screens.BaseContentScreen
 import org.iesharia.core.ui.theme.WrestlingTheme
 import org.iesharia.di.rememberViewModel
@@ -36,8 +31,8 @@ import org.iesharia.features.competitions.domain.model.Competition
 import org.iesharia.features.competitions.domain.model.MatchDay
 import org.iesharia.features.competitions.ui.viewmodel.CompetitionDetailUiState
 import org.iesharia.features.competitions.ui.viewmodel.CompetitionDetailViewModel
-import org.iesharia.features.teams.domain.model.Team
 import org.iesharia.features.teams.ui.components.MatchDaySection
+import org.iesharia.features.teams.ui.components.TeamGridCard
 import org.koin.core.parameter.parametersOf
 
 class CompetitionDetailScreen(private val competitionId: String) : BaseContentScreen() {
@@ -147,9 +142,10 @@ private fun CompetitionDetailContent(
                         .height((uiState.teams.size / 2f).toInt() * 72.dp + 16.dp)
                 ) {
                     items(uiState.teams) { team ->
-                        TeamCard(
+                        // Usar directamente TeamGridCard en lugar de TeamCard
+                        TeamGridCard(
                             team = team,
-                            onClick = { onTeamClick(team.id) } // Esta es la línea importante!
+                            onClick = { onTeamClick(team.id) }
                         )
                     }
                 }
@@ -211,23 +207,59 @@ private fun CompetitionBanner(competition: Competition) {
         competition.season
     }
 
-    EntityHeader(
-        title = competition.name,
-        iconVector = Icons.Default.EmojiEvents,
-        iconSize = 60.dp,
-        subtitleContent = {
-            Text(
-                text = "Temporada $season",
-                style = MaterialTheme.typography.titleMedium,
-                color = Color.White.copy(alpha = 0.8f),
-                modifier = Modifier.padding(vertical = WrestlingTheme.dimensions.spacing_4)
-            )
-        },
-        bottomContent = {
-            EntityHeaderChips {
+    Surface(
+        color = MaterialTheme.colorScheme.primaryContainer,
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = WrestlingTheme.dimensions.spacing_16,
+                    vertical = WrestlingTheme.dimensions.spacing_16),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            // Icono de trofeo
+            Box(
+                modifier = Modifier
+                    .size(80.dp)
+                    .clip(CircleShape)
+                    .background(Color(0x20FFFFFF)),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    imageVector = Icons.Default.EmojiEvents,
+                    contentDescription = null,
+                    modifier = Modifier.size(48.dp),
+                    tint = Color.White.copy(alpha = 0.9f)
+                )
+            }
+
+            Spacer(modifier = Modifier.width(WrestlingTheme.dimensions.spacing_16))
+
+            // Información de la competición
+            Column(
+                modifier = Modifier.weight(1f)
+            ) {
+                Text(
+                    text = competition.name,
+                    style = MaterialTheme.typography.headlineSmall,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.White
+                )
+
+                Text(
+                    text = "Temporada $season",
+                    style = MaterialTheme.typography.titleMedium,
+                    color = Color.White.copy(alpha = 0.8f),
+                    modifier = Modifier.padding(vertical = WrestlingTheme.dimensions.spacing_4)
+                )
+
+                // Chips de filtros
                 Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceEvenly
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = WrestlingTheme.dimensions.spacing_8),
+                    horizontalArrangement = Arrangement.spacedBy(WrestlingTheme.dimensions.spacing_8)
                 ) {
                     // Primera
                     FilterChip(
@@ -281,57 +313,6 @@ private fun CompetitionBanner(competition: Competition) {
                     )
                 }
             }
-        }
-    )
-}
-
-@Composable
-private fun TeamCard(
-    team: Team,
-    onClick: () -> Unit
-) {
-    Card(
-        onClick = onClick,
-        modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
-        ),
-        shape = WrestlingTheme.shapes.medium
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = WrestlingTheme.dimensions.spacing_8, vertical = WrestlingTheme.dimensions.spacing_12),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            // Avatar o logo por defecto
-            Box(
-                modifier = Modifier
-                    .size(40.dp)
-                    .clip(CircleShape)
-                    .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.1f)),
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Person,
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.size(24.dp)
-                )
-            }
-
-            Spacer(modifier = Modifier.height(WrestlingTheme.dimensions.spacing_8))
-
-            // Nombre del equipo
-            Text(
-                text = team.name,
-                style = MaterialTheme.typography.bodyMedium,
-                fontWeight = FontWeight.Medium,
-                color = MaterialTheme.colorScheme.onSurface,
-                maxLines = 2,
-                overflow = TextOverflow.Ellipsis,
-                textAlign = TextAlign.Center
-            )
         }
     }
 }
