@@ -9,13 +9,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import org.iesharia.core.resources.AppStrings
+import org.iesharia.features.teams.domain.model.Match
+import org.iesharia.features.teams.domain.model.Team
 import org.iesharia.core.ui.components.common.ItemCard
 import org.iesharia.core.ui.components.common.SectionList
 import org.iesharia.core.ui.components.common.SectionType
-import org.iesharia.core.ui.theme.WrestlingTheme
-import org.iesharia.features.teams.domain.model.Match
-import org.iesharia.features.teams.domain.model.Team
+import org.iesharia.core.ui.theme.*
+import org.iesharia.core.resources.AppStrings
 
 @Composable
 fun TeamItem(
@@ -28,6 +28,7 @@ fun TeamItem(
     ItemCard(
         onClick = onClick,
         modifier = modifier,
+        containerColor = DarkSurface2,
         title = {
             // Logo e información del equipo
             Row(
@@ -39,7 +40,8 @@ fun TeamItem(
                     Text(
                         text = team.name,
                         style = MaterialTheme.typography.titleLarge,
-                        fontWeight = FontWeight.Bold
+                        fontWeight = FontWeight.Bold,
+                        color = White90
                     )
 
                     Spacer(modifier = Modifier.height(WrestlingTheme.dimensions.spacing_4))
@@ -47,7 +49,7 @@ fun TeamItem(
                     Text(
                         text = AppStrings.Teams.islandLabel.format(team.island.displayName()),
                         style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                        color = White80
                     )
                 }
             }
@@ -96,7 +98,7 @@ fun TeamItem(
             Text(
                 text = AppStrings.Teams.noRecentMatches,
                 style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                color = White80,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.fillMaxWidth()
             )
