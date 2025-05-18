@@ -26,7 +26,7 @@ import org.iesharia.features.teams.ui.components.TeamItem
 import org.iesharia.features.wrestlers.ui.components.WrestlerItem
 
 /**
- * Pantalla principal de la aplicación, optimizada para mostrar secciones responsivas
+ * Main home screen of the application, optimized for OLED displays
  */
 class HomeScreen : BaseContentScreen() {
 
@@ -44,12 +44,12 @@ class HomeScreen : BaseContentScreen() {
 
     @Composable
     override fun OnNavigateBack(): (() -> Unit)? {
-        return null // No hay navegación hacia atrás en la pantalla principal
+        return null // No back navigation from main screen
     }
 
     @Composable
     override fun TopBarActions() {
-        // Sin acciones en la barra superior para esta pantalla
+        // No actions for this screen
     }
 
     @Composable
@@ -70,7 +70,7 @@ class HomeScreen : BaseContentScreen() {
 }
 
 /**
- * Contenido principal de la pantalla de inicio
+ * Main content of the home screen
  */
 @Composable
 private fun HomeContent(
@@ -81,32 +81,32 @@ private fun HomeContent(
         modifier = Modifier.fillMaxSize(),
         contentPadding = PaddingValues(vertical = WrestlingTheme.dimensions.spacing_16)
     ) {
-        // Sección de favoritos - Header con filtros
+        // Favorites section
         item {
             Surface(
-                color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
+                color = MaterialTheme.colorScheme.surfaceVariant,
                 shape = WrestlingTheme.shapes.medium,
                 modifier = Modifier.padding(horizontal = WrestlingTheme.dimensions.spacing_16)
             ) {
                 Column(modifier = Modifier.fillMaxWidth()) {
-                    // Header de la sección de favoritos
+                    // Favorites section header with filters
                     FavoritesSectionHeader(
                         selectedType = uiState.selectedFavoriteType,
                         onTypeSelected = { viewModel.setFavoriteType(it) }
                     )
 
-                    // Contenido según el tipo seleccionado
+                    // Favorites content based on selected filter
                     val favorites = viewModel.getFilteredFavorites()
 
                     if (favorites.isEmpty()) {
                         EmptyFavorites(uiState.selectedFavoriteType)
                     } else {
-                        // Obtención de favoritos según tipo
+                        // Display favorites by type
                         val competitions = favorites.filterIsInstance<Favorite.CompetitionFavorite>()
                         val teams = favorites.filterIsInstance<Favorite.TeamFavorite>()
                         val wrestlers = favorites.filterIsInstance<Favorite.WrestlerFavorite>()
 
-                        // Sección de competiciones
+                        // Competition favorites section
                         if (competitions.isNotEmpty() && shouldShowCompetitions(uiState.selectedFavoriteType)) {
                             SectionSubtitle(
                                 subtitle = AppStrings.Competitions.favoriteCompetitions,
@@ -134,7 +134,7 @@ private fun HomeContent(
                             }
                         }
 
-                        // Sección de equipos
+                        // Team favorites section
                         if (teams.isNotEmpty() && shouldShowTeams(uiState.selectedFavoriteType)) {
                             SectionSubtitle(
                                 subtitle = AppStrings.Teams.favoriteTeams,
@@ -148,7 +148,6 @@ private fun HomeContent(
                                 verticalArrangement = Arrangement.spacedBy(WrestlingTheme.dimensions.spacing_12)
                             ) {
                                 teams.forEach { favorite ->
-                                    // Obtener datos de enfrentamientos para equipos
                                     val teamId = favorite.team.id
                                     val lastMatches = viewModel.getTeamLastMatches(teamId)
                                     val nextMatches = viewModel.getTeamNextMatches(teamId)
@@ -167,7 +166,7 @@ private fun HomeContent(
                             }
                         }
 
-                        // Sección de luchadores
+                        // Wrestler favorites section
                         if (wrestlers.isNotEmpty() && shouldShowWrestlers(uiState.selectedFavoriteType)) {
                             SectionSubtitle(
                                 subtitle = AppStrings.Wrestlers.favoriteWrestlers,
@@ -181,7 +180,6 @@ private fun HomeContent(
                                 verticalArrangement = Arrangement.spacedBy(WrestlingTheme.dimensions.spacing_12)
                             ) {
                                 wrestlers.forEach { favorite ->
-                                    // Obtener resultados para luchadores
                                     val wrestlerId = favorite.wrestler.id
                                     val results = viewModel.getWrestlerResults(wrestlerId)
 
@@ -195,13 +193,14 @@ private fun HomeContent(
                         }
                     }
 
-                    // Espaciado final
+                    // Bottom spacing
                     Spacer(modifier = Modifier.height(WrestlingTheme.dimensions.spacing_16))
                 }
             }
 
             Spacer(modifier = Modifier.height(WrestlingTheme.dimensions.spacing_16))
 
+            // Section divider
             HorizontalDivider(
                 modifier = Modifier.padding(
                     horizontal = WrestlingTheme.dimensions.spacing_16,
@@ -212,19 +211,19 @@ private fun HomeContent(
             Spacer(modifier = Modifier.height(WrestlingTheme.dimensions.spacing_16))
         }
 
-        // Sección de competiciones - Header y filtros
+        // Competitions section with filters
         item {
             CompetitionsSection(
                 competitions = emptyList(),
                 currentFilters = uiState.filters,
                 onFilterChanged = viewModel::updateFilters,
                 onClearFilters = viewModel::clearFilters,
-                onCompetitionClick = { /* No se usa */ },
+                onCompetitionClick = { /* Not used here */ },
                 showEmptyState = false
             )
         }
 
-        // Lista de competiciones
+        // Competitions list
         val filteredCompetitions = viewModel.getFilteredCompetitions()
         if (filteredCompetitions.isEmpty()) {
             item {
@@ -243,7 +242,7 @@ private fun HomeContent(
             }
         }
 
-        // Espacio al final para evitar que el último elemento quede cortado
+        // Bottom spacing
         item {
             Spacer(modifier = Modifier.height(WrestlingTheme.dimensions.spacing_16))
         }
