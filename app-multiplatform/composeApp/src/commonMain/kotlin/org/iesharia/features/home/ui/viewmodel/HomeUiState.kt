@@ -40,17 +40,12 @@ data class CompetitionFilters(
  */
 data class HomeUiState(
     val isLoading: Boolean = true,
-    val errorMessage: String? = null,  // Campo para mensajes de error
-
-    // Favoritos
+    val errorMessage: String? = null,
     val favorites: List<Favorite> = emptyList(),
     val selectedFavoriteType: FavoriteType = FavoriteType.ALL,
-
-    // Competiciones
     val competitions: List<Competition> = emptyList(),
     val filters: CompetitionFilters = CompetitionFilters(),
-
-    // Datos adicionales para equipos y luchadores
     val teamMatches: Map<String, Pair<List<Match>, List<Match>>> = emptyMap(),
-    val wrestlerResults: Map<String, List<WrestlerMatchResult>> = emptyMap()
+    val wrestlerResults: Map<String, List<WrestlerMatchResult>> = emptyMap(),
+    val searchQuery: String = "" // Nuevo campo para la búsqueda
 )
