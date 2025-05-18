@@ -7,16 +7,14 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Person
-import androidx.compose.material3.*
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.times
@@ -34,7 +32,7 @@ import org.iesharia.features.competitions.ui.components.EmptyCompetitions
 import org.iesharia.features.home.ui.components.*
 import org.iesharia.features.home.ui.viewmodel.HomeUiState
 import org.iesharia.features.home.ui.viewmodel.HomeViewModel
-import org.iesharia.features.teams.domain.model.Team
+import org.iesharia.features.teams.ui.components.TeamGridCard
 import org.iesharia.features.teams.ui.components.TeamItem
 import org.iesharia.features.wrestlers.ui.components.WrestlerItem
 
@@ -435,58 +433,6 @@ private fun HomeContent(
         // Espaciado al final
         item {
             Spacer(modifier = Modifier.height(WrestlingTheme.dimensions.spacing_16))
-        }
-    }
-}
-
-/**
- * Tarjeta compacta para mostrar un equipo en el grid
- * Implementada para usar los colores OLED específicos del tema
- */
-@Composable
-fun TeamGridCard(
-    team: Team,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    Surface(
-        onClick = onClick,
-        color = DarkSurface2,
-        shape = WrestlingTheme.shapes.medium,
-        modifier = modifier
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(WrestlingTheme.dimensions.spacing_12),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            // Logo o avatar
-            Box(
-                modifier = Modifier
-                    .size(40.dp)
-                    .clip(CircleShape)
-                    .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.1f)),
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Person,
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.size(24.dp)
-                )
-            }
-
-            Spacer(modifier = Modifier.width(WrestlingTheme.dimensions.spacing_8))
-
-            // Nombre del equipo
-            Text(
-                text = team.name,
-                style = MaterialTheme.typography.bodyMedium,
-                fontWeight = FontWeight.Medium,
-                color = White90,
-                modifier = Modifier.weight(1f)
-            )
         }
     }
 }
