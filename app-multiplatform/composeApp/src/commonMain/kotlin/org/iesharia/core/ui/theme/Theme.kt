@@ -1,6 +1,5 @@
 package org.iesharia.core.ui.theme
 
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
@@ -9,79 +8,84 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.ui.graphics.Color
 
-// Esquema de colores oscuro optimizado para OLED
+/**
+ * Dark color scheme optimized for OLED screens
+ */
 private val DarkColorScheme = darkColorScheme(
+    // Primary colors
     primary = DarkPrimary,
     onPrimary = DarkOnPrimary,
-    primaryContainer = SandDark,
-    onPrimaryContainer = Color.White,
+    primaryContainer = DarkPrimaryContainer,
+    onPrimaryContainer = DarkOnPrimaryContainer,
 
+    // Secondary colors
     secondary = DarkSecondary,
     onSecondary = DarkOnSecondary,
-    secondaryContainer = CanaryBlue,
-    onSecondaryContainer = Color.White,
+    secondaryContainer = DarkSecondaryContainer,
+    onSecondaryContainer = DarkOnSecondaryContainer,
 
+    // Tertiary colors
     tertiary = DarkTertiary,
     onTertiary = DarkOnTertiary,
-    tertiaryContainer = LaurisilvaGreen,
-    onTertiaryContainer = Color.White,
+    tertiaryContainer = DarkTertiaryContainer,
+    onTertiaryContainer = DarkOnTertiaryContainer,
 
+    // Background colors
     background = DarkBackground,
     onBackground = DarkOnBackground,
     surface = DarkSurface,
     onSurface = DarkOnSurface,
+    surfaceVariant = DarkSurfaceVariant,
+    onSurfaceVariant = DarkOnSurfaceVariant,
 
+    // Error colors
     error = DarkError,
     onError = DarkOnError,
-    errorContainer = TraditionalRed,
-    onErrorContainer = Color.White,
+    errorContainer = DarkErrorContainer,
+    onErrorContainer = DarkOnErrorContainer,
 
-    surfaceVariant = DarkSurfaceVariant,
-    onSurfaceVariant = DarkOnSurface.copy(alpha = 0.8f),
+    // Other colors
     outline = DarkOutline,
     outlineVariant = DarkOutlineVariant,
-
-    // Colores adicionales para mejorar la UI
-    surfaceTint = DarkPrimary.copy(alpha = 0.05f),
-    inverseSurface = Color(0xFFEEEEEE),
-    inverseOnSurface = Color(0xFF1A1A1A),
-    scrim = Color.Black.copy(alpha = 0.6f)
+    scrim = Color.Black.copy(alpha = Alpha.Scrim)
 )
 
-// Esquema de colores claro (aunque nos centraremos en el oscuro para OLED)
+/**
+ * Light color scheme (maintained for potential future light mode)
+ * Note: Currently not in use as the app forces dark mode for OLED optimization
+ */
 private val LightColorScheme = lightColorScheme(
-    primary = SandDark,
+    // Primary colors
+    primary = SandMedium,
     onPrimary = Color.White,
     primaryContainer = SandLight,
-    onPrimaryContainer = Color(0xFF3C2E1A),
+    onPrimaryContainer = SandDark,
 
+    // Secondary colors
     secondary = CanaryBlue,
     onSecondary = Color.White,
     secondaryContainer = CanaryBlueLight,
-    onSecondaryContainer = Color(0xFF071B33),
+    onSecondaryContainer = CanaryBlueDark,
 
+    // Tertiary colors
     tertiary = LaurisilvaGreen,
     onTertiary = Color.White,
     tertiaryContainer = LaurisilvaGreenLight,
-    onTertiaryContainer = Color(0xFF002111),
+    onTertiaryContainer = LaurisilvaGreenDark,
 
+    // Background colors
     background = Color(0xFFF8F8F8),
     onBackground = Color(0xFF1A1A1A),
     surface = Color.White,
     onSurface = Color(0xFF1A1A1A),
 
+    // Other colors
     error = TraditionalRed,
-    onError = Color.White,
-    errorContainer = TraditionalRedLight,
-    onErrorContainer = Color(0xFF410000),
-
-    surfaceVariant = Color(0xFFF2F2F2),
-    onSurfaceVariant = Color(0xFF444444),
-    outline = Color(0xFFAAAAAA)
+    onError = Color.White
 )
 
 /**
- * Objeto para acceder al tema globalmente
+ * Object for globally accessing theme properties
  */
 object WrestlingTheme {
     val dimensions: Dimensions
@@ -93,18 +97,55 @@ object WrestlingTheme {
         @Composable
         @ReadOnlyComposable
         get() = LocalAppShapes.current
+
+    // Extension functions for common theme operations
+
+    /**
+     * Returns a surface color with elevation effect for OLED screens
+     * (subtle gradient rather than shadows)
+     */
+    @Composable
+    fun elevatedSurfaceColor(elevation: Int): Color {
+        return when(elevation) {
+            0 -> DarkSurface1
+            1 -> DarkSurface2
+            2 -> DarkSurface3
+            else -> DarkSurface4
+        }
+    }
+
+    /**
+     * Returns appropriate alpha value based on emphasis level
+     */
+    fun getAlpha(emphasis: Emphasis): Float {
+        return when(emphasis) {
+            Emphasis.HIGH -> Alpha.High
+            Emphasis.MEDIUM -> Alpha.Medium
+            Emphasis.LOW -> Alpha.Low
+            Emphasis.DISABLED -> Alpha.Disabled
+        }
+    }
 }
 
+/**
+ * Emphasis levels for content
+ */
+enum class Emphasis {
+    HIGH, MEDIUM, LOW, DISABLED
+}
+
+/**
+ * Main theme composable for the Wrestling app
+ */
 @Composable
 fun WrestlingAppTheme(
-    darkTheme: Boolean = isSystemInDarkTheme(),
-    dynamicColor: Boolean = false, // No usamos colores dinámicos en esta versión
+    darkTheme: Boolean = true,
     content: @Composable () -> Unit
 ) {
-    // Siempre forzamos el tema oscuro para aprovechar pantallas OLED
+    // Use dark color scheme for OLED optimization
     val colorScheme = DarkColorScheme
 
-    // Proveemos las dimensiones y formas personalizadas
+    // Provide dimensions and shapes
     CompositionLocalProvider(
         LocalAppDimensions provides Dimensions(),
         LocalAppShapes provides AppShapes()
