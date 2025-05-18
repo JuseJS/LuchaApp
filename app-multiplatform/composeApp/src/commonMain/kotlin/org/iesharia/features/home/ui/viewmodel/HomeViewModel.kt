@@ -12,7 +12,9 @@ import org.iesharia.features.competitions.domain.model.Competition
 import org.iesharia.features.competitions.domain.model.DivisionCategory
 import org.iesharia.features.competitions.domain.usecase.GetCompetitionsUseCase
 import org.iesharia.features.teams.domain.model.Match
+import org.iesharia.features.teams.domain.model.Team
 import org.iesharia.features.teams.domain.usecase.GetTeamMatchesUseCase
+import org.iesharia.features.wrestlers.domain.model.Wrestler
 import org.iesharia.features.wrestlers.domain.model.WrestlerMatchResult
 import org.iesharia.features.wrestlers.domain.usecase.GetWrestlerResultsUseCase
 
@@ -167,6 +169,43 @@ class HomeViewModel(
         launchSafe {
             navigationManager.navigateWithParams(Routes.Wrestler.Detail(), wrestlerId)
         }
+    }
+
+    fun updateSearchQuery(query: String) {
+        updateState { it.copy(searchQuery = query) }
+    }
+
+    // Obtener todos los equipos de todas las competiciones
+    fun getAllTeams(): List<Team> {
+        return competitions.flatMap { it.teams }.distinctBy { it.id }
+    }
+
+    // Obtener resultados de búsqueda
+    fun getSearchResults(): Triple<List<Competition>, List<Team>, List<Wrestler>> {
+        val query = uiState.value.searchQuery.lowercase()
+        if (query.isBlank()) {
+            return Triple(emptyList(), emptyList(), emptyList())
+        }
+
+        // Filtrar competiciones
+        val competitionResults = competitions.filter {
+            it.name.lowercase().contains(query) ||
+                    it.ageCategory.displayName().lowercase().contains(query) ||
+                    it.divisionCategory.displayName().lowercase().contains(query) ||
+                    it.island.displayName().lowercase().contains(query)
+        }
+
+        // Filtrar equipos
+        val teamResults = getAllTeams().filter {
+            it.name.lowercase().contains(query) ||
+                    it.island.displayName().lowercase().contains(query) ||
+                    it.venue.lowercase().contains(query)
+        }
+
+        // Para luchadores, dejamos vacío por ahora ya que no tenemos un repositorio global
+        val wrestlerResults = emptyList<Wrestler>()
+
+        return Triple(competitionResults, teamResults, wrestlerResults)
     }
 
     /**
