@@ -10,6 +10,9 @@ import androidx.compose.ui.unit.dp
 import org.iesharia.features.competitions.domain.model.Competition
 import org.iesharia.core.ui.components.common.ItemCard
 import org.iesharia.core.ui.components.common.SectionSubtitle
+import org.iesharia.core.ui.theme.DarkSurface2
+import org.iesharia.core.ui.theme.White80
+import org.iesharia.core.ui.theme.White90
 import org.iesharia.core.ui.theme.WrestlingTheme
 import org.iesharia.core.resources.AppStrings
 import org.iesharia.features.teams.ui.components.MatchDaySection
@@ -24,11 +27,13 @@ fun CompetitionItem(
     ItemCard(
         onClick = onClick,
         modifier = modifier,
+        containerColor = DarkSurface2,
         title = {
             Text(
                 text = competition.name,
                 style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.Bold
+                fontWeight = FontWeight.Bold,
+                color = White90
             )
         },
         subtitle = {
@@ -37,13 +42,13 @@ fun CompetitionItem(
             Text(
                 text = "${competition.ageCategory.displayName()} - ${competition.divisionCategory.displayName()} - ${competition.island.displayName()}",
                 style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+                color = White80
             )
 
             Text(
                 text = AppStrings.Competitions.season.format(competition.season),
                 style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+                color = White80
             )
         }
     ) {
