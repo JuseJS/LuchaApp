@@ -93,8 +93,41 @@ compose.desktop {
 
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
-            packageName = "org.iesharia"
+            packageName = "LuchaCanaria"
             packageVersion = "1.0.0"
+
+            // Add application metadata
+            description = "Aplicación de Lucha Canaria"
+            copyright = "© 2025 IES Haria"
+            vendor = "IES Haria"
+
+            // Windows configuration
+            windows {
+                // Usa app_icon.ico en lugar de app_logo.ico después de tu cambio
+                iconFile.set(project.file("src/commonMain/composeResources/drawable/app_icon.ico"))
+                menuGroup = "IES Haria Apps"
+                // Opciones adicionales
+                dirChooser = true
+                perUserInstall = true
+                shortcut = true
+                menu = true
+            }
+
+            // macOS configuration
+            macOS {
+                // For macOS you need .icns format - if you don't have it, you can convert your ico or png
+                // using online converters or specify a default compose icon by not setting this
+                // If you have an icns file, configure it like:
+                // iconFile.set(project.file("src/commonMain/composeResources/drawable/app_logo.icns"))
+                bundleID = "org.iesharia.luchacanaria"
+            }
+
+            // Linux configuration
+            linux {
+                // For Linux you typically need a PNG
+                // If you have a PNG version of your logo, use:
+                // iconFile.set(project.file("src/commonMain/composeResources/drawable/app_logo.png"))
+            }
         }
     }
 }
