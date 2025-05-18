@@ -1,12 +1,9 @@
 package org.iesharia.features.home.ui.components
 
-import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.material3.FilterChip
-import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -14,7 +11,7 @@ import androidx.compose.ui.unit.dp
 import org.iesharia.core.resources.AppStrings
 import org.iesharia.core.ui.components.common.EmptyStateMessage
 import org.iesharia.core.ui.components.common.SectionTitle
-import org.iesharia.core.ui.theme.WrestlingTheme
+import org.iesharia.core.ui.theme.*
 import org.iesharia.features.home.ui.viewmodel.FavoriteType
 
 @Composable
@@ -30,7 +27,8 @@ fun FavoritesSectionHeader(
     ) {
         // Título de la sección
         SectionTitle(
-            title = AppStrings.Home.favorites
+            title = AppStrings.Home.favorites,
+            color = White90
         )
 
         Spacer(modifier = Modifier.height(WrestlingTheme.dimensions.spacing_12))
@@ -46,8 +44,17 @@ fun FavoritesSectionHeader(
                 FilterChip(
                     selected = type == selectedType,
                     onClick = { onTypeSelected(type) },
-                    label = { Text(type.displayName()) },
-                    modifier = Modifier.padding(end = WrestlingTheme.dimensions.spacing_8)
+                    label = {
+                        Text(
+                            text = type.displayName(),
+                            color = if (type == selectedType) White90 else White80
+                        )
+                    },
+                    modifier = Modifier.padding(end = WrestlingTheme.dimensions.spacing_8),
+                    colors = FilterChipDefaults.filterChipColors(
+                        selectedContainerColor = MaterialTheme.colorScheme.primary,
+                        containerColor = DarkSurface2
+                    )
                 )
             }
         }
@@ -63,7 +70,8 @@ fun EmptyFavorites(selectedType: FavoriteType) {
         contentAlignment = Alignment.Center
     ) {
         EmptyStateMessage(
-            message = AppStrings.Home.noFavorites.format(selectedType.displayName().lowercase())
+            message = AppStrings.Home.noFavorites.format(selectedType.displayName().lowercase()),
+            color = White60
         )
     }
 }
@@ -72,7 +80,7 @@ fun EmptyFavorites(selectedType: FavoriteType) {
 fun FavoritesSectionDivider() {
     Column(modifier = Modifier.fillMaxWidth()) {
         Spacer(modifier = Modifier.height(WrestlingTheme.dimensions.spacing_16))
-        HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+        HorizontalDivider(color = DarkOutline)
         Spacer(modifier = Modifier.height(WrestlingTheme.dimensions.spacing_16))
     }
 }
