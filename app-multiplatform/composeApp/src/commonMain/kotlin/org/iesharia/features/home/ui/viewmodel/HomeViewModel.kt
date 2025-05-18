@@ -180,6 +180,10 @@ class HomeViewModel(
         return competitions.flatMap { it.teams }.distinctBy { it.id }
     }
 
+    fun getTeamsByDivision(): Map<DivisionCategory, List<Team>> {
+        return getAllTeams().groupBy { it.divisionCategory }
+    }
+
     // Obtener resultados de búsqueda
     fun getSearchResults(): Triple<List<Competition>, List<Team>, List<Wrestler>> {
         val query = uiState.value.searchQuery.lowercase()
