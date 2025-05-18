@@ -19,7 +19,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import org.iesharia.core.resources.AppStrings
 import org.iesharia.core.ui.components.common.*
-import org.iesharia.core.ui.theme.WrestlingTheme
+import org.iesharia.core.ui.theme.*
 import org.iesharia.features.wrestlers.domain.model.Wrestler
 import org.iesharia.features.wrestlers.domain.model.WrestlerMatchResult
 
@@ -54,6 +54,7 @@ fun WrestlerItem(
     ItemCard(
         onClick = onClick,
         modifier = modifier,
+        containerColor = DarkSurface2,
         title = {
             // Wrestler header
             WrestlerHeader(
@@ -128,7 +129,8 @@ private fun WrestlerHeader(
             Text(
                 text = wrestler.fullName,
                 style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold
+                fontWeight = FontWeight.Bold,
+                color = White90
             )
 
             // Nickname (if exists)
@@ -137,7 +139,7 @@ private fun WrestlerHeader(
                 Text(
                     text = "\"${wrestler.nickname}\"",
                     style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.primary
+                    color = SandLight
                 )
             }
 
@@ -151,7 +153,7 @@ private fun WrestlerHeader(
                 Text(
                     text = wrestler.classification.displayName(),
                     style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    color = White80
                 )
             }
         }
@@ -173,6 +175,8 @@ private fun WrestlerBasicInfo(wrestler: Wrestler) {
             style = InfoRowStyle.CENTERED,
             labelStyle = MaterialTheme.typography.labelSmall,
             valueStyle = MaterialTheme.typography.bodySmall,
+            labelColor = White80,
+            valueColor = White90,
             modifier = Modifier.weight(1f)
         )
 
@@ -182,6 +186,8 @@ private fun WrestlerBasicInfo(wrestler: Wrestler) {
             style = InfoRowStyle.CENTERED,
             labelStyle = MaterialTheme.typography.labelSmall,
             valueStyle = MaterialTheme.typography.bodySmall,
+            labelColor = White80,
+            valueColor = White90,
             modifier = Modifier.weight(1f)
         )
 
@@ -191,6 +197,8 @@ private fun WrestlerBasicInfo(wrestler: Wrestler) {
             style = InfoRowStyle.CENTERED,
             labelStyle = MaterialTheme.typography.labelSmall,
             valueStyle = MaterialTheme.typography.bodySmall,
+            labelColor = White80,
+            valueColor = White90,
             modifier = Modifier.weight(1f)
         )
     }
@@ -204,7 +212,7 @@ private fun WrestlerResultsSection(
     Text(
         text = AppStrings.Wrestlers.recentMatches,
         style = MaterialTheme.typography.titleSmall,
-        color = MaterialTheme.colorScheme.secondary,
+        color = CanaryBlueLight,
         fontWeight = FontWeight.Bold
     )
 
@@ -230,7 +238,7 @@ fun WrestlerMatchResultView(
 ) {
     ItemCard(
         modifier = Modifier.fillMaxWidth(),
-        containerColor = MaterialTheme.colorScheme.surfaceVariant,
+        containerColor = DarkSurface2,
         contentPadding = PaddingValues(WrestlingTheme.dimensions.spacing_12),
         title = {
             // Date and result
@@ -242,7 +250,7 @@ fun WrestlerMatchResultView(
                 Text(
                     text = result.date,
                     style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    color = White80
                 )
 
                 // Result badge
@@ -285,7 +293,7 @@ fun WrestlerMatchResultView(
                     text = AppStrings.Wrestlers.vs,
                     style = MaterialTheme.typography.bodyMedium,
                     fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.primary
+                    color = CanaryBlueLight
                 )
 
                 // Category
@@ -293,7 +301,7 @@ fun WrestlerMatchResultView(
                 Text(
                     text = result.category,
                     style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    color = White80,
                     textAlign = TextAlign.Center
                 )
             }
@@ -314,7 +322,7 @@ fun WrestlerMatchResultView(
             text = AppStrings.Wrestlers.agarradas,
             style = MaterialTheme.typography.labelMedium,
             fontWeight = FontWeight.Medium,
-            color = MaterialTheme.colorScheme.primary
+            color = SandLight
         )
 
         Spacer(modifier = Modifier.height(8.dp))
@@ -357,7 +365,8 @@ private fun WrestlerInfoColumn(
             fontWeight = FontWeight.Medium,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
-            textAlign = TextAlign.Center
+            textAlign = TextAlign.Center,
+            color = White90
         )
 
         Spacer(modifier = Modifier.height(4.dp))
@@ -365,8 +374,8 @@ private fun WrestlerInfoColumn(
         // Classification badge
         InfoBadge(
             text = classification,
-            color = MaterialTheme.colorScheme.secondary,
-            backgroundColor = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.3f)
+            color = CanaryBlueLight,
+            backgroundColor = DarkSurface3
         )
 
         Spacer(modifier = Modifier.height(4.dp))
@@ -374,11 +383,11 @@ private fun WrestlerInfoColumn(
         // Fouls badge
         InfoBadge(
             text = AppStrings.Wrestlers.foulsFormat.format(fouls),
-            color = if (fouls > 0) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurfaceVariant,
+            color = if (fouls > 0) TraditionalRedLight else White80,
             backgroundColor = if (fouls > 0)
-                MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.3f)
+                TraditionalRed.copy(alpha = 0.3f)
             else
-                MaterialTheme.colorScheme.surfaceVariant
+                DarkSurface3
         )
     }
 }
@@ -393,7 +402,7 @@ private fun GripItem(
 ) {
     Surface(
         shape = WrestlingTheme.shapes.small,
-        color = MaterialTheme.colorScheme.surface
+        color = DarkSurface2,
     ) {
         Row(
             modifier = Modifier
@@ -423,20 +432,20 @@ private fun GripItem(
                 Text(
                     text = AppStrings.Wrestlers.separated,
                     style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.tertiary,
+                    color = LaurisilvaGreenLight,
                     fontWeight = FontWeight.Medium
                 )
             } else if (grip.winner.isNotEmpty()) {
                 Text(
                     text = grip.winner,
                     style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurface
+                    color = White90
                 )
             } else {
                 Text(
                     text = AppStrings.Wrestlers.noResult,
                     style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    color = White80
                 )
             }
         }
