@@ -2,7 +2,9 @@ package org.iesharia.core.data.mock
 
 import kotlinx.datetime.Clock
 import kotlinx.datetime.DatePeriod
+import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.Month
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.plus
 import kotlinx.datetime.toLocalDateTime
@@ -15,6 +17,8 @@ import org.iesharia.features.competitions.domain.model.MatchDay
 import org.iesharia.features.teams.domain.model.Match
 import org.iesharia.features.teams.domain.model.Team
 import org.iesharia.features.wrestlers.domain.model.Wrestler
+import org.iesharia.features.wrestlers.domain.model.WrestlerCategory
+import org.iesharia.features.wrestlers.domain.model.WrestlerClassification
 import org.iesharia.features.wrestlers.domain.model.WrestlerMatchResult
 
 /**
@@ -82,14 +86,16 @@ class MockDataGenerator {
             id = "team1",
             name = "C.L. Tegueste",
             imageUrl = "",
-            island = Island.TENERIFE
+            island = Island.TENERIFE,
+            venue = "Terrero de Tegueste"
         ))
 
         _teams.add(Team(
             id = "team2",
             name = "C.L. Victoria",
             imageUrl = "",
-            island = Island.TENERIFE
+            island = Island.TENERIFE,
+            venue = "Terrero de La Victoria"
         ))
 
         // Equipos de Gran Canaria
@@ -97,14 +103,16 @@ class MockDataGenerator {
             id = "team3",
             name = "C.L. Unión Sardina",
             imageUrl = "",
-            island = Island.GRAN_CANARIA
+            island = Island.GRAN_CANARIA,
+            venue = "Terrero de Sardina"
         ))
 
         _teams.add(Team(
             id = "team4",
             name = "C.L. Adargoma",
             imageUrl = "",
-            island = Island.GRAN_CANARIA
+            island = Island.GRAN_CANARIA,
+            venue = "Terrero de Adargoma"
         ))
 
         // Equipos de Lanzarote
@@ -112,14 +120,16 @@ class MockDataGenerator {
             id = "team5",
             name = "C.L. Tao",
             imageUrl = "",
-            island = Island.LANZAROTE
+            island = Island.LANZAROTE,
+            venue = "Terrero de Tao"
         ))
 
         _teams.add(Team(
             id = "team6",
             name = "C.L. Tinajo",
             imageUrl = "",
-            island = Island.LANZAROTE
+            island = Island.LANZAROTE,
+            venue = "Terrero de Tinajo"
         ))
     }
 
@@ -132,46 +142,243 @@ class MockDataGenerator {
             generateTeams()
         }
 
-        // Luchador para el primer equipo de Tenerife
+        // Luchadores para el primer equipo de Tenerife (Team1 - C.L. Tegueste)
+        // Regionales
         _wrestlers.add(Wrestler(
             id = "wrestler1",
+            licenseNumber = "LCA-001",
             name = "Eusebio",
             surname = "Ledesma",
             imageUrl = null,
             teamId = _teams[0].id,
-            position = "Destacado A",
-            weight = 85,
+            category = WrestlerCategory.REGIONAL,
+            classification = WrestlerClassification.PUNTAL_A,
             height = 182,
-            birthYear = 1995,
-            achievements = emptyList()
+            weight = 85,
+            birthDate = LocalDate(1990, Month.MAY, 15),
+            nickname = "El Peruano"
         ))
 
-        // Luchador para el primer equipo de Gran Canaria
         _wrestlers.add(Wrestler(
             id = "wrestler2",
+            licenseNumber = "LCA-002",
+            name = "Antonio",
+            surname = "Martín",
+            imageUrl = null,
+            teamId = _teams[0].id,
+            category = WrestlerCategory.REGIONAL,
+            classification = WrestlerClassification.DESTACADO_A,
+            height = 178,
+            weight = 82,
+            birthDate = LocalDate(1995, Month.JUNE, 21),
+            nickname = "Merienda Gallinas"
+        ))
+
+        // Juveniles
+        _wrestlers.add(Wrestler(
+            id = "wrestler3",
+            licenseNumber = "LCA-003",
+            name = "Miguel",
+            surname = "Hernández",
+            imageUrl = null,
+            teamId = _teams[0].id,
+            category = WrestlerCategory.JUVENIL,
+            classification = WrestlerClassification.NONE,
+            height = 175,
+            weight = 68,
+            birthDate = LocalDate(2006, Month.AUGUST, 12),
+            nickname = null
+        ))
+
+        // Cadetes
+        _wrestlers.add(Wrestler(
+            id = "wrestler4",
+            licenseNumber = "LCA-004",
+            name = "Pedro",
+            surname = "González",
+            imageUrl = null,
+            teamId = _teams[0].id,
+            category = WrestlerCategory.CADETE,
+            classification = WrestlerClassification.NONE,
+            height = 160,
+            weight = 52,
+            birthDate = LocalDate(2008, Month.FEBRUARY, 3),
+            nickname = null
+        ))
+
+        // Luchadores para el segundo equipo de Tenerife (Team2 - C.L. Victoria)
+        // Regionales
+        _wrestlers.add(Wrestler(
+            id = "wrestler5",
+            licenseNumber = "LCA-005",
+            name = "Juan",
+            surname = "Díaz",
+            imageUrl = null,
+            teamId = _teams[1].id,
+            category = WrestlerCategory.REGIONAL,
+            classification = WrestlerClassification.PUNTAL_B,
+            height = 180,
+            weight = 86,
+            birthDate = LocalDate(1992, Month.JANUARY, 18),
+            nickname = null
+        ))
+
+        _wrestlers.add(Wrestler(
+            id = "wrestler6",
+            licenseNumber = "LCA-006",
+            name = "Marcos",
+            surname = "Pérez",
+            imageUrl = null,
+            teamId = _teams[1].id,
+            category = WrestlerCategory.REGIONAL,
+            classification = WrestlerClassification.DESTACADO_B,
+            height = 175,
+            weight = 80,
+            birthDate = LocalDate(1994, Month.MARCH, 25),
+            nickname = null
+        ))
+
+        // Juveniles
+        _wrestlers.add(Wrestler(
+            id = "wrestler7",
+            licenseNumber = "LCA-007",
+            name = "Carlos",
+            surname = "Santana",
+            imageUrl = null,
+            teamId = _teams[1].id,
+            category = WrestlerCategory.JUVENIL,
+            classification = WrestlerClassification.NONE,
+            height = 170,
+            weight = 65,
+            birthDate = LocalDate(2007, Month.JULY, 8),
+            nickname = null
+        ))
+
+        // Luchadores para el primer equipo de Gran Canaria (Team3 - C.L. Unión Sardina)
+        // Regionales
+        _wrestlers.add(Wrestler(
+            id = "wrestler8",
+            licenseNumber = "LCA-008",
             name = "Fabián",
             surname = "Rocha",
             imageUrl = null,
             teamId = _teams[2].id,
-            position = "Puntal B",
-            weight = 78,
-            height = 175,
-            birthYear = 1998,
-            achievements = emptyList()
+            category = WrestlerCategory.REGIONAL,
+            classification = WrestlerClassification.PUNTAL_A,
+            height = 190,
+            weight = 95,
+            birthDate = LocalDate(1988, Month.NOVEMBER, 30),
+            nickname = null
         ))
 
-        // Luchador para el primer equipo de Lanzarote
         _wrestlers.add(Wrestler(
-            id = "wrestler3",
+            id = "wrestler9",
+            licenseNumber = "LCA-009",
+            name = "Roberto",
+            surname = "Alonso",
+            imageUrl = null,
+            teamId = _teams[2].id,
+            category = WrestlerCategory.REGIONAL,
+            classification = WrestlerClassification.DESTACADO_A,
+            height = 178,
+            weight = 82,
+            birthDate = LocalDate(1993, Month.APRIL, 12),
+            nickname = null
+        ))
+
+        // Cadetes
+        _wrestlers.add(Wrestler(
+            id = "wrestler10",
+            licenseNumber = "LCA-010",
+            name = "Daniel",
+            surname = "Medina",
+            imageUrl = null,
+            teamId = _teams[2].id,
+            category = WrestlerCategory.CADETE,
+            classification = WrestlerClassification.NONE,
+            height = 165,
+            weight = 58,
+            birthDate = LocalDate(2009, Month.SEPTEMBER, 5),
+            nickname = null
+        ))
+
+        // Luchadores para el primer equipo de Lanzarote (Team5 - C.L. Tao)
+        // Regionales
+        _wrestlers.add(Wrestler(
+            id = "wrestler11",
+            licenseNumber = "LCA-011",
             name = "Cristian",
             surname = "Pérez",
             imageUrl = null,
             teamId = _teams[4].id,
-            position = "Puntal A",
-            weight = 92,
+            category = WrestlerCategory.REGIONAL,
+            classification = WrestlerClassification.PUNTAL_B,
             height = 188,
-            birthYear = 1990,
-            achievements = emptyList()
+            weight = 92,
+            birthDate = LocalDate(1991, Month.OCTOBER, 7),
+            nickname = null
+        ))
+
+        _wrestlers.add(Wrestler(
+            id = "wrestler12",
+            licenseNumber = "LCA-012",
+            name = "Alejandro",
+            surname = "García",
+            imageUrl = null,
+            teamId = _teams[4].id,
+            category = WrestlerCategory.REGIONAL,
+            classification = WrestlerClassification.DESTACADO_C,
+            height = 176,
+            weight = 78,
+            birthDate = LocalDate(1996, Month.DECEMBER, 14),
+            nickname = null
+        ))
+
+        // Juveniles
+        _wrestlers.add(Wrestler(
+            id = "wrestler13",
+            licenseNumber = "LCA-013",
+            name = "Francisco",
+            surname = "Ortega",
+            imageUrl = null,
+            teamId = _teams[4].id,
+            category = WrestlerCategory.JUVENIL,
+            classification = WrestlerClassification.NONE,
+            height = 172,
+            weight = 67,
+            birthDate = LocalDate(2006, Month.MARCH, 23),
+            nickname = null
+        ))
+
+        // Añadir al menos un luchador para cada equipo restante
+        _wrestlers.add(Wrestler(
+            id = "wrestler14",
+            licenseNumber = "LCA-014",
+            name = "José",
+            surname = "Medina",
+            imageUrl = null,
+            teamId = _teams[3].id,
+            category = WrestlerCategory.REGIONAL,
+            classification = WrestlerClassification.PUNTAL_C,
+            height = 183,
+            weight = 89,
+            birthDate = LocalDate(1990, Month.AUGUST, 9),
+            nickname = null
+        ))
+
+        _wrestlers.add(Wrestler(
+            id = "wrestler15",
+            licenseNumber = "LCA-015",
+            name = "Manuel",
+            surname = "Suárez",
+            imageUrl = null,
+            teamId = _teams[5].id,
+            category = WrestlerCategory.REGIONAL,
+            classification = WrestlerClassification.PUNTAL_C,
+            height = 179,
+            weight = 84,
+            birthDate = LocalDate(1993, Month.JUNE, 17),
+            nickname = null
         ))
     }
 
@@ -194,7 +401,7 @@ class MockDataGenerator {
             localScore = 12,
             visitorScore = 10,
             date = now.plusDays(-14),
-            venue = "Terrero de Tegueste",
+            venue = _teams[0].venue, // Usar el terrero del equipo local
             completed = true
         )
 
@@ -205,7 +412,7 @@ class MockDataGenerator {
             localScore = 8,
             visitorScore = 12,
             date = now.plusDays(-13),
-            venue = "Terrero de Tao",
+            venue = _teams[4].venue, // Usar el terrero del equipo local
             completed = true
         )
 
@@ -217,7 +424,7 @@ class MockDataGenerator {
             localScore = 12,
             visitorScore = 12,
             date = now.plusDays(-7),
-            venue = "Terrero de Adargoma",
+            venue = _teams[3].venue, // Usar el terrero del equipo local
             completed = true
         )
 
@@ -228,7 +435,7 @@ class MockDataGenerator {
             localScore = 8,
             visitorScore = 10,
             date = now.plusDays(-6),
-            venue = "Terrero de La Victoria",
+            venue = _teams[1].venue, // Usar el terrero del equipo local
             completed = true
         )
 
@@ -238,7 +445,7 @@ class MockDataGenerator {
             localTeam = _teams[5], // Tinajo
             visitorTeam = _teams[0], // Tegueste
             date = now.plusDays(3),
-            venue = "Terrero de Tinajo",
+            venue = _teams[5].venue, // Usar el terrero del equipo local
             completed = false
         )
 
@@ -247,7 +454,7 @@ class MockDataGenerator {
             localTeam = _teams[2], // Unión Sardina
             visitorTeam = _teams[4], // Tao
             date = now.plusDays(4),
-            venue = "Terrero de Sardina",
+            venue = _teams[2].venue, // Usar el terrero del equipo local
             completed = false
         )
 
@@ -415,11 +622,18 @@ class MockDataGenerator {
             val opponent = _wrestlers.find { it.teamId == opponentTeam.id }
                 ?: Wrestler(
                     id = "wrestler_opp${index}",
+                    licenseNumber = "LCA-X${index+1}",
                     name = "Luchador",
                     surname = "Oponente ${index+1}",
                     imageUrl = null,
                     teamId = opponentTeam.id,
-                    position = "Central"
+                    category = wrestler.category,
+                    classification = if (wrestler.category == WrestlerCategory.REGIONAL)
+                        WrestlerClassification.entries.random() else WrestlerClassification.NONE,
+                    height = 175,
+                    weight = 80,
+                    birthDate = LocalDate(1995, Month.JANUARY, 1),
+                    nickname = "Cosivo"
                 )
 
             // Determinar el resultado basado en índice para variedad
@@ -430,8 +644,8 @@ class MockDataGenerator {
                 else -> if (index % 2 == 0) WrestlerMatchResult.Result.SEPARATED else WrestlerMatchResult.Result.EXPELLED
             }
 
-            // Determinar categoría correcta
-            val categoriaEdad = if ((wrestler.birthYear ?: 2000) >= 2006) "Juvenil" else "Regional"
+            // Determinar categoría correcta según la fecha de nacimiento del luchador
+            val categoriaEdad = wrestler.category.displayName()
 
             // Añadir el resultado
             results.add(
@@ -441,7 +655,7 @@ class MockDataGenerator {
                     fouls = index % 3,
                     opponentFouls = (index + 1) % 3,
                     category = categoriaEdad,
-                    classification = wrestler.position,
+                    classification = wrestler.classification.displayName(),
                     date = match.date.toString().split("T")[0]
                 )
             )
