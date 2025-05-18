@@ -1,20 +1,32 @@
 package org.iesharia.features.home.ui.screens
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.times
 import org.iesharia.core.domain.model.Favorite
 import org.iesharia.core.resources.AppStrings
+import org.iesharia.core.ui.components.common.EmptyStateMessage
+import org.iesharia.core.ui.components.common.SearchBar
 import org.iesharia.core.ui.components.common.SectionSubtitle
 import org.iesharia.core.ui.screens.BaseContentScreen
-import org.iesharia.core.ui.theme.WrestlingTheme
+import org.iesharia.core.ui.theme.*
 import org.iesharia.di.rememberViewModel
 import org.iesharia.features.competitions.ui.components.CompetitionItem
 import org.iesharia.features.competitions.ui.components.CompetitionsSection
@@ -22,11 +34,12 @@ import org.iesharia.features.competitions.ui.components.EmptyCompetitions
 import org.iesharia.features.home.ui.components.*
 import org.iesharia.features.home.ui.viewmodel.HomeUiState
 import org.iesharia.features.home.ui.viewmodel.HomeViewModel
+import org.iesharia.features.teams.domain.model.Team
 import org.iesharia.features.teams.ui.components.TeamItem
 import org.iesharia.features.wrestlers.ui.components.WrestlerItem
 
 /**
- * Main home screen of the application, optimized for OLED displays
+ * Pantalla principal de la aplicación, optimizada para pantallas OLED
  */
 class HomeScreen : BaseContentScreen() {
 
@@ -44,12 +57,12 @@ class HomeScreen : BaseContentScreen() {
 
     @Composable
     override fun OnNavigateBack(): (() -> Unit)? {
-        return null // No back navigation from main screen
+        return null // No hay navegación hacia atrás desde la pantalla principal
     }
 
     @Composable
     override fun TopBarActions() {
-        // No actions for this screen
+        // No hay acciones para esta pantalla
     }
 
     @Composable
@@ -62,15 +75,22 @@ class HomeScreen : BaseContentScreen() {
     override fun ContentImpl() {
         val uiState by viewModel.uiState.collectAsState()
 
-        HomeContent(
-            uiState = uiState,
-            viewModel = viewModel
-        )
+        // Aplicamos el color de fondo negro puro para optimizar pantallas OLED
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(DarkBackground)
+        ) {
+            HomeContent(
+                uiState = uiState,
+                viewModel = viewModel
+            )
+        }
     }
 }
 
 /**
- * Main content of the home screen
+ * Contenido principal de la pantalla de inicio
  */
 @Composable
 private fun HomeContent(
@@ -81,32 +101,148 @@ private fun HomeContent(
         modifier = Modifier.fillMaxSize(),
         contentPadding = PaddingValues(vertical = WrestlingTheme.dimensions.spacing_16)
     ) {
-        // Favorites section
+        // Barra de búsqueda
+        item {
+            SearchBar(
+                query = uiState.searchQuery,
+                onQueryChange = { viewModel.updateSearchQuery(it) },
+                placeholder = "Buscar competiciones, equipos o luchadores...",
+                modifier = Modifier.padding(horizontal = WrestlingTheme.dimensions.spacing_16),
+                backgroundColor = DarkSurface2,
+                contentColor = White90
+            )
+
+            Spacer(modifier = Modifier.height(WrestlingTheme.dimensions.spacing_16))
+        }
+
+        // Resultados de búsqueda (solo se muestran si hay una búsqueda activa)
+        if (uiState.searchQuery.isNotBlank()) {
+            item {
+                val (competitions, teams, wrestlers) = viewModel.getSearchResults()
+                val hasResults = competitions.isNotEmpty() || teams.isNotEmpty() || wrestlers.isNotEmpty()
+
+                if (hasResults) {
+                    Column(modifier = Modifier.fillMaxWidth()) {
+                        // Título principal
+                        Text(
+                            text = "Resultados de búsqueda",
+                            style = MaterialTheme.typography.titleLarge,
+                            fontWeight = FontWeight.Bold,
+                            color = White90,
+                            modifier = Modifier.padding(horizontal = WrestlingTheme.dimensions.spacing_16)
+                        )
+
+                        Spacer(modifier = Modifier.height(WrestlingTheme.dimensions.spacing_16))
+
+                        // Competiciones encontradas
+                        if (competitions.isNotEmpty()) {
+                            Text(
+                                text = "Competiciones encontradas",
+                                style = MaterialTheme.typography.titleMedium,
+                                color = MaterialTheme.colorScheme.secondary,
+                                fontWeight = FontWeight.Bold,
+                                modifier = Modifier.padding(horizontal = WrestlingTheme.dimensions.spacing_16)
+                            )
+
+                            Spacer(modifier = Modifier.height(WrestlingTheme.dimensions.spacing_8))
+
+                            competitions.take(3).forEach { competition ->
+                                CompetitionItem(
+                                    competition = competition,
+                                    onClick = { viewModel.navigateToCompetitionDetail(competition.id) },
+                                    modifier = Modifier.padding(
+                                        horizontal = WrestlingTheme.dimensions.spacing_16,
+                                        vertical = WrestlingTheme.dimensions.spacing_4
+                                    ),
+                                    showMatchDays = false
+                                )
+                            }
+
+                            if (teams.isNotEmpty()) {
+                                Spacer(modifier = Modifier.height(WrestlingTheme.dimensions.spacing_16))
+                            }
+                        }
+
+                        // Equipos encontrados
+                        if (teams.isNotEmpty()) {
+                            Text(
+                                text = "Equipos encontrados",
+                                style = MaterialTheme.typography.titleMedium,
+                                color = MaterialTheme.colorScheme.secondary,
+                                fontWeight = FontWeight.Bold,
+                                modifier = Modifier.padding(horizontal = WrestlingTheme.dimensions.spacing_16)
+                            )
+
+                            Spacer(modifier = Modifier.height(WrestlingTheme.dimensions.spacing_8))
+
+                            // Grid de equipos
+                            val rowHeight = 72.dp
+                            val numRows = (teams.size + 1) / 2
+                            val gridHeight = (numRows * (rowHeight + WrestlingTheme.dimensions.spacing_8)) + WrestlingTheme.dimensions.spacing_8
+
+                            LazyVerticalGrid(
+                                columns = GridCells.Fixed(2),
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(gridHeight.coerceAtMost(216.dp)),
+                                contentPadding = PaddingValues(horizontal = WrestlingTheme.dimensions.spacing_16),
+                                horizontalArrangement = Arrangement.spacedBy(WrestlingTheme.dimensions.spacing_8),
+                                verticalArrangement = Arrangement.spacedBy(WrestlingTheme.dimensions.spacing_8)
+                            ) {
+                                items(teams) { team ->
+                                    TeamGridCard(
+                                        team = team,
+                                        onClick = { viewModel.navigateToTeamDetail(team.id) }
+                                    )
+                                }
+                            }
+                        }
+                    }
+                } else {
+                    // Mensaje cuando no hay resultados
+                    EmptyStateMessage(
+                        message = "No se encontraron resultados para '${uiState.searchQuery}'",
+                        modifier = Modifier.padding(horizontal = WrestlingTheme.dimensions.spacing_16)
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(WrestlingTheme.dimensions.spacing_16))
+
+                HorizontalDivider(
+                    modifier = Modifier.padding(horizontal = WrestlingTheme.dimensions.spacing_16),
+                    color = MaterialTheme.colorScheme.outlineVariant
+                )
+
+                Spacer(modifier = Modifier.height(WrestlingTheme.dimensions.spacing_16))
+            }
+        }
+
+        // Sección de favoritos
         item {
             Surface(
-                color = MaterialTheme.colorScheme.surfaceVariant,
+                color = DarkSurface3,
                 shape = WrestlingTheme.shapes.medium,
                 modifier = Modifier.padding(horizontal = WrestlingTheme.dimensions.spacing_16)
             ) {
                 Column(modifier = Modifier.fillMaxWidth()) {
-                    // Favorites section header with filters
+                    // Encabezado de sección de favoritos con filtros
                     FavoritesSectionHeader(
                         selectedType = uiState.selectedFavoriteType,
                         onTypeSelected = { viewModel.setFavoriteType(it) }
                     )
 
-                    // Favorites content based on selected filter
+                    // Contenido de favoritos basado en el filtro seleccionado
                     val favorites = viewModel.getFilteredFavorites()
 
                     if (favorites.isEmpty()) {
                         EmptyFavorites(uiState.selectedFavoriteType)
                     } else {
-                        // Display favorites by type
+                        // Mostrar favoritos por tipo
                         val competitions = favorites.filterIsInstance<Favorite.CompetitionFavorite>()
                         val teams = favorites.filterIsInstance<Favorite.TeamFavorite>()
                         val wrestlers = favorites.filterIsInstance<Favorite.WrestlerFavorite>()
 
-                        // Competition favorites section
+                        // Sección de competiciones favoritas
                         if (competitions.isNotEmpty() && shouldShowCompetitions(uiState.selectedFavoriteType)) {
                             SectionSubtitle(
                                 subtitle = AppStrings.Competitions.favoriteCompetitions,
@@ -134,7 +270,7 @@ private fun HomeContent(
                             }
                         }
 
-                        // Team favorites section
+                        // Sección de equipos favoritos
                         if (teams.isNotEmpty() && shouldShowTeams(uiState.selectedFavoriteType)) {
                             SectionSubtitle(
                                 subtitle = AppStrings.Teams.favoriteTeams,
@@ -166,7 +302,7 @@ private fun HomeContent(
                             }
                         }
 
-                        // Wrestler favorites section
+                        // Sección de luchadores favoritos
                         if (wrestlers.isNotEmpty() && shouldShowWrestlers(uiState.selectedFavoriteType)) {
                             SectionSubtitle(
                                 subtitle = AppStrings.Wrestlers.favoriteWrestlers,
@@ -193,14 +329,14 @@ private fun HomeContent(
                         }
                     }
 
-                    // Bottom spacing
+                    // Espaciado inferior
                     Spacer(modifier = Modifier.height(WrestlingTheme.dimensions.spacing_16))
                 }
             }
 
             Spacer(modifier = Modifier.height(WrestlingTheme.dimensions.spacing_16))
 
-            // Section divider
+            // Divisor de sección
             HorizontalDivider(
                 modifier = Modifier.padding(
                     horizontal = WrestlingTheme.dimensions.spacing_16,
@@ -211,19 +347,19 @@ private fun HomeContent(
             Spacer(modifier = Modifier.height(WrestlingTheme.dimensions.spacing_16))
         }
 
-        // Competitions section with filters
+        // Sección de competiciones con filtros
         item {
             CompetitionsSection(
                 competitions = emptyList(),
                 currentFilters = uiState.filters,
                 onFilterChanged = viewModel::updateFilters,
                 onClearFilters = viewModel::clearFilters,
-                onCompetitionClick = { /* Not used here */ },
+                onCompetitionClick = { /* No se usa aquí */ },
                 showEmptyState = false
             )
         }
 
-        // Competitions list
+        // Lista de competiciones
         val filteredCompetitions = viewModel.getFilteredCompetitions()
         if (filteredCompetitions.isEmpty()) {
             item {
@@ -242,9 +378,115 @@ private fun HomeContent(
             }
         }
 
-        // Bottom spacing
+        // Nueva sección de equipos en grid
         item {
             Spacer(modifier = Modifier.height(WrestlingTheme.dimensions.spacing_16))
+
+            HorizontalDivider(
+                modifier = Modifier.padding(horizontal = WrestlingTheme.dimensions.spacing_16),
+                color = MaterialTheme.colorScheme.outlineVariant
+            )
+
+            Spacer(modifier = Modifier.height(WrestlingTheme.dimensions.spacing_16))
+
+            // Título de la sección
+            Text(
+                text = "Equipos Participantes",
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.Bold,
+                color = White90,
+                modifier = Modifier.padding(horizontal = WrestlingTheme.dimensions.spacing_16)
+            )
+
+            Spacer(modifier = Modifier.height(WrestlingTheme.dimensions.spacing_16))
+
+            // Obtener todos los equipos de todas las competiciones
+            val allTeams = uiState.competitions.flatMap { it.teams }.distinctBy { it.id }
+
+            if (allTeams.isEmpty()) {
+                EmptyStateMessage(
+                    message = "No hay equipos disponibles"
+                )
+            } else {
+                // Calcular altura aproximada del grid
+                val rowHeight = 72.dp
+                val numRows = (allTeams.size + 1) / 2 // +1 y división entera para redondear hacia arriba
+                val gridHeight = (numRows * (rowHeight + WrestlingTheme.dimensions.spacing_8)) + WrestlingTheme.dimensions.spacing_8
+
+                LazyVerticalGrid(
+                    columns = GridCells.Fixed(2),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(gridHeight.coerceAtMost(280.dp)), // altura máxima
+                    contentPadding = PaddingValues(horizontal = WrestlingTheme.dimensions.spacing_16),
+                    horizontalArrangement = Arrangement.spacedBy(WrestlingTheme.dimensions.spacing_8),
+                    verticalArrangement = Arrangement.spacedBy(WrestlingTheme.dimensions.spacing_8)
+                ) {
+                    items(allTeams) { team ->
+                        TeamGridCard(
+                            team = team,
+                            onClick = { viewModel.navigateToTeamDetail(team.id) }
+                        )
+                    }
+                }
+            }
+        }
+
+        // Espaciado al final
+        item {
+            Spacer(modifier = Modifier.height(WrestlingTheme.dimensions.spacing_16))
+        }
+    }
+}
+
+/**
+ * Tarjeta compacta para mostrar un equipo en el grid
+ * Implementada para usar los colores OLED específicos del tema
+ */
+@Composable
+fun TeamGridCard(
+    team: Team,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Surface(
+        onClick = onClick,
+        color = DarkSurface2,
+        shape = WrestlingTheme.shapes.medium,
+        modifier = modifier
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(WrestlingTheme.dimensions.spacing_12),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            // Logo o avatar
+            Box(
+                modifier = Modifier
+                    .size(40.dp)
+                    .clip(CircleShape)
+                    .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.1f)),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Person,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.size(24.dp)
+                )
+            }
+
+            Spacer(modifier = Modifier.width(WrestlingTheme.dimensions.spacing_8))
+
+            // Nombre del equipo
+            Text(
+                text = team.name,
+                style = MaterialTheme.typography.bodyMedium,
+                fontWeight = FontWeight.Medium,
+                color = White90,
+                modifier = Modifier.weight(1f)
+            )
         }
     }
 }
