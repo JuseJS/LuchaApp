@@ -87,7 +87,8 @@ class MockDataGenerator {
             name = "C.L. Tegueste",
             imageUrl = "",
             island = Island.TENERIFE,
-            venue = "Terrero de Tegueste"
+            venue = "Terrero de Tegueste",
+            divisionCategory = DivisionCategory.PRIMERA
         ))
 
         _teams.add(Team(
@@ -95,7 +96,8 @@ class MockDataGenerator {
             name = "C.L. Victoria",
             imageUrl = "",
             island = Island.TENERIFE,
-            venue = "Terrero de La Victoria"
+            venue = "Terrero de La Victoria",
+            divisionCategory = DivisionCategory.PRIMERA
         ))
 
         // Equipos de Gran Canaria
@@ -104,7 +106,8 @@ class MockDataGenerator {
             name = "C.L. Unión Sardina",
             imageUrl = "",
             island = Island.GRAN_CANARIA,
-            venue = "Terrero de Sardina"
+            venue = "Terrero de Sardina",
+            divisionCategory = DivisionCategory.SEGUNDA
         ))
 
         _teams.add(Team(
@@ -112,7 +115,8 @@ class MockDataGenerator {
             name = "C.L. Adargoma",
             imageUrl = "",
             island = Island.GRAN_CANARIA,
-            venue = "Terrero de Adargoma"
+            venue = "Terrero de Adargoma",
+            divisionCategory = DivisionCategory.SEGUNDA
         ))
 
         // Equipos de Lanzarote
@@ -121,7 +125,8 @@ class MockDataGenerator {
             name = "C.L. Tao",
             imageUrl = "",
             island = Island.LANZAROTE,
-            venue = "Terrero de Tao"
+            venue = "Terrero de Tao",
+            divisionCategory = DivisionCategory.TERCERA
         ))
 
         _teams.add(Team(
@@ -129,7 +134,8 @@ class MockDataGenerator {
             name = "C.L. Tinajo",
             imageUrl = "",
             island = Island.LANZAROTE,
-            venue = "Terrero de Tinajo"
+            venue = "Terrero de Tinajo",
+            divisionCategory = DivisionCategory.TERCERA
         ))
     }
 
