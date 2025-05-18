@@ -90,7 +90,7 @@ class CompetitionDetailScreen(private val competitionId: String) : BaseContentSc
         } else if (!uiState.isLoading) {
             CompetitionDetailContent(
                 uiState = uiState,
-                onTeamClick = { /* Navegación a detalles del equipo (placeholder) */ }
+                onTeamClick = { teamId -> viewModel.navigateToTeamDetail(teamId) }
             )
         }
     }
@@ -149,7 +149,7 @@ private fun CompetitionDetailContent(
                     items(uiState.teams) { team ->
                         TeamCard(
                             team = team,
-                            onClick = { onTeamClick(team.id) }
+                            onClick = { onTeamClick(team.id) } // Esta es la línea importante!
                         )
                     }
                 }

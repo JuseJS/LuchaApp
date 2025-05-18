@@ -17,6 +17,9 @@ import org.koin.core.context.startKoin
 import org.koin.core.module.Module
 import org.koin.dsl.module
 import org.iesharia.core.navigation.NavigationManager
+import org.iesharia.features.wrestlers.data.repository.MockWrestlerRepository
+import org.iesharia.features.wrestlers.domain.repository.WrestlerRepository
+import org.iesharia.features.wrestlers.domain.usecase.GetWrestlersByTeamIdUseCase
 
 /**
  * Módulo para servicios comunes
@@ -33,6 +36,7 @@ private val repositoryModule = module {
     single { MockDataGenerator() }
     single<CompetitionRepository> { MockCompetitionRepository(get()) }
     single<UserRepository> { MockUserRepository(get()) }
+    single<WrestlerRepository> { MockWrestlerRepository(get()) }
 }
 
 /**
@@ -44,6 +48,7 @@ private val useCaseModule = module {
     factory { GetTeamMatchesUseCase(get()) }
     factory { GetWrestlerResultsUseCase(get()) }
     factory { LoginUseCase(get()) }
+    factory { GetWrestlersByTeamIdUseCase(get()) }
 }
 
 private val navigationModule = module {

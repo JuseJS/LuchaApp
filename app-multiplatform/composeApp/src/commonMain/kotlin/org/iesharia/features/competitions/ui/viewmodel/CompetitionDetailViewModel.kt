@@ -5,6 +5,7 @@ import org.iesharia.core.common.ErrorHandler
 import org.iesharia.core.domain.model.AppError
 import org.iesharia.core.domain.model.Favorite
 import org.iesharia.core.navigation.NavigationManager
+import org.iesharia.core.navigation.Routes
 import org.iesharia.features.common.domain.usecase.GetFavoritesUseCase
 import org.iesharia.features.competitions.domain.repository.CompetitionRepository
 
@@ -52,6 +53,12 @@ class CompetitionDetailViewModel(
                     teams = competition.teams
                 )
             }
+        }
+    }
+
+    fun navigateToTeamDetail(teamId: String) {
+        launchSafe {
+            navigationManager.navigateWithParams(Routes.Team.Detail(), teamId)
         }
     }
 

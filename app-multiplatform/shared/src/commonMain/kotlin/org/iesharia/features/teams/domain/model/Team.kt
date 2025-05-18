@@ -9,5 +9,6 @@ data class Team(
     val id: String,
     val name: String,
     val imageUrl: String,
-    val island: Island
+    val island: Island,
+    val venue: String
 )
