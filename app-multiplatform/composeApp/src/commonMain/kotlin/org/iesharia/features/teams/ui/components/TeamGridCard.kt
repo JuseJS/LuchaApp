@@ -20,9 +20,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import org.iesharia.core.ui.components.common.InfoBadge
 import org.iesharia.core.ui.theme.DarkSurface2
 import org.iesharia.core.ui.theme.White90
 import org.iesharia.core.ui.theme.WrestlingTheme
+import org.iesharia.features.competitions.domain.model.DivisionCategory
 import org.iesharia.features.teams.domain.model.Team
 
 /**
@@ -46,7 +48,8 @@ fun TeamGridCard(
     containerColor: Color = DarkSurface2,
     contentColor: Color = White90,
     iconBackgroundColor: Color = MaterialTheme.colorScheme.primary.copy(alpha = 0.1f),
-    iconTintColor: Color = MaterialTheme.colorScheme.primary
+    iconTintColor: Color = MaterialTheme.colorScheme.primary,
+    showDivision: Boolean = false
 ) {
     Card(
         onClick = onClick,
@@ -57,46 +60,64 @@ fun TeamGridCard(
         ),
         shape = WrestlingTheme.shapes.medium
     ) {
-        // Contenedor principal con alineación central
+        // Main content container
         Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(WrestlingTheme.dimensions.spacing_12),
-            contentAlignment = Alignment.Center // Centra todo el contenido como una unidad
+            contentAlignment = Alignment.Center
         ) {
-            // Row que contiene el icono y el texto juntos
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                // Importante: El Row no tiene fillMaxWidth para que se centre como un grupo
+            // Row that contains the icon and text
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier.wrapContentWidth()
             ) {
-                // Logo o avatar
-                Box(
-                    modifier = Modifier
-                        .size(40.dp)
-                        .clip(CircleShape)
-                        .background(iconBackgroundColor),
-                    contentAlignment = Alignment.Center
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.wrapContentWidth()
                 ) {
-                    Icon(
-                        imageVector = Icons.Default.Person,
-                        contentDescription = null,
-                        tint = iconTintColor,
-                        modifier = Modifier.size(24.dp)
+                    // Logo or avatar
+                    Box(
+                        modifier = Modifier
+                            .size(40.dp)
+                            .clip(CircleShape)
+                            .background(iconBackgroundColor),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Person,
+                            contentDescription = null,
+                            tint = iconTintColor,
+                            modifier = Modifier.size(24.dp)
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.width(WrestlingTheme.dimensions.spacing_8))
+
+                    // Team name
+                    Text(
+                        text = team.name,
+                        style = MaterialTheme.typography.bodyMedium,
+                        fontWeight = FontWeight.Medium,
+                        color = contentColor,
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis
                     )
                 }
 
-                Spacer(modifier = Modifier.width(WrestlingTheme.dimensions.spacing_8))
+                // Show division if requested
+                if (showDivision) {
+                    Spacer(modifier = Modifier.height(WrestlingTheme.dimensions.spacing_4))
 
-                // Nombre del equipo
-                Text(
-                    text = team.name,
-                    style = MaterialTheme.typography.bodyMedium,
-                    fontWeight = FontWeight.Medium,
-                    color = contentColor,
-                    maxLines = 2,
-                    overflow = TextOverflow.Ellipsis
-                )
+                    InfoBadge(
+                        text = team.divisionCategory.displayName(),
+                        color = when(team.divisionCategory) {
+                            DivisionCategory.PRIMERA -> MaterialTheme.colorScheme.primary
+                            DivisionCategory.SEGUNDA -> MaterialTheme.colorScheme.secondary
+                            DivisionCategory.TERCERA -> MaterialTheme.colorScheme.tertiary
+                        }
+                    )
+                }
             }
         }
     }

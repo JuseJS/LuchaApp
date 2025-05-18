@@ -26,12 +26,14 @@ import org.iesharia.core.ui.components.common.SectionSubtitle
 import org.iesharia.core.ui.screens.BaseContentScreen
 import org.iesharia.core.ui.theme.*
 import org.iesharia.di.rememberViewModel
+import org.iesharia.features.competitions.domain.model.DivisionCategory
 import org.iesharia.features.competitions.ui.components.CompetitionItem
 import org.iesharia.features.competitions.ui.components.CompetitionsSection
 import org.iesharia.features.competitions.ui.components.EmptyCompetitions
 import org.iesharia.features.home.ui.components.*
 import org.iesharia.features.home.ui.viewmodel.HomeUiState
 import org.iesharia.features.home.ui.viewmodel.HomeViewModel
+import org.iesharia.features.teams.domain.model.Team
 import org.iesharia.features.teams.ui.components.TeamGridCard
 import org.iesharia.features.teams.ui.components.TeamItem
 import org.iesharia.features.wrestlers.ui.components.WrestlerItem
@@ -376,7 +378,7 @@ private fun HomeContent(
             }
         }
 
-        // Nueva sección de equipos en grid
+        // Nueva sección de equipos por división
         item {
             Spacer(modifier = Modifier.height(WrestlingTheme.dimensions.spacing_16))
 
@@ -387,52 +389,93 @@ private fun HomeContent(
 
             Spacer(modifier = Modifier.height(WrestlingTheme.dimensions.spacing_16))
 
-            // Título de la sección
-            Text(
-                text = "Equipos Participantes",
-                style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.Bold,
-                color = White90,
-                modifier = Modifier.padding(horizontal = WrestlingTheme.dimensions.spacing_16)
-            )
-
-            Spacer(modifier = Modifier.height(WrestlingTheme.dimensions.spacing_16))
-
-            // Obtener todos los equipos de todas las competiciones
+            // Get all teams from all competitions
             val allTeams = uiState.competitions.flatMap { it.teams }.distinctBy { it.id }
 
-            if (allTeams.isEmpty()) {
-                EmptyStateMessage(
-                    message = "No hay equipos disponibles"
-                )
-            } else {
-                // Calcular altura aproximada del grid
-                val rowHeight = 72.dp
-                val numRows = (allTeams.size + 1) / 2 // +1 y división entera para redondear hacia arriba
-                val gridHeight = (numRows * (rowHeight + WrestlingTheme.dimensions.spacing_8)) + WrestlingTheme.dimensions.spacing_8
-
-                LazyVerticalGrid(
-                    columns = GridCells.Fixed(2),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(gridHeight.coerceAtMost(280.dp)), // altura máxima
-                    contentPadding = PaddingValues(horizontal = WrestlingTheme.dimensions.spacing_16),
-                    horizontalArrangement = Arrangement.spacedBy(WrestlingTheme.dimensions.spacing_8),
-                    verticalArrangement = Arrangement.spacedBy(WrestlingTheme.dimensions.spacing_8)
-                ) {
-                    items(allTeams) { team ->
-                        TeamGridCard(
-                            team = team,
-                            onClick = { viewModel.navigateToTeamDetail(team.id) }
-                        )
-                    }
-                }
-            }
+            // Use the TeamsByDivisionSection component
+            TeamsByDivisionSection(
+                title = "Equipos",
+                allTeams = allTeams,
+                onTeamClick = { viewModel.navigateToTeamDetail(it) }
+            )
         }
 
         // Espaciado al final
         item {
             Spacer(modifier = Modifier.height(WrestlingTheme.dimensions.spacing_16))
+        }
+    }
+}
+
+/**
+ * Component for displaying teams grouped by division
+ */
+@Composable
+private fun TeamsByDivisionSection(
+    title: String,
+    allTeams: List<Team>,
+    onTeamClick: (String) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    // Group teams by division
+    val teamsByDivision = allTeams.groupBy { it.divisionCategory }
+
+    Column(modifier = modifier.fillMaxWidth()) {
+        // Section title
+        Text(
+            text = title,
+            style = MaterialTheme.typography.titleLarge,
+            fontWeight = FontWeight.Bold,
+            color = White90,
+            modifier = Modifier.padding(horizontal = WrestlingTheme.dimensions.spacing_16)
+        )
+
+        Spacer(modifier = Modifier.height(WrestlingTheme.dimensions.spacing_16))
+
+        // Check if there are teams to show
+        if (teamsByDivision.isEmpty()) {
+            EmptyStateMessage(message = "No hay equipos disponibles")
+        } else {
+            // For each division, create a subsection
+            DivisionCategory.entries.forEach { division ->
+                val teamsInDivision = teamsByDivision[division] ?: emptyList()
+
+                if (teamsInDivision.isNotEmpty()) {
+                    // Division title
+                    SectionSubtitle(
+                        subtitle = division.displayName(),
+                        modifier = Modifier.padding(horizontal = WrestlingTheme.dimensions.spacing_16)
+                    )
+
+                    Spacer(modifier = Modifier.height(WrestlingTheme.dimensions.spacing_8))
+
+                    // Calculate height based on number of teams in this division
+                    val rowHeight = 72.dp
+                    val numRows = (teamsInDivision.size + 1) / 2 // +1 and integer division to round up
+                    val gridHeight = (numRows * (rowHeight + WrestlingTheme.dimensions.spacing_8)) + WrestlingTheme.dimensions.spacing_8
+
+                    // Grid of teams for this division
+                    LazyVerticalGrid(
+                        columns = GridCells.Fixed(2),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(gridHeight.coerceAtMost(180.dp)), // max height per division
+                        contentPadding = PaddingValues(horizontal = WrestlingTheme.dimensions.spacing_16),
+                        horizontalArrangement = Arrangement.spacedBy(WrestlingTheme.dimensions.spacing_8),
+                        verticalArrangement = Arrangement.spacedBy(WrestlingTheme.dimensions.spacing_8)
+                    ) {
+                        items(teamsInDivision) { team ->
+                            TeamGridCard(
+                                team = team,
+                                onClick = { onTeamClick(team.id) },
+                                showDivision = false // We already show division in the section title
+                            )
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(WrestlingTheme.dimensions.spacing_16))
+                }
+            }
         }
     }
 }
