@@ -1,11 +1,8 @@
 package org.iesharia.features.teams.ui.screens
 
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
@@ -14,15 +11,11 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import org.iesharia.core.resources.AppStrings
-import org.iesharia.core.ui.components.common.EmptyStateMessage
-import org.iesharia.core.ui.components.common.ItemCard
+import org.iesharia.core.ui.components.common.*
 import org.iesharia.core.ui.screens.BaseContentScreen
 import org.iesharia.core.ui.theme.WrestlingTheme
 import org.iesharia.di.rememberViewModel
@@ -199,71 +192,35 @@ private fun TeamDetailContent(
 
 @Composable
 private fun TeamHeader(team: Team) {
-    Surface(
-        color = MaterialTheme.colorScheme.primaryContainer,
-        modifier = Modifier.fillMaxWidth()
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = WrestlingTheme.dimensions.spacing_24, bottom = WrestlingTheme.dimensions.spacing_16),
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
-            // Logo del equipo
-            Box(
-                modifier = Modifier
-                    .size(100.dp)
-                    .clip(CircleShape)
-                    .background(Color(0x20FFFFFF)),
-                contentAlignment = Alignment.Center
+    EntityHeader(
+        title = team.name,
+        iconVector = Icons.Default.Groups,
+        subtitleContent = {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                if (team.imageUrl.isNotEmpty()) {
-                    // Aquí iría el código para cargar la imagen real
-                    // Por ahora usamos un icono placeholder
-                    Image(
-                        imageVector = Icons.Default.Groups,
-                        contentDescription = "Logo equipo",
-                        modifier = Modifier.size(60.dp),
-                        colorFilter = ColorFilter.tint(Color.White.copy(alpha = 0.9f))
-                    )
-                } else {
-                    Image(
-                        imageVector = Icons.Default.Groups,
-                        contentDescription = "Logo equipo",
-                        modifier = Modifier.size(60.dp),
-                        colorFilter = ColorFilter.tint(Color.White.copy(alpha = 0.9f))
-                    )
-                }
+                InfoRow(
+                    label = "Isla",
+                    value = team.island.displayName(),
+                    style = InfoRowStyle.HORIZONTAL,
+                    labelStyle = MaterialTheme.typography.titleMedium,
+                    valueStyle = MaterialTheme.typography.titleMedium,
+                    labelColor = Color.White.copy(alpha = 0.8f),
+                    valueColor = Color.White.copy(alpha = 0.8f)
+                )
+
+                InfoRow(
+                    label = "Terrero",
+                    value = team.venue,
+                    style = InfoRowStyle.HORIZONTAL,
+                    labelStyle = MaterialTheme.typography.titleMedium,
+                    valueStyle = MaterialTheme.typography.titleMedium,
+                    labelColor = Color.White.copy(alpha = 0.8f),
+                    valueColor = Color.White.copy(alpha = 0.8f)
+                )
             }
-
-            Spacer(modifier = Modifier.height(WrestlingTheme.dimensions.spacing_16))
-
-            // Nombre del equipo
-            Text(
-                text = team.name,
-                style = MaterialTheme.typography.headlineSmall,
-                fontWeight = FontWeight.Bold,
-                color = Color.White,
-                textAlign = TextAlign.Center
-            )
-
-            Spacer(modifier = Modifier.height(WrestlingTheme.dimensions.spacing_8))
-
-            // Isla
-            Text(
-                text = "Isla: ${team.island.displayName()}",
-                style = MaterialTheme.typography.titleMedium,
-                color = Color.White.copy(alpha = 0.8f)
-            )
-
-            // Terrero principal
-            Text(
-                text = "Terrero: ${team.venue}",
-                style = MaterialTheme.typography.titleMedium,
-                color = Color.White.copy(alpha = 0.8f)
-            )
         }
-    }
+    )
 }
 
 @Composable
@@ -271,22 +228,10 @@ private fun SearchWrestlersSection(
     query: String,
     onQueryChange: (String) -> Unit
 ) {
-    OutlinedTextField(
-        value = query,
-        onValueChange = onQueryChange,
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = WrestlingTheme.dimensions.spacing_16),
-        placeholder = { Text("Buscar luchador...") },
-        leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
-        trailingIcon = {
-            if (query.isNotEmpty()) {
-                IconButton(onClick = { onQueryChange("") }) {
-                    Icon(Icons.Default.Clear, contentDescription = "Limpiar")
-                }
-            }
-        },
-        singleLine = true,
+    SearchBar(
+        query = query,
+        onQueryChange = onQueryChange,
+        placeholder = "Buscar luchador...",
         shape = WrestlingTheme.shapes.medium
     )
 }

@@ -1,6 +1,5 @@
 package org.iesharia.features.competitions.ui.screens
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -22,13 +21,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.times
 import org.iesharia.core.ui.components.common.EmptyStateMessage
+import org.iesharia.core.ui.components.common.EntityHeader
+import org.iesharia.core.ui.components.common.EntityHeaderChips
 import org.iesharia.core.ui.screens.BaseContentScreen
 import org.iesharia.core.ui.theme.WrestlingTheme
 import org.iesharia.di.rememberViewModel
@@ -200,126 +200,89 @@ private fun CompetitionDetailContent(
 
 @Composable
 private fun CompetitionBanner(competition: Competition) {
-    Surface(
-        color = MaterialTheme.colorScheme.primaryContainer,
-        modifier = Modifier.fillMaxWidth()
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = WrestlingTheme.dimensions.spacing_16),
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
-            // Logo/Trofeo
-            Box(
-                modifier = Modifier
-                    .size(60.dp)
-                    .clip(CircleShape)
-                    .background(Color(0x20FFFFFF)),
-                contentAlignment = Alignment.Center
-            ) {
-                Image(
-                    imageVector = Icons.Default.EmojiEvents,
-                    contentDescription = "Logo competición",
-                    modifier = Modifier.size(36.dp),
-                    colorFilter = ColorFilter.tint(Color.White.copy(alpha = 0.9f))
-                )
-            }
+    val season = try {
+        val years = competition.season.split("-")
+        if (years.size == 2) {
+            "${years[0]}/${years[1].takeLast(2)}"
+        } else {
+            competition.season
+        }
+    } catch (e: Exception) {
+        competition.season
+    }
 
-            Spacer(modifier = Modifier.height(WrestlingTheme.dimensions.spacing_12))
-
-            // Nombre de la competición
-            Text(
-                text = competition.name,
-                style = MaterialTheme.typography.headlineSmall,
-                fontWeight = FontWeight.Bold,
-                color = Color.White,
-                textAlign = TextAlign.Center
-            )
-
-            // Temporada
-            // Convertir 2024-2025 a formato 2024/25
-            val season = try {
-                val years = competition.season.split("-")
-                if (years.size == 2) {
-                    "${years[0]}/${years[1].takeLast(2)}"
-                } else {
-                    competition.season
-                }
-            } catch (e: Exception) {
-                competition.season
-            }
-
+    EntityHeader(
+        title = competition.name,
+        iconVector = Icons.Default.EmojiEvents,
+        iconSize = 60.dp,
+        subtitleContent = {
             Text(
                 text = "Temporada $season",
                 style = MaterialTheme.typography.titleMedium,
                 color = Color.White.copy(alpha = 0.8f),
                 modifier = Modifier.padding(vertical = WrestlingTheme.dimensions.spacing_4)
             )
-
-            Spacer(modifier = Modifier.height(WrestlingTheme.dimensions.spacing_16))
-
-            // Valores mostrados en forma de chips en la parte inferior
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(Color(0x33000000))
-                    .padding(horizontal = WrestlingTheme.dimensions.spacing_8, vertical = WrestlingTheme.dimensions.spacing_12),
-                horizontalArrangement = Arrangement.SpaceEvenly
-            ) {
-                // Primera
-                FilterChip(
-                    selected = false,
-                    onClick = { },
-                    label = {
-                        Text(
-                            text = competition.divisionCategory.displayName(),
-                            style = MaterialTheme.typography.bodyMedium,
-                            fontWeight = FontWeight.Medium
+        },
+        bottomContent = {
+            EntityHeaderChips {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceEvenly
+                ) {
+                    // Primera
+                    FilterChip(
+                        selected = false,
+                        onClick = { },
+                        label = {
+                            Text(
+                                text = competition.divisionCategory.displayName(),
+                                style = MaterialTheme.typography.bodyMedium,
+                                fontWeight = FontWeight.Medium
+                            )
+                        },
+                        colors = FilterChipDefaults.filterChipColors(
+                            containerColor = MaterialTheme.colorScheme.primary,
+                            labelColor = Color.White
                         )
-                    },
-                    colors = FilterChipDefaults.filterChipColors(
-                        containerColor = MaterialTheme.colorScheme.primary,
-                        labelColor = Color.White
                     )
-                )
 
-                // Regional
-                FilterChip(
-                    selected = false,
-                    onClick = { },
-                    label = {
-                        Text(
-                            text = competition.ageCategory.displayName(),
-                            style = MaterialTheme.typography.bodyMedium,
-                            fontWeight = FontWeight.Medium
+                    // Regional
+                    FilterChip(
+                        selected = false,
+                        onClick = { },
+                        label = {
+                            Text(
+                                text = competition.ageCategory.displayName(),
+                                style = MaterialTheme.typography.bodyMedium,
+                                fontWeight = FontWeight.Medium
+                            )
+                        },
+                        colors = FilterChipDefaults.filterChipColors(
+                            containerColor = MaterialTheme.colorScheme.secondary,
+                            labelColor = Color.White
                         )
-                    },
-                    colors = FilterChipDefaults.filterChipColors(
-                        containerColor = MaterialTheme.colorScheme.secondary,
-                        labelColor = Color.White
                     )
-                )
 
-                // Tenerife
-                FilterChip(
-                    selected = false,
-                    onClick = { },
-                    label = {
-                        Text(
-                            text = competition.island.displayName(),
-                            style = MaterialTheme.typography.bodyMedium,
-                            fontWeight = FontWeight.Medium
+                    // Tenerife
+                    FilterChip(
+                        selected = false,
+                        onClick = { },
+                        label = {
+                            Text(
+                                text = competition.island.displayName(),
+                                style = MaterialTheme.typography.bodyMedium,
+                                fontWeight = FontWeight.Medium
+                            )
+                        },
+                        colors = FilterChipDefaults.filterChipColors(
+                            containerColor = MaterialTheme.colorScheme.tertiary,
+                            labelColor = Color.White
                         )
-                    },
-                    colors = FilterChipDefaults.filterChipColors(
-                        containerColor = MaterialTheme.colorScheme.tertiary,
-                        labelColor = Color.White
                     )
-                )
+                }
             }
         }
-    }
+    )
 }
 
 @Composable

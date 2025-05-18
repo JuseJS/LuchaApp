@@ -18,9 +18,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import org.iesharia.core.resources.AppStrings
-import org.iesharia.core.ui.components.common.BadgeStatus
-import org.iesharia.core.ui.components.common.InfoBadge
-import org.iesharia.core.ui.components.common.ItemCard
+import org.iesharia.core.ui.components.common.*
 import org.iesharia.core.ui.theme.WrestlingTheme
 import org.iesharia.features.wrestlers.domain.model.Wrestler
 import org.iesharia.features.wrestlers.domain.model.WrestlerMatchResult
@@ -169,23 +167,30 @@ private fun WrestlerBasicInfo(wrestler: Wrestler) {
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         // License number
-        InfoColumn(
-            title = "Licencia",
+        InfoRow(
+            label = "Licencia",
             value = wrestler.licenseNumber,
+            style = InfoRowStyle.CENTERED,
+            labelStyle = MaterialTheme.typography.labelSmall,
+            valueStyle = MaterialTheme.typography.bodySmall,
             modifier = Modifier.weight(1f)
         )
 
-        // Weight (if exists)
-        InfoColumn(
-            title = "Peso",
+        InfoRow(
+            label = "Peso",
             value = wrestler.weight?.let { "$it kg" } ?: "-",
+            style = InfoRowStyle.CENTERED,
+            labelStyle = MaterialTheme.typography.labelSmall,
+            valueStyle = MaterialTheme.typography.bodySmall,
             modifier = Modifier.weight(1f)
         )
 
-        // Height (if exists)
-        InfoColumn(
-            title = "Altura",
+        InfoRow(
+            label = "Altura",
             value = wrestler.height?.let { "$it cm" } ?: "-",
+            style = InfoRowStyle.CENTERED,
+            labelStyle = MaterialTheme.typography.labelSmall,
+            valueStyle = MaterialTheme.typography.bodySmall,
             modifier = Modifier.weight(1f)
         )
     }
@@ -212,38 +217,6 @@ private fun WrestlerResultsSection(
             wrestler = wrestler
         )
         Spacer(modifier = Modifier.height(WrestlingTheme.dimensions.spacing_8))
-    }
-}
-
-/**
- * Simple column to display information with title and value
- */
-@Composable
-private fun InfoColumn(
-    title: String,
-    value: String,
-    modifier: Modifier = Modifier
-) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = modifier
-    ) {
-        Text(
-            text = title,
-            style = MaterialTheme.typography.labelSmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
-        )
-
-        Spacer(modifier = Modifier.height(2.dp))
-
-        Text(
-            text = value,
-            style = MaterialTheme.typography.bodySmall,
-            fontWeight = FontWeight.Medium,
-            textAlign = TextAlign.Center,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis
-        )
     }
 }
 
