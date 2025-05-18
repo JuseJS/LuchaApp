@@ -12,7 +12,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import org.iesharia.features.teams.domain.model.Match
 import org.iesharia.features.competitions.domain.model.MatchDay
-import org.iesharia.core.ui.theme.WrestlingTheme
+import org.iesharia.core.ui.theme.*
 import org.iesharia.core.resources.AppStrings
 
 @Composable
@@ -28,7 +28,7 @@ fun MatchDaySection(
         Text(
             text = matchDay.getDateRangeFormatted(),
             style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
+            color = White80
         )
 
         Spacer(modifier = Modifier.height(WrestlingTheme.dimensions.spacing_8))
@@ -52,7 +52,8 @@ fun MatchItem(
         modifier = modifier.fillMaxWidth(),
         shape = WrestlingTheme.shapes.cardShape,
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+            containerColor = DarkSurface3.copy(alpha = 0.8f),
+            contentColor = White80
         )
     ) {
         Column(
@@ -79,7 +80,7 @@ fun MatchItem(
                 Text(
                     text = AppStrings.Teams.vs,
                     style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    color = White80,
                     modifier = Modifier.padding(horizontal = WrestlingTheme.dimensions.spacing_8)
                 )
 
@@ -104,14 +105,14 @@ fun MatchItem(
                 Text(
                     text = match.venue,
                     style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    color = White80
                 )
 
                 // Fecha
                 Text(
                     text = "${match.date.dayOfMonth}/${match.date.month}/${match.date.year} ${match.date.hour}:${match.date.minute.toString().padStart(2, '0')}",
                     style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    color = White80
                 )
             }
         }
@@ -135,15 +136,16 @@ private fun TeamScore(
             text = teamName,
             style = MaterialTheme.typography.bodyMedium,
             maxLines = 1,
+            color = White90,
             textAlign = TextAlign.Center
         )
 
         // Puntuación
         val scoreText = score?.toString() ?: "-"
         val scoreColor = when {
-            !isDrawn && isWinner -> MaterialTheme.colorScheme.primary
-            isDrawn -> MaterialTheme.colorScheme.tertiary
-            else -> MaterialTheme.colorScheme.onSurface
+            !isDrawn && isWinner -> LaurisilvaGreenLight // Verde para el ganador
+            isDrawn -> AccentGold // Dorado para empate
+            else -> White90
         }
 
         Text(
