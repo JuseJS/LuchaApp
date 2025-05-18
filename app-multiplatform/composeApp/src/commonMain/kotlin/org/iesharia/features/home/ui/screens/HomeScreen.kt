@@ -35,7 +35,7 @@ import org.iesharia.features.home.ui.viewmodel.HomeUiState
 import org.iesharia.features.home.ui.viewmodel.HomeViewModel
 import org.iesharia.features.teams.domain.model.Team
 import org.iesharia.features.teams.ui.components.TeamGridCard
-import org.iesharia.features.teams.ui.components.TeamItem
+import org.iesharia.features.wrestlers.domain.model.WrestlerCategory
 import org.iesharia.features.wrestlers.ui.components.WrestlerItem
 
 /**
@@ -279,23 +279,11 @@ private fun HomeContent(
 
                             Spacer(modifier = Modifier.height(WrestlingTheme.dimensions.spacing_8))
 
-                            Column(
-                                modifier = Modifier.padding(horizontal = WrestlingTheme.dimensions.spacing_16),
-                                verticalArrangement = Arrangement.spacedBy(WrestlingTheme.dimensions.spacing_12)
-                            ) {
-                                teams.forEach { favorite ->
-                                    val teamId = favorite.team.id
-                                    val lastMatches = viewModel.getTeamLastMatches(teamId)
-                                    val nextMatches = viewModel.getTeamNextMatches(teamId)
-
-                                    TeamItem(
-                                        team = favorite.team,
-                                        onClick = { viewModel.navigateToTeamDetail(favorite.team.id) },
-                                        lastMatches = lastMatches.take(2),
-                                        nextMatches = nextMatches.take(2)
-                                    )
-                                }
-                            }
+                            TeamsByDivisionSection(
+                                title = "", // Empty title as we already have the section subtitle
+                                allTeams = teams.map { it.team },
+                                onTeamClick = { viewModel.navigateToTeamDetail(it) }
+                            )
 
                             if (wrestlers.isNotEmpty() && shouldShowWrestlers(uiState.selectedFavoriteType)) {
                                 FavoritesSectionDivider()
@@ -311,19 +299,50 @@ private fun HomeContent(
 
                             Spacer(modifier = Modifier.height(WrestlingTheme.dimensions.spacing_8))
 
-                            Column(
-                                modifier = Modifier.padding(horizontal = WrestlingTheme.dimensions.spacing_16),
-                                verticalArrangement = Arrangement.spacedBy(WrestlingTheme.dimensions.spacing_12)
-                            ) {
-                                wrestlers.forEach { favorite ->
-                                    val wrestlerId = favorite.wrestler.id
-                                    val results = viewModel.getWrestlerResults(wrestlerId)
+                            // Group wrestlers by category
+                            val wrestlersByCategory = wrestlers.map { it.wrestler }.groupBy { it.category }
 
-                                    WrestlerItem(
-                                        wrestler = favorite.wrestler,
-                                        onClick = { viewModel.navigateToWrestlerDetail(favorite.wrestler.id) },
-                                        matchResults = results
+                            // For each category with wrestlers, display a grid
+                            WrestlerCategory.entries.forEach { category ->
+                                val wrestlersInCategory = wrestlersByCategory[category] ?: emptyList()
+
+                                if (wrestlersInCategory.isNotEmpty()) {
+                                    // Category header
+                                    Text(
+                                        text = category.displayName(),
+                                        style = MaterialTheme.typography.titleMedium,
+                                        color = MaterialTheme.colorScheme.primary,
+                                        fontWeight = FontWeight.Bold,
+                                        modifier = Modifier.padding(horizontal = WrestlingTheme.dimensions.spacing_16)
                                     )
+
+                                    Spacer(modifier = Modifier.height(WrestlingTheme.dimensions.spacing_8))
+
+                                    // Altura ajustada para el nuevo diseño más compacto y horizontal
+                                    val rowHeight = 120.dp
+                                    val numRows = (wrestlersInCategory.size + 1) / 2
+                                    val gridHeight = (numRows * rowHeight) + ((numRows - 1) * WrestlingTheme.dimensions.spacing_8)
+
+                                    // Display wrestlers in a grid
+                                    LazyVerticalGrid(
+                                        columns = GridCells.Fixed(2),
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .height(gridHeight.coerceAtMost(300.dp)),
+                                        contentPadding = PaddingValues(horizontal = WrestlingTheme.dimensions.spacing_16),
+                                        horizontalArrangement = Arrangement.spacedBy(WrestlingTheme.dimensions.spacing_8),
+                                        verticalArrangement = Arrangement.spacedBy(WrestlingTheme.dimensions.spacing_8)
+                                    ) {
+                                        items(wrestlersInCategory) { wrestler ->
+                                            WrestlerItem(
+                                                wrestler = wrestler,
+                                                onClick = { viewModel.navigateToWrestlerDetail(wrestler.id) },
+                                                isGridItem = true // Usar el nuevo diseño en grid
+                                            )
+                                        }
+                                    }
+
+                                    Spacer(modifier = Modifier.height(WrestlingTheme.dimensions.spacing_16))
                                 }
                             }
                         }
