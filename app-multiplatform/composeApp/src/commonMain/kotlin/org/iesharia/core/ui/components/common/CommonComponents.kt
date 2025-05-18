@@ -7,8 +7,12 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import org.iesharia.core.ui.theme.White60
+import org.iesharia.core.ui.theme.White80
+import org.iesharia.core.ui.theme.White90
 import org.iesharia.core.ui.theme.WrestlingTheme
 
 /**
@@ -21,12 +25,14 @@ import org.iesharia.core.ui.theme.WrestlingTheme
 @Composable
 fun SectionTitle(
     title: String,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    color: Color = White90
 ) {
     Text(
         text = title,
         style = MaterialTheme.typography.titleLarge,
         fontWeight = FontWeight.Bold,
+        color = color,
         modifier = modifier.padding(horizontal = WrestlingTheme.dimensions.spacing_16)
     )
 }
@@ -37,12 +43,13 @@ fun SectionTitle(
 @Composable
 fun SectionSubtitle(
     subtitle: String,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    color: Color = MaterialTheme.colorScheme.secondary
 ) {
     Text(
         text = subtitle,
         style = MaterialTheme.typography.titleMedium,
-        color = MaterialTheme.colorScheme.secondary,
+        color = color,
         fontWeight = FontWeight.Bold,
         modifier = modifier.padding(horizontal = WrestlingTheme.dimensions.spacing_16)
     )
@@ -55,12 +62,13 @@ fun SectionSubtitle(
 @Composable
 fun EmptyStateMessage(
     message: String,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    color: Color = White60
 ) {
     Text(
         text = message,
         style = MaterialTheme.typography.bodyMedium,
-        color = MaterialTheme.colorScheme.onSurfaceVariant,
+        color = color,
         textAlign = TextAlign.Center,
         modifier = modifier.padding(horizontal = WrestlingTheme.dimensions.spacing_16)
     )
@@ -73,12 +81,14 @@ fun EmptyStateMessage(
 fun LabeledValue(
     label: String,
     value: String,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    labelColor: Color = White80,
+    valueColor: Color = White90
 ) {
     Text(
         text = "$label: $value",
         style = MaterialTheme.typography.bodyMedium,
-        color = MaterialTheme.colorScheme.onSurfaceVariant,
+        color = labelColor,
         modifier = modifier
     )
 }
