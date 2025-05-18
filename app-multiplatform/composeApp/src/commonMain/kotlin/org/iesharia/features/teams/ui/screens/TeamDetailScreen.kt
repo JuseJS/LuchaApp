@@ -4,7 +4,9 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.FavoriteBorder
+import androidx.compose.material.icons.filled.Groups
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -26,7 +28,6 @@ import org.iesharia.features.teams.ui.components.MatchDaySection
 import org.iesharia.features.teams.ui.viewmodel.TeamDetailViewModel
 import org.iesharia.features.wrestlers.domain.model.Wrestler
 import org.iesharia.features.wrestlers.domain.model.WrestlerCategory
-import org.iesharia.features.wrestlers.ui.components.WrestlerDetailLevel
 import org.iesharia.features.wrestlers.ui.components.WrestlerItem
 import org.koin.core.parameter.parametersOf
 
@@ -274,7 +275,6 @@ private fun WrestlerCategorySection(
                 WrestlerItem(
                     wrestler = wrestler,
                     onClick = { onWrestlerClick(wrestler) },
-                    detailLevel = WrestlerDetailLevel.COMPACT,
                     modifier = Modifier.fillMaxWidth()
                 )
 
