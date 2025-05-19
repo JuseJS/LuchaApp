@@ -6,6 +6,7 @@ import org.iesharia.core.navigation.NavigationFactory
 import org.iesharia.core.navigation.NavigationManager
 import org.iesharia.features.competitions.ui.viewmodel.CompetitionDetailViewModel
 import org.iesharia.features.teams.ui.viewmodel.TeamDetailViewModel
+import org.iesharia.features.wrestlers.ui.viewmodel.WrestlerDetailViewModel
 import org.koin.core.module.Module
 import org.koin.dsl.module
 
@@ -28,6 +29,17 @@ val viewModelModule = module {
             competitionRepository = get(),
             getWrestlersByTeamIdUseCase = get(),
             getFavoritesUseCase = get(),
+            navigationManager = get(),
+            errorHandler = get()
+        )
+    }
+    factory { parameters ->
+        WrestlerDetailViewModel(
+            wrestlerId = parameters.get(),
+            wrestlerRepository = get(),
+            competitionRepository = get(),
+            getFavoritesUseCase = get(),
+            getWrestlerResultsUseCase = get(),
             navigationManager = get(),
             errorHandler = get()
         )
