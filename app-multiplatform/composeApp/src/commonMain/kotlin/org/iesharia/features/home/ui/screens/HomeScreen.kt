@@ -10,19 +10,15 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.times
 import org.iesharia.core.domain.model.Favorite
 import org.iesharia.core.resources.AppStrings
-import org.iesharia.core.ui.components.common.EmptyStateMessage
-import org.iesharia.core.ui.components.common.SearchBar
-import org.iesharia.core.ui.components.common.SectionSubtitle
+import org.iesharia.core.ui.components.common.*
 import org.iesharia.core.ui.screens.BaseContentScreen
 import org.iesharia.core.ui.theme.*
 import org.iesharia.di.rememberViewModel
@@ -57,7 +53,7 @@ class HomeScreen : BaseContentScreen() {
 
     @Composable
     override fun OnNavigateBack(): (() -> Unit)? {
-        return null // No hay navegación hacia atrás desde la pantalla principal
+        return null
     }
 
     @Composable
@@ -115,7 +111,6 @@ private fun HomeContent(
             Spacer(modifier = Modifier.height(WrestlingTheme.dimensions.spacing_16))
         }
 
-        // Resultados de búsqueda (solo se muestran si hay una búsqueda activa)
         if (uiState.searchQuery.isNotBlank()) {
             item {
                 val (competitions, teams, wrestlers) = viewModel.getSearchResults()
@@ -124,27 +119,20 @@ private fun HomeContent(
                 if (hasResults) {
                     Column(modifier = Modifier.fillMaxWidth()) {
                         // Título principal
-                        Text(
-                            text = "Resultados de búsqueda",
-                            style = MaterialTheme.typography.titleLarge,
-                            fontWeight = FontWeight.Bold,
-                            color = White90,
-                            modifier = Modifier.padding(horizontal = WrestlingTheme.dimensions.spacing_16)
+                        SectionDivider(
+                            title = "Resultados de búsqueda",
+                            type = SectionDividerType.PRIMARY,
+                            textColor = White90
                         )
 
                         Spacer(modifier = Modifier.height(WrestlingTheme.dimensions.spacing_16))
 
                         // Competiciones encontradas
                         if (competitions.isNotEmpty()) {
-                            Text(
-                                text = "Competiciones encontradas",
-                                style = MaterialTheme.typography.titleMedium,
-                                color = MaterialTheme.colorScheme.secondary,
-                                fontWeight = FontWeight.Bold,
-                                modifier = Modifier.padding(horizontal = WrestlingTheme.dimensions.spacing_16)
+                            SectionDivider(
+                                title = "Competiciones encontradas",
+                                type = SectionDividerType.TITLE
                             )
-
-                            Spacer(modifier = Modifier.height(WrestlingTheme.dimensions.spacing_8))
 
                             competitions.take(3).forEach { competition ->
                                 CompetitionItem(
@@ -165,15 +153,10 @@ private fun HomeContent(
 
                         // Equipos encontrados
                         if (teams.isNotEmpty()) {
-                            Text(
-                                text = "Equipos encontrados",
-                                style = MaterialTheme.typography.titleMedium,
-                                color = MaterialTheme.colorScheme.secondary,
-                                fontWeight = FontWeight.Bold,
-                                modifier = Modifier.padding(horizontal = WrestlingTheme.dimensions.spacing_16)
+                            SectionDivider(
+                                title = "Equipos encontrados",
+                                type = SectionDividerType.TITLE
                             )
-
-                            Spacer(modifier = Modifier.height(WrestlingTheme.dimensions.spacing_8))
 
                             // Grid de equipos
                             val rowHeight = 72.dp
@@ -244,12 +227,10 @@ private fun HomeContent(
 
                         // Sección de competiciones favoritas
                         if (competitions.isNotEmpty() && shouldShowCompetitions(uiState.selectedFavoriteType)) {
-                            SectionSubtitle(
-                                subtitle = AppStrings.Competitions.favoriteCompetitions,
-                                modifier = Modifier.padding(horizontal = WrestlingTheme.dimensions.spacing_16)
+                            SectionDivider(
+                                title = AppStrings.Competitions.favoriteCompetitions,
+                                type = SectionDividerType.TITLE
                             )
-
-                            Spacer(modifier = Modifier.height(WrestlingTheme.dimensions.spacing_8))
 
                             Column(
                                 modifier = Modifier.padding(horizontal = WrestlingTheme.dimensions.spacing_16),
@@ -272,15 +253,13 @@ private fun HomeContent(
 
                         // Sección de equipos favoritos
                         if (teams.isNotEmpty() && shouldShowTeams(uiState.selectedFavoriteType)) {
-                            SectionSubtitle(
-                                subtitle = AppStrings.Teams.favoriteTeams,
-                                modifier = Modifier.padding(horizontal = WrestlingTheme.dimensions.spacing_16)
+                            SectionDivider(
+                                title = AppStrings.Teams.favoriteTeams,
+                                type = SectionDividerType.TITLE
                             )
 
-                            Spacer(modifier = Modifier.height(WrestlingTheme.dimensions.spacing_8))
-
                             TeamsByDivisionSection(
-                                title = "", // Empty title as we already have the section subtitle
+                                title = "",
                                 allTeams = teams.map { it.team },
                                 onTeamClick = { viewModel.navigateToTeamDetail(it) }
                             )
@@ -292,12 +271,10 @@ private fun HomeContent(
 
                         // Sección de luchadores favoritos
                         if (wrestlers.isNotEmpty() && shouldShowWrestlers(uiState.selectedFavoriteType)) {
-                            SectionSubtitle(
-                                subtitle = AppStrings.Wrestlers.favoriteWrestlers,
-                                modifier = Modifier.padding(horizontal = WrestlingTheme.dimensions.spacing_16)
+                            SectionDivider(
+                                title = AppStrings.Wrestlers.favoriteWrestlers,
+                                type = SectionDividerType.TITLE
                             )
-
-                            Spacer(modifier = Modifier.height(WrestlingTheme.dimensions.spacing_8))
 
                             // Group wrestlers by category
                             val wrestlersByCategory = wrestlers.map { it.wrestler }.groupBy { it.category }
@@ -307,18 +284,13 @@ private fun HomeContent(
                                 val wrestlersInCategory = wrestlersByCategory[category] ?: emptyList()
 
                                 if (wrestlersInCategory.isNotEmpty()) {
-                                    // Category header
-                                    Text(
-                                        text = category.displayName(),
-                                        style = MaterialTheme.typography.titleMedium,
-                                        color = MaterialTheme.colorScheme.primary,
-                                        fontWeight = FontWeight.Bold,
-                                        modifier = Modifier.padding(horizontal = WrestlingTheme.dimensions.spacing_16)
+                                    SectionDivider(
+                                        title = category.displayName(),
+                                        type = SectionDividerType.SUBTITLE
                                     )
 
                                     Spacer(modifier = Modifier.height(WrestlingTheme.dimensions.spacing_8))
 
-                                    // Altura ajustada para el nuevo diseño (más información requiere más espacio)
                                     val rowHeight = 180.dp
                                     val numRows = (wrestlersInCategory.size + 1) / 2
                                     val gridHeight = (numRows * rowHeight) + ((numRows - 1) * WrestlingTheme.dimensions.spacing_8)
@@ -341,15 +313,10 @@ private fun HomeContent(
                                             )
                                         }
                                     }
-
-                                    Spacer(modifier = Modifier.height(WrestlingTheme.dimensions.spacing_16))
                                 }
                             }
                         }
                     }
-
-                    // Espaciado inferior
-                    Spacer(modifier = Modifier.height(WrestlingTheme.dimensions.spacing_16))
                 }
             }
 
@@ -413,7 +380,7 @@ private fun HomeContent(
 
             // Use the TeamsByDivisionSection component
             TeamsByDivisionSection(
-                title = "Equipos",
+                title = AppStrings.Home.teams,
                 allTeams = allTeams,
                 onTeamClick = { viewModel.navigateToTeamDetail(it) }
             )
@@ -440,16 +407,13 @@ private fun TeamsByDivisionSection(
     val teamsByDivision = allTeams.groupBy { it.divisionCategory }
 
     Column(modifier = modifier.fillMaxWidth()) {
-        // Section title
-        Text(
-            text = title,
-            style = MaterialTheme.typography.titleLarge,
-            fontWeight = FontWeight.Bold,
-            color = White90,
-            modifier = Modifier.padding(horizontal = WrestlingTheme.dimensions.spacing_16)
-        )
-
-        Spacer(modifier = Modifier.height(WrestlingTheme.dimensions.spacing_16))
+        if (title.isNotEmpty()) {
+            SectionDivider(
+                title = title,
+                type = SectionDividerType.PRIMARY,
+                textColor = White90
+            )
+        }
 
         // Check if there are teams to show
         if (teamsByDivision.isEmpty()) {
@@ -460,13 +424,11 @@ private fun TeamsByDivisionSection(
                 val teamsInDivision = teamsByDivision[division] ?: emptyList()
 
                 if (teamsInDivision.isNotEmpty()) {
-                    // Division title
-                    SectionSubtitle(
-                        subtitle = division.displayName(),
-                        modifier = Modifier.padding(horizontal = WrestlingTheme.dimensions.spacing_16)
+                    // Division title - usando SUBTITLE en lugar de PRIMARY
+                    SectionDivider(
+                        title = division.displayName(),
+                        type = SectionDividerType.SUBTITLE
                     )
-
-                    Spacer(modifier = Modifier.height(WrestlingTheme.dimensions.spacing_8))
 
                     // Calculate height based on number of teams in this division
                     val rowHeight = 72.dp
