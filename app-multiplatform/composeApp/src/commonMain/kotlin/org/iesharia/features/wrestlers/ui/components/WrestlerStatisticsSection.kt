@@ -135,8 +135,8 @@ fun SeasonSummaryCard(
                 StatisticBox(
                     label = "Victorias",
                     value = wins.toString(),
-                    color = MaterialTheme.colorScheme.primary,
-                    backgroundColor = MaterialTheme.colorScheme.primaryContainer,
+                    color = MaterialTheme.colorScheme.tertiary,
+                    backgroundColor = MaterialTheme.colorScheme.tertiaryContainer,
                     modifier = Modifier.weight(1f)
                 )
 
@@ -153,8 +153,8 @@ fun SeasonSummaryCard(
                 StatisticBox(
                     label = "Empates",
                     value = draws.toString(),
-                    color = MaterialTheme.colorScheme.tertiary,
-                    backgroundColor = MaterialTheme.colorScheme.tertiaryContainer,
+                    color = MaterialTheme.colorScheme.primary,
+                    backgroundColor = MaterialTheme.colorScheme.primaryContainer,
                     modifier = Modifier.weight(1f)
                 )
             }
