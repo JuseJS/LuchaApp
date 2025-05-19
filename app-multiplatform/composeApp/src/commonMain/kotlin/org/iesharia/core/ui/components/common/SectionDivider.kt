@@ -13,46 +13,114 @@ import androidx.compose.ui.unit.dp
 import org.iesharia.core.ui.theme.WrestlingTheme
 
 /**
- * Componente reutilizable para cabeceras de sección con una línea decorativa
+ * Tipos de divisores de sección disponibles
+ */
+enum class SectionDividerType {
+    /**
+     * Divisor principal con líneas a ambos lados del texto (estilo original)
+     */
+    PRIMARY,
+
+    /**
+     * Título grande sin líneas
+     */
+    TITLE,
+
+    /**
+     * Subtítulo mediano sin líneas, incluye espaciado inferior
+     */
+    SUBTITLE
+}
+
+/**
+ * Componente unificado para cabeceras y divisores de sección
  *
- * @param title Título de la sección
+ * @param title Texto de la sección
  * @param modifier Modificador para personalizar el componente
- * @param lineThickness Grosor de la línea decorativa
- * @param lineColor Color de la línea decorativa (por defecto, el color primario del tema)
+ * @param type Tipo de divisor que determina el estilo predefinido
+ * @param showDividerLines Sí se muestran las líneas decorativas (solo aplicable en ciertos tipos)
+ * @param leftLineWeight Peso de la línea izquierda (solo si showDividerLines es true)
+ * @param rightLineWeight Peso de la línea derecha (solo si showDividerLines es true)
+ * @param lineThickness Grosor de las líneas (solo si showDividerLines es true)
+ * @param leftLineColor Color de la línea izquierda (solo si showDividerLines es true)
+ * @param rightLineColor Color de la línea derecha (solo si showDividerLines es true)
+ * @param textStyle Estilo de texto personalizado (anula el estilo predefinido por tipo)
+ * @param textColor Color de texto personalizado (anula el color predefinido por tipo)
  */
 @Composable
 fun SectionDivider(
     title: String,
     modifier: Modifier = Modifier,
+    type: SectionDividerType = SectionDividerType.PRIMARY,
+    showDividerLines: Boolean = when(type) {
+        SectionDividerType.PRIMARY -> true
+        else -> false
+    },
     leftLineWeight: Float = 0.1f,
     rightLineWeight: Float = 1f,
     lineThickness: Dp = 3.dp,
     leftLineColor: Color = MaterialTheme.colorScheme.primary,
     rightLineColor: Color = MaterialTheme.colorScheme.outlineVariant,
-    textStyle: TextStyle = MaterialTheme.typography.titleLarge,
-    textColor: Color = MaterialTheme.colorScheme.onBackground
+    textStyle: TextStyle? = null,
+    textColor: Color? = null
 ) {
-    Row(
-        modifier = modifier.fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        HorizontalDivider(
-            modifier = Modifier.weight(leftLineWeight),
-            thickness = lineThickness,
-            color = leftLineColor
-        )
+    // Determinar valores basados en el tipo
+    val effectiveTextStyle = textStyle ?: when(type) {
+        SectionDividerType.PRIMARY, SectionDividerType.TITLE -> MaterialTheme.typography.titleLarge
+        SectionDividerType.SUBTITLE -> MaterialTheme.typography.titleMedium
+    }
 
-        Text(
-            text = title,
-            style = textStyle,
-            fontWeight = FontWeight.Bold,
-            color = textColor,
-            modifier = Modifier.padding(horizontal = WrestlingTheme.dimensions.spacing_8)
-        )
+    val effectiveTextColor = textColor ?: when(type) {
+        SectionDividerType.PRIMARY, SectionDividerType.TITLE -> MaterialTheme.colorScheme.onBackground
+        SectionDividerType.SUBTITLE -> MaterialTheme.colorScheme.secondary
+    }
 
-        HorizontalDivider(
-            modifier = Modifier.weight(rightLineWeight),
-            color = rightLineColor
-        )
+    val paddingHorizontal = if (!showDividerLines) {
+        WrestlingTheme.dimensions.spacing_16
+    } else {
+        WrestlingTheme.dimensions.spacing_8
+    }
+
+    Column(modifier = modifier) {
+        if (showDividerLines) {
+            // Versión con líneas divisoras
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                HorizontalDivider(
+                    modifier = Modifier.weight(leftLineWeight),
+                    thickness = lineThickness,
+                    color = leftLineColor
+                )
+
+                Text(
+                    text = title,
+                    style = effectiveTextStyle,
+                    fontWeight = FontWeight.Bold,
+                    color = effectiveTextColor,
+                    modifier = Modifier.padding(horizontal = paddingHorizontal)
+                )
+
+                HorizontalDivider(
+                    modifier = Modifier.weight(rightLineWeight),
+                    color = rightLineColor
+                )
+            }
+        } else {
+            // Versión sin líneas divisoras (solo texto)
+            Text(
+                text = title,
+                style = effectiveTextStyle,
+                fontWeight = FontWeight.Bold,
+                color = effectiveTextColor,
+                modifier = Modifier.padding(horizontal = paddingHorizontal)
+            )
+        }
+
+        // Añadir espaciado automático después de subtítulos
+        if (type == SectionDividerType.SUBTITLE) {
+            Spacer(modifier = Modifier.height(WrestlingTheme.dimensions.spacing_8))
+        }
     }
 }
