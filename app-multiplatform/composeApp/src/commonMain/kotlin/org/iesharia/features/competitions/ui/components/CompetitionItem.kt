@@ -9,7 +9,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import org.iesharia.features.competitions.domain.model.Competition
 import org.iesharia.core.ui.components.common.ItemCard
-import org.iesharia.core.ui.components.common.SectionSubtitle
+import org.iesharia.core.ui.components.common.SectionDivider
+import org.iesharia.core.ui.components.common.SectionDividerType
 import org.iesharia.core.ui.theme.DarkSurface2
 import org.iesharia.core.ui.theme.White80
 import org.iesharia.core.ui.theme.White90
@@ -58,8 +59,9 @@ fun CompetitionItem(
 
             // Última jornada completada
             competition.lastCompletedMatchDay?.let { matchDay ->
-                SectionSubtitle(
-                    subtitle = AppStrings.Competitions.lastMatchDay.format(matchDay.number),
+                SectionDivider(
+                    title = AppStrings.Competitions.lastMatchDay.format(matchDay.number),
+                    type = SectionDividerType.SUBTITLE,
                     modifier = Modifier.padding(horizontal = 0.dp)
                 )
                 MatchDaySection(matchDay = matchDay)
@@ -68,8 +70,9 @@ fun CompetitionItem(
 
             // Próxima jornada
             competition.nextMatchDay?.let { matchDay ->
-                SectionSubtitle(
-                    subtitle = AppStrings.Competitions.nextMatchDay.format(matchDay.number),
+                SectionDivider(
+                    title = AppStrings.Competitions.nextMatchDay.format(matchDay.number),
+                    type = SectionDividerType.SUBTITLE,
                     modifier = Modifier.padding(horizontal = 0.dp)
                 )
                 MatchDaySection(matchDay = matchDay)
