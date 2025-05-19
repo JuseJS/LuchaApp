@@ -7,10 +7,11 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import org.iesharia.core.domain.model.Island
 import org.iesharia.core.ui.components.common.EmptyStateMessage
+import org.iesharia.core.ui.components.common.SectionDivider
+import org.iesharia.core.ui.components.common.SectionDividerType
 import org.iesharia.features.home.ui.viewmodel.CompetitionFilters
 import org.iesharia.core.ui.theme.WrestlingTheme
 import org.iesharia.features.competitions.domain.model.AgeCategory
@@ -77,10 +78,10 @@ private fun CompetitionSectionHeader(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        Text(
-            text = AppStrings.Competitions.activeCompetitions,
-            style = MaterialTheme.typography.titleLarge,
-            fontWeight = FontWeight.Bold
+        SectionDivider(
+            title = AppStrings.Competitions.activeCompetitions,
+            type = SectionDividerType.PRIMARY,
+            modifier = Modifier.weight(1f)
         )
 
         IconButton(onClick = { onFilterClick(showFiltersDialog) }) {
