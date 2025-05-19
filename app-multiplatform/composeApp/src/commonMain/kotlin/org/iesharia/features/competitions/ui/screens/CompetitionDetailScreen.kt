@@ -23,7 +23,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.times
-import org.iesharia.core.ui.components.common.EmptyStateMessage
+import org.iesharia.core.ui.components.common.*
 import org.iesharia.core.ui.screens.BaseContentScreen
 import org.iesharia.core.ui.theme.WrestlingTheme
 import org.iesharia.di.rememberViewModel
@@ -103,25 +103,105 @@ private fun CompetitionDetailContent(
     ) {
         // Banner de información
         item {
-            CompetitionBanner(competition = competition)
+            val season = try {
+                val years = competition.season.split("-")
+                if (years.size == 2) {
+                    "${years[0]}/${years[1].takeLast(2)}"
+                } else {
+                    competition.season
+                }
+            } catch (e: Exception) {
+                competition.season
+            }
+
+            EntityHeader(
+                title = competition.name,
+                iconVector = Icons.Default.EmojiEvents,
+                iconSize = 80.dp,
+                subtitleContent = {
+                    Text(
+                        text = "Temporada $season",
+                        style = MaterialTheme.typography.titleMedium,
+                        color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.8f)
+                    )
+                },
+                bottomContent = {
+                    // Usar los componentes existentes para los chips
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(
+                                horizontal = WrestlingTheme.dimensions.spacing_16,
+                                vertical = WrestlingTheme.dimensions.spacing_8
+                            ),
+                        horizontalArrangement = Arrangement.spacedBy(WrestlingTheme.dimensions.spacing_8)
+                    ) {
+                        // Primera
+                        FilterChip(
+                            selected = false,
+                            onClick = { },
+                            label = {
+                                Text(
+                                    text = competition.divisionCategory.displayName(),
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    fontWeight = FontWeight.Medium
+                                )
+                            },
+                            colors = FilterChipDefaults.filterChipColors(
+                                containerColor = MaterialTheme.colorScheme.primary,
+                                labelColor = MaterialTheme.colorScheme.onPrimary
+                            )
+                        )
+
+                        // Regional
+                        FilterChip(
+                            selected = false,
+                            onClick = { },
+                            label = {
+                                Text(
+                                    text = competition.ageCategory.displayName(),
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    fontWeight = FontWeight.Medium
+                                )
+                            },
+                            colors = FilterChipDefaults.filterChipColors(
+                                containerColor = MaterialTheme.colorScheme.secondary,
+                                labelColor = MaterialTheme.colorScheme.onSecondary
+                            )
+                        )
+
+                        // Tenerife
+                        FilterChip(
+                            selected = false,
+                            onClick = { },
+                            label = {
+                                Text(
+                                    text = competition.island.displayName(),
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    fontWeight = FontWeight.Medium
+                                )
+                            },
+                            colors = FilterChipDefaults.filterChipColors(
+                                containerColor = MaterialTheme.colorScheme.tertiary,
+                                labelColor = MaterialTheme.colorScheme.onTertiary
+                            )
+                        )
+                    }
+                }
+            )
         }
 
         // Sección de equipos participantes
         item {
-            Box(
+            SectionDivider(
+                title = "Equipos Participantes",
+                type = SectionDividerType.PRIMARY,
+                textColor = Color.White,
                 modifier = Modifier
                     .fillMaxWidth()
                     .background(Color.Black)
                     .padding(vertical = WrestlingTheme.dimensions.spacing_8)
-            ) {
-                Text(
-                    text = "Equipos Participantes",
-                    style = MaterialTheme.typography.titleLarge,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.White,
-                    modifier = Modifier.padding(horizontal = WrestlingTheme.dimensions.spacing_16)
-                )
-            }
+            )
         }
 
         // Grid de equipos
@@ -154,20 +234,15 @@ private fun CompetitionDetailContent(
 
         // Sección de jornadas
         item {
-            Box(
+            SectionDivider(
+                title = "Jornadas",
+                type = SectionDividerType.PRIMARY,
+                textColor = Color.White,
                 modifier = Modifier
                     .fillMaxWidth()
                     .background(Color.Black)
                     .padding(vertical = WrestlingTheme.dimensions.spacing_8)
-            ) {
-                Text(
-                    text = "Jornadas",
-                    style = MaterialTheme.typography.titleLarge,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.White,
-                    modifier = Modifier.padding(horizontal = WrestlingTheme.dimensions.spacing_16)
-                )
-            }
+            )
         }
 
         // Lista de jornadas
