@@ -5,17 +5,24 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
-import androidx.compose.material3.*
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import org.iesharia.core.ui.components.common.EmptyStateMessage
+import org.iesharia.core.ui.components.common.EntityHeader
 import org.iesharia.core.ui.screens.BaseContentScreen
 import org.iesharia.core.ui.theme.WrestlingTheme
 import org.iesharia.di.rememberViewModel
-import org.iesharia.features.wrestlers.ui.components.*
+import org.iesharia.features.wrestlers.ui.components.WrestlerMatchHistorySection
+import org.iesharia.features.wrestlers.ui.components.WrestlerPersonalInfoSection
+import org.iesharia.features.wrestlers.ui.components.WrestlerStatisticsSection
 import org.iesharia.features.wrestlers.ui.viewmodel.WrestlerDetailViewModel
 import org.koin.core.parameter.parametersOf
 
@@ -97,8 +104,30 @@ private fun WrestlerDetailContent(
     ) {
         // Banner del luchador
         item {
-            WrestlerBanner(wrestler = wrestler)
-            Spacer(modifier = Modifier.height(WrestlingTheme.dimensions.spacing_24))
+            EntityHeader(
+                title = wrestler.fullName,
+                iconVector = Icons.Default.Person,
+                iconSize = 80.dp,
+                subtitleContent = {
+                    Column {
+                        if (wrestler.nickname != null) {
+                            Text(
+                                text = "\"${wrestler.nickname}\"",
+                                style = MaterialTheme.typography.titleMedium,
+                                color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.8f)
+                            )
+                        }
+
+                        // Podemos añadir más información en el subtítulo ahora que tenemos espacio horizontal
+                        Text(
+                            text = wrestler.classification.displayName(),
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f)
+                        )
+                    }
+                }
+            )
+            Spacer(modifier = Modifier.height(WrestlingTheme.dimensions.spacing_16))
         }
 
         // Sección de información personal mejorada
