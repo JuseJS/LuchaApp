@@ -4,7 +4,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
@@ -15,20 +14,15 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import org.iesharia.core.resources.AppStrings
-import org.iesharia.core.ui.components.common.EmptyStateMessage
-import org.iesharia.core.ui.components.common.ItemCard
-import org.iesharia.core.ui.components.common.SearchBar
-import org.iesharia.core.ui.components.common.SectionSubtitle
+import org.iesharia.core.ui.components.common.*
 import org.iesharia.core.ui.screens.BaseContentScreen
 import org.iesharia.core.ui.theme.WrestlingTheme
 import org.iesharia.di.rememberViewModel
 import org.iesharia.features.competitions.domain.model.Competition
 import org.iesharia.features.competitions.domain.model.MatchDay
-import org.iesharia.features.teams.domain.model.Team
 import org.iesharia.features.teams.ui.components.MatchDaySection
 import org.iesharia.features.teams.ui.viewmodel.TeamDetailViewModel
 import org.iesharia.features.wrestlers.domain.model.Wrestler
@@ -103,7 +97,72 @@ private fun TeamDetailContent(
     ) {
         // Banner mejorado del equipo
         item {
-            TeamBanner(team = team)
+            EntityHeader(
+                title = team.name,
+                iconVector = Icons.Default.Groups,
+                iconSize = 80.dp,
+                subtitleContent = {
+                    Column {
+                        Text(
+                            text = AppStrings.Teams.islandLabel.format(team.island.displayName()),
+                            style = MaterialTheme.typography.titleMedium,
+                            color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.8f)
+                        )
+
+                        Text(
+                            text = "Terrero: ${team.venue}",
+                            style = MaterialTheme.typography.titleMedium,
+                            color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.8f)
+                        )
+                    }
+                },
+                bottomContent = {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(
+                                horizontal = WrestlingTheme.dimensions.spacing_16,
+                                vertical = WrestlingTheme.dimensions.spacing_8
+                            ),
+                        horizontalArrangement = Arrangement.spacedBy(WrestlingTheme.dimensions.spacing_8),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        // División
+                        FilterChip(
+                            selected = false,
+                            onClick = { },
+                            label = {
+                                Text(
+                                    text = team.divisionCategory.displayName(),
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    fontWeight = FontWeight.Medium
+                                )
+                            },
+                            colors = FilterChipDefaults.filterChipColors(
+                                containerColor = MaterialTheme.colorScheme.primary,
+                                labelColor = MaterialTheme.colorScheme.onPrimary
+                            )
+                        )
+
+                        // Isla
+                        FilterChip(
+                            selected = false,
+                            onClick = { },
+                            label = {
+                                Text(
+                                    text = team.island.displayName(),
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    fontWeight = FontWeight.Medium
+                                )
+                            },
+                            colors = FilterChipDefaults.filterChipColors(
+                                containerColor = MaterialTheme.colorScheme.tertiary,
+                                labelColor = MaterialTheme.colorScheme.onTertiary
+                            )
+                        )
+                    }
+                }
+            )
             Spacer(modifier = Modifier.height(WrestlingTheme.dimensions.spacing_16))
         }
 
@@ -119,12 +178,11 @@ private fun TeamDetailContent(
 
         // Sección de luchadores por categoría
         item {
-            Text(
-                text = "Luchadores",
-                style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.Bold,
+            SectionDivider(
+                title = "Luchadores",
+                type = SectionDividerType.PRIMARY,
                 modifier = Modifier.padding(horizontal = WrestlingTheme.dimensions.spacing_16),
-                color = MaterialTheme.colorScheme.onBackground
+                textColor = MaterialTheme.colorScheme.onBackground
             )
 
             Spacer(modifier = Modifier.height(WrestlingTheme.dimensions.spacing_16))
@@ -165,20 +223,16 @@ private fun TeamDetailContent(
 
         // Sección de competiciones mejorada
         item {
-            Box(
+            SectionDivider(
+                title = "Competiciones",
+                type = SectionDividerType.PRIMARY,
+                textColor = MaterialTheme.colorScheme.onBackground,
                 modifier = Modifier
                     .fillMaxWidth()
                     .background(MaterialTheme.colorScheme.background)
-                    .padding(vertical = WrestlingTheme.dimensions.spacing_8)
-            ) {
-                Text(
-                    text = "Competiciones",
-                    style = MaterialTheme.typography.titleLarge,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onBackground,
-                    modifier = Modifier.padding(horizontal = WrestlingTheme.dimensions.spacing_16)
-                )
-            }
+                    .padding(vertical = WrestlingTheme.dimensions.spacing_8,
+                        horizontal = WrestlingTheme.dimensions.spacing_16)
+            )
 
             Spacer(modifier = Modifier.height(WrestlingTheme.dimensions.spacing_8))
         }
@@ -200,111 +254,6 @@ private fun TeamDetailContent(
         // Espacio al final para evitar que el último elemento quede cortado
         item {
             Spacer(modifier = Modifier.height(WrestlingTheme.dimensions.spacing_16))
-        }
-    }
-}
-
-@Composable
-private fun TeamBanner(
-    team: Team
-) {
-    Surface(
-        color = MaterialTheme.colorScheme.primaryContainer,
-        modifier = Modifier.fillMaxWidth()
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(
-                    horizontal = WrestlingTheme.dimensions.spacing_16,
-                    vertical = WrestlingTheme.dimensions.spacing_16
-                ),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            // Icono de equipo
-            Box(
-                modifier = Modifier
-                    .size(80.dp)
-                    .clip(CircleShape)
-                    .background(MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.1f)),
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Groups,
-                    contentDescription = null,
-                    modifier = Modifier.size(48.dp),
-                    tint = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.9f)
-                )
-            }
-
-            Spacer(modifier = Modifier.width(WrestlingTheme.dimensions.spacing_16))
-
-            // Información del equipo
-            Column(
-                modifier = Modifier.weight(1f)
-            ) {
-                Text(
-                    text = team.name,
-                    style = MaterialTheme.typography.headlineSmall,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onPrimaryContainer
-                )
-
-                Text(
-                    text = AppStrings.Teams.islandLabel.format(team.island.displayName()),
-                    style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.8f),
-                    modifier = Modifier.padding(vertical = WrestlingTheme.dimensions.spacing_4)
-                )
-
-                Text(
-                    text = "Terrero: ${team.venue}",
-                    style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.8f)
-                )
-
-                // Chips de divisiones
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = WrestlingTheme.dimensions.spacing_8),
-                    horizontalArrangement = Arrangement.spacedBy(WrestlingTheme.dimensions.spacing_8)
-                ) {
-                    // División
-                    FilterChip(
-                        selected = false,
-                        onClick = { },
-                        label = {
-                            Text(
-                                text = team.divisionCategory.displayName(),
-                                style = MaterialTheme.typography.bodyMedium,
-                                fontWeight = FontWeight.Medium
-                            )
-                        },
-                        colors = FilterChipDefaults.filterChipColors(
-                            containerColor = MaterialTheme.colorScheme.primary,
-                            labelColor = MaterialTheme.colorScheme.onPrimary
-                        )
-                    )
-
-                    // Isla
-                    FilterChip(
-                        selected = false,
-                        onClick = { },
-                        label = {
-                            Text(
-                                text = team.island.displayName(),
-                                style = MaterialTheme.typography.bodyMedium,
-                                fontWeight = FontWeight.Medium
-                            )
-                        },
-                        colors = FilterChipDefaults.filterChipColors(
-                            containerColor = MaterialTheme.colorScheme.tertiary,
-                            labelColor = MaterialTheme.colorScheme.onTertiary
-                        )
-                    )
-                }
-            }
         }
     }
 }
@@ -336,11 +285,10 @@ private fun WrestlerCategorySection(
             .padding(horizontal = WrestlingTheme.dimensions.spacing_16)
     ) {
         // Título de la categoría
-        Text(
-            text = category.displayName(),
-            style = MaterialTheme.typography.titleLarge,
-            fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.primary
+        SectionDivider(
+            title = category.displayName(),
+            type = SectionDividerType.SUBTITLE,
+            textColor = MaterialTheme.colorScheme.primary
         )
 
         Spacer(modifier = Modifier.height(WrestlingTheme.dimensions.spacing_8))
@@ -412,9 +360,10 @@ private fun CompetitionWithMatchDays(
 
             // Última jornada
             lastMatchDay?.let { matchDay ->
-                SectionSubtitle(
-                    subtitle = AppStrings.Competitions.lastMatchDay.format(matchDay.number),
-                    color = MaterialTheme.colorScheme.secondary
+                SectionDivider(
+                    title = AppStrings.Competitions.lastMatchDay.format(matchDay.number),
+                    type = SectionDividerType.SUBTITLE,
+                    textColor = MaterialTheme.colorScheme.secondary
                 )
 
                 Spacer(modifier = Modifier.height(WrestlingTheme.dimensions.spacing_8))
@@ -426,9 +375,10 @@ private fun CompetitionWithMatchDays(
 
             // Próxima jornada
             nextMatchDay?.let { matchDay ->
-                SectionSubtitle(
-                    subtitle = AppStrings.Competitions.nextMatchDay.format(matchDay.number),
-                    color = MaterialTheme.colorScheme.tertiary
+                SectionDivider(
+                    title = AppStrings.Competitions.nextMatchDay.format(matchDay.number),
+                    type = SectionDividerType.SUBTITLE,
+                    textColor = MaterialTheme.colorScheme.tertiary
                 )
 
                 Spacer(modifier = Modifier.height(WrestlingTheme.dimensions.spacing_8))
