@@ -10,7 +10,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import org.iesharia.core.resources.AppStrings
 import org.iesharia.core.ui.components.common.EmptyStateMessage
-import org.iesharia.core.ui.components.common.SectionTitle
+import org.iesharia.core.ui.components.common.SectionDivider
 import org.iesharia.core.ui.theme.*
 import org.iesharia.features.home.ui.viewmodel.FavoriteType
 
@@ -26,9 +26,8 @@ fun FavoritesSectionHeader(
             .padding(vertical = WrestlingTheme.dimensions.spacing_16)
     ) {
         // Título de la sección
-        SectionTitle(
-            title = AppStrings.Home.favorites,
-            color = White90
+        SectionDivider(
+            title = AppStrings.Home.favorites
         )
 
         Spacer(modifier = Modifier.height(WrestlingTheme.dimensions.spacing_12))
