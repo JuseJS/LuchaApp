@@ -318,8 +318,8 @@ private fun HomeContent(
 
                                     Spacer(modifier = Modifier.height(WrestlingTheme.dimensions.spacing_8))
 
-                                    // Altura ajustada para el nuevo diseño más compacto y horizontal
-                                    val rowHeight = 120.dp
+                                    // Altura ajustada para el nuevo diseño (más información requiere más espacio)
+                                    val rowHeight = 180.dp
                                     val numRows = (wrestlersInCategory.size + 1) / 2
                                     val gridHeight = (numRows * rowHeight) + ((numRows - 1) * WrestlingTheme.dimensions.spacing_8)
 
@@ -328,7 +328,7 @@ private fun HomeContent(
                                         columns = GridCells.Fixed(2),
                                         modifier = Modifier
                                             .fillMaxWidth()
-                                            .height(gridHeight.coerceAtMost(300.dp)),
+                                            .height(gridHeight.coerceAtMost(380.dp)), // Altura máxima ajustada
                                         contentPadding = PaddingValues(horizontal = WrestlingTheme.dimensions.spacing_16),
                                         horizontalArrangement = Arrangement.spacedBy(WrestlingTheme.dimensions.spacing_8),
                                         verticalArrangement = Arrangement.spacedBy(WrestlingTheme.dimensions.spacing_8)
