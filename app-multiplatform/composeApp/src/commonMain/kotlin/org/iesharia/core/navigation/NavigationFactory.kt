@@ -5,6 +5,7 @@ import org.iesharia.features.auth.ui.screens.LoginScreen
 import org.iesharia.features.competitions.ui.screens.CompetitionDetailScreen
 import org.iesharia.features.home.ui.screens.HomeScreen
 import org.iesharia.features.teams.ui.screens.TeamDetailScreen
+import org.iesharia.features.wrestlers.ui.screens.WrestlerDetailScreen
 
 /**
  * Factory que convierte rutas de navegación en pantallas de Voyager.
@@ -30,12 +31,10 @@ class NavigationFactory {
                 TeamDetailScreen(teamId)
             }
 
-            // Luchadores
+            // Luchadores - Actualizado para usar la nueva pantalla
             is Routes.Wrestler.Detail -> {
                 val wrestlerId = getLastPathSegment(navigationRoute.route)
-                // Por ahora retornamos HomeScreen
-                // TODO: Implementar pantalla de detalle de luchador
-                HomeScreen()
+                WrestlerDetailScreen(wrestlerId)
             }
 
             // Ruta desconocida
