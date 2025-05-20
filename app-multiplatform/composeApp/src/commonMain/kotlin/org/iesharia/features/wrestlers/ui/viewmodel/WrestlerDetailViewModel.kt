@@ -5,7 +5,6 @@ import org.iesharia.core.common.ErrorHandler
 import org.iesharia.core.domain.model.AppError
 import org.iesharia.core.domain.model.Favorite
 import org.iesharia.core.navigation.NavigationManager
-import org.iesharia.core.navigation.Routes
 import org.iesharia.features.common.domain.usecase.GetFavoritesUseCase
 import org.iesharia.features.competitions.domain.repository.CompetitionRepository
 import org.iesharia.features.wrestlers.domain.model.WrestlerClassification
@@ -22,9 +21,9 @@ class WrestlerDetailViewModel(
     private val competitionRepository: CompetitionRepository,
     private val getFavoritesUseCase: GetFavoritesUseCase,
     private val getWrestlerResultsUseCase: GetWrestlerResultsUseCase,
-    private val navigationManager: NavigationManager,
+    navigationManager: NavigationManager,
     errorHandler: ErrorHandler
-) : BaseViewModel<WrestlerDetailUiState>(WrestlerDetailUiState(), errorHandler) {
+) : BaseViewModel<WrestlerDetailUiState>(WrestlerDetailUiState(), errorHandler, navigationManager) {
 
     init {
         loadWrestlerDetails()
@@ -133,21 +132,10 @@ class WrestlerDetailViewModel(
     }
 
     /**
-     * Navega a la pantalla anterior
-     */
-    fun navigateBack() {
-        launchSafe {
-            navigationManager.navigateBack()
-        }
-    }
-
-    /**
      * Navega a la pantalla de detalle de equipo
      */
     fun navigateToTeamDetail(teamId: String) {
-        launchSafe {
-            navigationManager.navigateWithParams(Routes.Team.Detail(), teamId)
-        }
+        navigateToEntityDetail(EntityType.TEAM, teamId)
     }
 
     /**
