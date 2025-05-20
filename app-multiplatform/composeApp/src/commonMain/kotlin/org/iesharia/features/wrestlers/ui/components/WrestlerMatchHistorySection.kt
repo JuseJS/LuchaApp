@@ -3,7 +3,6 @@ package org.iesharia.features.wrestlers.ui.components
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.*
@@ -14,10 +13,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import org.iesharia.core.resources.AppStrings
-import org.iesharia.core.ui.components.common.BadgeStatus
-import org.iesharia.core.ui.components.common.EmptyStateMessage
-import org.iesharia.core.ui.components.common.InfoBadge
-import org.iesharia.core.ui.components.common.SectionDivider
+import org.iesharia.core.ui.components.common.*
 import org.iesharia.core.ui.theme.WrestlingTheme
 import org.iesharia.features.wrestlers.domain.model.WrestlerMatchResult
 
@@ -57,130 +53,58 @@ fun WrestlerMatchHistorySection(
 fun WrestlerMatchResultCard(
     result: WrestlerMatchResult
 ) {
-    Card(
+    EntityListItem(
+        onClick = { /* No acción en este caso */ },
         modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
-        ),
-        shape = WrestlingTheme.shapes.medium
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(WrestlingTheme.dimensions.spacing_16)
-        ) {
-            // Cabecera con fecha y resultado
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
+        containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
+        leadingContent = {
+            // Avatar del oponente
+            Box(
+                modifier = Modifier
+                    .size(48.dp)
+                    .clip(CircleShape)
+                    .background(MaterialTheme.colorScheme.secondary.copy(alpha = 0.1f)),
+                contentAlignment = Alignment.Center
             ) {
-                Surface(
-                    shape = RoundedCornerShape(4.dp),
-                    color = MaterialTheme.colorScheme.surfaceVariant
-                ) {
-                    Text(
-                        text = result.date,
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
-                    )
-                }
-
-                // Badge de resultado
-                val status = when(result.result) {
-                    WrestlerMatchResult.Result.WIN -> BadgeStatus.SUCCESS
-                    WrestlerMatchResult.Result.LOSS -> BadgeStatus.ERROR
-                    WrestlerMatchResult.Result.DRAW -> BadgeStatus.WARNING
-                    else -> BadgeStatus.NEUTRAL
-                }
-
-                InfoBadge(
-                    text = result.result.displayName(),
-                    status = status
+                Icon(
+                    imageVector = Icons.Default.Person,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.secondary,
+                    modifier = Modifier.size(28.dp)
                 )
             }
-
-            Spacer(modifier = Modifier.height(WrestlingTheme.dimensions.spacing_16))
-
-            // Información del oponente
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                // Avatar del oponente
-                Box(
-                    modifier = Modifier
-                        .size(48.dp)
-                        .clip(CircleShape)
-                        .background(MaterialTheme.colorScheme.secondary.copy(alpha = 0.1f)),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Person,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.secondary,
-                        modifier = Modifier.size(28.dp)
-                    )
-                }
-
-                Spacer(modifier = Modifier.width(WrestlingTheme.dimensions.spacing_16))
-
-                // Datos del oponente
-                Column(modifier = Modifier.weight(1f)) {
-                    Text(
-                        text = result.opponentName,
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.SemiBold,
-                        color = MaterialTheme.colorScheme.onSurface
-                    )
-
-                    Spacer(modifier = Modifier.height(WrestlingTheme.dimensions.spacing_4))
-
-                    // Clasificación
-                    Text(
-                        text = result.classification,
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
-
-                // Información de faltas
-                Column(horizontalAlignment = Alignment.End) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(WrestlingTheme.dimensions.spacing_8)
-                    ) {
-                        // Faltas propias
-                        InfoBadge(
-                            text = "Faltas: ${result.fouls}",
-                            color = if (result.fouls > 0)
-                                MaterialTheme.colorScheme.error
-                            else
-                                MaterialTheme.colorScheme.onSurfaceVariant,
-                            backgroundColor = if (result.fouls > 0)
-                                MaterialTheme.colorScheme.error.copy(alpha = 0.1f)
-                            else
-                                MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.1f)
-                        )
-
-                        // Faltas del oponente
-                        InfoBadge(
-                            text = "Oponente: ${result.opponentFouls}",
-                            color = if (result.opponentFouls > 0)
-                                MaterialTheme.colorScheme.error
-                            else
-                                MaterialTheme.colorScheme.onSurfaceVariant,
-                            backgroundColor = if (result.opponentFouls > 0)
-                                MaterialTheme.colorScheme.error.copy(alpha = 0.1f)
-                            else
-                                MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.1f)
-                        )
-                    }
-                }
+        },
+        titleContent = {
+            Text(
+                text = result.opponentName,
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.SemiBold,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+        },
+        subtitleContent = {
+            // Clasificación
+            Text(
+                text = result.classification,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        },
+        trailingContent = {
+            // Badge de resultado
+            val status = when(result.result) {
+                WrestlerMatchResult.Result.WIN -> BadgeStatus.SUCCESS
+                WrestlerMatchResult.Result.LOSS -> BadgeStatus.ERROR
+                WrestlerMatchResult.Result.DRAW -> BadgeStatus.WARNING
+                else -> BadgeStatus.NEUTRAL
             }
 
-            // Agarradas (opcional - mostrar si hay espacio)
+            InfoBadge(
+                text = result.result.displayName(),
+                status = status
+            )
+        },
+        detailContent = {
             if (result.result != WrestlerMatchResult.Result.SEPARATED &&
                 result.result != WrestlerMatchResult.Result.EXPELLED) {
 
@@ -214,8 +138,40 @@ fun WrestlerMatchResultCard(
                     }
                 }
             }
+
+            // Información de faltas
+            Spacer(modifier = Modifier.height(WrestlingTheme.dimensions.spacing_12))
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                InfoBadge(
+                    text = "Faltas: ${result.fouls}",
+                    color = if (result.fouls > 0)
+                        MaterialTheme.colorScheme.error
+                    else
+                        MaterialTheme.colorScheme.onSurfaceVariant,
+                    backgroundColor = if (result.fouls > 0)
+                        MaterialTheme.colorScheme.error.copy(alpha = 0.1f)
+                    else
+                        MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.1f)
+                )
+
+                InfoBadge(
+                    text = "Oponente: ${result.opponentFouls}",
+                    color = if (result.opponentFouls > 0)
+                        MaterialTheme.colorScheme.error
+                    else
+                        MaterialTheme.colorScheme.onSurfaceVariant,
+                    backgroundColor = if (result.opponentFouls > 0)
+                        MaterialTheme.colorScheme.error.copy(alpha = 0.1f)
+                    else
+                        MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.1f)
+                )
+            }
         }
-    }
+    )
 }
 
 /**
