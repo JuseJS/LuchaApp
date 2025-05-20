@@ -1,8 +1,6 @@
 package org.iesharia.features.teams.ui.components
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -10,10 +8,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import org.iesharia.features.teams.domain.model.Match
-import org.iesharia.features.competitions.domain.model.MatchDay
-import org.iesharia.core.ui.theme.*
 import org.iesharia.core.resources.AppStrings
+import org.iesharia.core.ui.components.common.EntityListItem
+import org.iesharia.core.ui.theme.*
+import org.iesharia.features.competitions.domain.model.MatchDay
+import org.iesharia.features.teams.domain.model.Match
 
 @Composable
 fun MatchDaySection(
@@ -48,19 +47,11 @@ fun MatchItem(
     match: Match,
     modifier: Modifier = Modifier
 ) {
-    Card(
+    EntityListItem(
+        onClick = { /* No acción en este caso */ },
         modifier = modifier.fillMaxWidth(),
-        shape = WrestlingTheme.shapes.cardShape,
-        colors = CardDefaults.cardColors(
-            containerColor = DarkSurface3.copy(alpha = 0.8f),
-            contentColor = White80
-        )
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(WrestlingTheme.dimensions.spacing_12)
-        ) {
+        containerColor = DarkSurface3.copy(alpha = 0.8f),
+        titleContent = {
             // Equipos y resultado
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -93,9 +84,8 @@ fun MatchItem(
                     modifier = Modifier.weight(2f)
                 )
             }
-
-            Spacer(modifier = Modifier.height(WrestlingTheme.dimensions.spacing_8))
-
+        },
+        subtitleContent = {
             // Información adicional
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -116,7 +106,7 @@ fun MatchItem(
                 )
             }
         }
-    }
+    )
 }
 
 @Composable
