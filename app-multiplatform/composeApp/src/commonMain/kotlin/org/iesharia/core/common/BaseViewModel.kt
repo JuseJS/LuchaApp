@@ -13,13 +13,16 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.iesharia.core.domain.model.AppError
+import org.iesharia.core.navigation.NavigationManager
+import org.iesharia.core.navigation.Routes
 
 /**
- * ViewModel base con funcionalidad para manejo de estado y errores
+ * ViewModel base con funcionalidad para manejo de estado, errores y navegación
  */
 abstract class BaseViewModel<T>(
     initialState: T,
-    protected val errorHandler: ErrorHandler
+    protected val errorHandler: ErrorHandler,
+    protected val navigationManager: NavigationManager? = null
 ) : ViewModel() {
 
     // Estado UI
@@ -105,5 +108,54 @@ abstract class BaseViewModel<T>(
         block: suspend () -> Unit
     ) {
         launchSafe(Dispatchers.IO, errorHandler, block)
+    }
+
+    // --- Funcionalidad de navegación ---
+
+    /**
+     * Tipos de entidades para navegación
+     */
+    protected enum class EntityType {
+        WRESTLER,
+        TEAM,
+        COMPETITION
+    }
+
+    /**
+     * Navegación a detalle de entidad
+     */
+    protected fun navigateToEntityDetail(entityType: EntityType, entityId: String) {
+        navigationManager?.let { manager ->
+            launchSafe {
+                val route = when (entityType) {
+                    EntityType.WRESTLER -> Routes.Wrestler.Detail()
+                    EntityType.TEAM -> Routes.Team.Detail()
+                    EntityType.COMPETITION -> Routes.Competition.Detail()
+                }
+                manager.navigateWithParams(route, entityId)
+            }
+        }
+    }
+
+    /**
+     * Navegación a la pantalla principal
+     */
+    protected fun navigateToHome() {
+        navigationManager?.let { manager ->
+            launchSafe {
+                manager.navigate(Routes.Home.Main)
+            }
+        }
+    }
+
+    /**
+     * Navegación atrás
+     */
+    fun navigateBack() {
+        navigationManager?.let { manager ->
+            launchSafe {
+                manager.navigateBack()
+            }
+        }
     }
 }
