@@ -306,9 +306,9 @@ private fun HomeContent(
                             )
 
                             // Group wrestlers by category
+                            // En HomeScreen.kt o donde se implemente la sección de luchadores favoritos
                             val wrestlersByCategory = wrestlers.map { it.wrestler }.groupBy { it.category }
 
-                            // For each category with wrestlers, display a grid
                             WrestlerCategory.entries.forEach { category ->
                                 val wrestlersInCategory = wrestlersByCategory[category] ?: emptyList()
 
@@ -320,16 +320,16 @@ private fun HomeContent(
 
                                     Spacer(modifier = Modifier.height(WrestlingTheme.dimensions.spacing_8))
 
-                                    val rowHeight = 180.dp
-                                    val numRows = (wrestlersInCategory.size + 1) / 2
+                                    val itemsPerRow = 3 // Cambiado de 2 a 3 elementos por fila
+                                    val rowHeight = 150.dp // Altura ajustada para un grid más compacto
+                                    val numRows = (wrestlersInCategory.size + itemsPerRow - 1) / itemsPerRow
                                     val gridHeight = (numRows * rowHeight) + ((numRows - 1) * WrestlingTheme.dimensions.spacing_8)
 
-                                    // Display wrestlers in a grid
                                     LazyVerticalGrid(
-                                        columns = GridCells.Fixed(2),
+                                        columns = GridCells.Fixed(itemsPerRow), // Cambiado a 3 columnas
                                         modifier = Modifier
                                             .fillMaxWidth()
-                                            .height(gridHeight.coerceAtMost(380.dp)), // Altura máxima ajustada
+                                            .height(gridHeight.coerceAtMost(330.dp)),
                                         contentPadding = PaddingValues(horizontal = WrestlingTheme.dimensions.spacing_16),
                                         horizontalArrangement = Arrangement.spacedBy(WrestlingTheme.dimensions.spacing_8),
                                         verticalArrangement = Arrangement.spacedBy(WrestlingTheme.dimensions.spacing_8)
@@ -338,7 +338,7 @@ private fun HomeContent(
                                             WrestlerItem(
                                                 wrestler = wrestler,
                                                 onClick = { viewModel.navigateToWrestlerDetail(wrestler.id) },
-                                                isGridItem = true // Usar el nuevo diseño en grid
+                                                isGridItem = true
                                             )
                                         }
                                     }
@@ -428,7 +428,7 @@ private fun HomeContent(
  * Component for displaying teams grouped by division
  */
 @Composable
-private fun TeamsByDivisionSection(
+fun TeamsByDivisionSection(
     title: String,
     allTeams: List<Team>,
     onTeamClick: (String) -> Unit,
@@ -463,12 +463,13 @@ private fun TeamsByDivisionSection(
 
                     // Calculate height based on number of teams in this division
                     val rowHeight = 72.dp
-                    val numRows = (teamsInDivision.size + 1) / 2 // +1 and integer division to round up
+                    val itemsPerRow = 3 // Cambiado de 2 a 3 elementos por fila
+                    val numRows = (teamsInDivision.size + itemsPerRow - 1) / itemsPerRow // Redondeo hacia arriba
                     val gridHeight = (numRows * (rowHeight + WrestlingTheme.dimensions.spacing_8)) + WrestlingTheme.dimensions.spacing_8
 
                     // Grid of teams for this division
                     LazyVerticalGrid(
-                        columns = GridCells.Fixed(2),
+                        columns = GridCells.Fixed(itemsPerRow), // Cambiado a 3 columnas
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(gridHeight.coerceAtMost(180.dp)), // max height per division
@@ -480,7 +481,7 @@ private fun TeamsByDivisionSection(
                             TeamGridCard(
                                 team = team,
                                 onClick = { onTeamClick(team.id) },
-                                showDivision = false // We already show division in the section title
+                                showDivision = false
                             )
                         }
                     }
