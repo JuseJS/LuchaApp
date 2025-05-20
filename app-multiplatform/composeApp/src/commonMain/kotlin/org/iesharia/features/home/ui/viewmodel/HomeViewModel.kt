@@ -2,6 +2,7 @@ package org.iesharia.features.home.ui.viewmodel
 
 import org.iesharia.core.common.BaseViewModel
 import org.iesharia.core.common.ErrorHandler
+import org.iesharia.core.domain.model.AppError
 import org.iesharia.core.domain.model.Favorite
 import org.iesharia.core.domain.model.Island
 import org.iesharia.core.navigation.NavigationManager
@@ -41,10 +42,22 @@ class HomeViewModel(
      * Carga los datos iniciales
      */
     private fun loadData() {
-        launchSafe {
+        // Como no cargamos una entidad específica, usamos launchSafe directamente
+        launchSafe(
+            errorHandler = { error ->
+                updateState {
+                    it.copy(
+                        isLoading = false,
+                        errorMessage = error.message
+                    )
+                }
+            }
+        ) {
+            // Cargar datos
             competitions = getCompetitionsUseCase()
             favorites = getFavoritesUseCase()
 
+            // Actualizar estado
             updateState {
                 it.copy(
                     isLoading = false,
@@ -54,6 +67,13 @@ class HomeViewModel(
                 )
             }
         }
+    }
+
+    override fun updateErrorState(currentState: HomeUiState, error: AppError): HomeUiState {
+        return currentState.copy(
+            isLoading = false,
+            errorMessage = error.message
+        )
     }
 
     /**
