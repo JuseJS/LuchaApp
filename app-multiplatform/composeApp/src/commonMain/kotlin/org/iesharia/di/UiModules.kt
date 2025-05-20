@@ -5,6 +5,7 @@ import org.iesharia.features.auth.ui.viewmodel.LoginViewModel
 import org.iesharia.core.navigation.NavigationFactory
 import org.iesharia.core.navigation.NavigationManager
 import org.iesharia.features.competitions.ui.viewmodel.CompetitionDetailViewModel
+import org.iesharia.features.matches.ui.viewmodel.MatchDetailViewModel
 import org.iesharia.features.teams.ui.viewmodel.TeamDetailViewModel
 import org.iesharia.features.wrestlers.ui.viewmodel.WrestlerDetailViewModel
 import org.koin.core.module.Module
@@ -40,6 +41,16 @@ val viewModelModule = module {
             competitionRepository = get(),
             getFavoritesUseCase = get(),
             getWrestlerResultsUseCase = get(),
+            navigationManager = get(),
+            errorHandler = get()
+        )
+    }
+    // Nuevo ViewModel para detalles de enfrentamiento
+    factory { parameters ->
+        MatchDetailViewModel(
+            matchId = parameters.get(),
+            getMatchDetailsUseCase = get(),
+            matchRepository = get(),
             navigationManager = get(),
             errorHandler = get()
         )
