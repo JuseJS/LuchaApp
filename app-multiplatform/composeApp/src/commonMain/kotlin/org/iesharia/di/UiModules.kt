@@ -10,10 +10,10 @@ import org.iesharia.features.wrestlers.ui.viewmodel.WrestlerDetailViewModel
 import org.koin.core.module.Module
 import org.koin.dsl.module
 
-// Módulo para ViewModels
+// Módulo específico para ViewModels (en composeApp)
 val viewModelModule = module {
-    factory { HomeViewModel(get(), get(), get(), get(), get<NavigationManager>(), get()) }
-    factory { LoginViewModel(get<NavigationManager>(), get()) }
+    factory { HomeViewModel(get(), get(), get(), get(), get<NavigationManager>(), get(), get(), get()) }
+    factory { LoginViewModel(get<NavigationManager>(), get(), get(), get()) }
     factory { parameters ->
         CompetitionDetailViewModel(
             competitionId = parameters.get(),
