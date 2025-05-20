@@ -1,15 +1,12 @@
 package org.iesharia.features.home.ui.components
 
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.horizontalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import org.iesharia.core.resources.AppStrings
-import org.iesharia.core.ui.components.common.EmptyStateMessage
 import org.iesharia.core.ui.components.common.SectionDivider
 import org.iesharia.core.ui.components.common.SectionDividerType
 import org.iesharia.core.ui.theme.*
@@ -58,21 +55,6 @@ fun FavoritesSectionHeader(
                 )
             }
         }
-    }
-}
-
-@Composable
-fun EmptyFavorites(selectedType: FavoriteType) {
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(100.dp),
-        contentAlignment = Alignment.Center
-    ) {
-        EmptyStateMessage(
-            message = AppStrings.Home.noFavorites.format(selectedType.displayName().lowercase()),
-            color = White60
-        )
     }
 }
 
