@@ -9,7 +9,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import org.iesharia.core.resources.AppStrings
-import org.iesharia.core.ui.components.common.EntityListItem
+import org.iesharia.core.ui.components.common.ItemCard
 import org.iesharia.core.ui.theme.*
 import org.iesharia.features.competitions.domain.model.MatchDay
 import org.iesharia.features.teams.domain.model.Match
@@ -17,7 +17,8 @@ import org.iesharia.features.teams.domain.model.Match
 @Composable
 fun MatchDaySection(
     matchDay: MatchDay,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onMatchClick: ((String) -> Unit)? = null
 ) {
     Column(
         modifier = modifier
@@ -34,79 +35,84 @@ fun MatchDaySection(
 
         // Lista de enfrentamientos
         matchDay.matches.forEach { match ->
-            MatchItem(
+            MatchItemCard(
                 match = match,
-                modifier = Modifier.padding(bottom = WrestlingTheme.dimensions.spacing_8)
+                modifier = Modifier.padding(bottom = WrestlingTheme.dimensions.spacing_8),
+                onClick = { onMatchClick?.invoke(match.id) }
             )
         }
     }
 }
 
 @Composable
-fun MatchItem(
+fun MatchItemCard(
     match: Match,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit
 ) {
-    EntityListItem(
-        onClick = { /* No acción en este caso */ },
+    ItemCard(
+        onClick = onClick,
         modifier = modifier.fillMaxWidth(),
         containerColor = DarkSurface3.copy(alpha = 0.8f),
-        titleContent = {
-            // Equipos y resultado
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceEvenly,
-                verticalAlignment = Alignment.CenterVertically
+        title = {
+            Column(
+                modifier = Modifier.fillMaxWidth()
             ) {
-                // Equipo local
-                TeamScore(
-                    teamName = match.localTeam.name,
-                    score = match.localScore,
-                    isWinner = match.winner == match.localTeam,
-                    isDrawn = match.isDrawn,
-                    modifier = Modifier.weight(2f)
-                )
+                // Equipos y resultado
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceEvenly,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    // Equipo local
+                    TeamScore(
+                        teamName = match.localTeam.name,
+                        score = match.localScore,
+                        isWinner = match.winner == match.localTeam,
+                        isDrawn = match.isDrawn,
+                        modifier = Modifier.weight(2f)
+                    )
 
-                // Separador
-                Text(
-                    text = AppStrings.Teams.vs,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = White80,
-                    modifier = Modifier.padding(horizontal = WrestlingTheme.dimensions.spacing_8)
-                )
+                    // Separador
+                    Text(
+                        text = AppStrings.Teams.vs,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = White80,
+                        modifier = Modifier.padding(horizontal = WrestlingTheme.dimensions.spacing_8)
+                    )
 
-                // Equipo visitante
-                TeamScore(
-                    teamName = match.visitorTeam.name,
-                    score = match.visitorScore,
-                    isWinner = match.winner == match.visitorTeam,
-                    isDrawn = match.isDrawn,
-                    modifier = Modifier.weight(2f)
-                )
-            }
-        },
-        subtitleContent = {
-            // Información adicional
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                // Terrero
-                Text(
-                    text = match.venue,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = White80
-                )
-
-                // Fecha
-                Text(
-                    text = "${match.date.dayOfMonth}/${match.date.month}/${match.date.year} ${match.date.hour}:${match.date.minute.toString().padStart(2, '0')}",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = White80
-                )
+                    // Equipo visitante
+                    TeamScore(
+                        teamName = match.visitorTeam.name,
+                        score = match.visitorScore,
+                        isWinner = match.winner == match.visitorTeam,
+                        isDrawn = match.isDrawn,
+                        modifier = Modifier.weight(2f)
+                    )
+                }
             }
         }
-    )
+    ) {
+        // Información adicional
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            // Terrero
+            Text(
+                text = match.venue,
+                style = MaterialTheme.typography.bodySmall,
+                color = White80
+            )
+
+            // Fecha
+            Text(
+                text = "${match.date.dayOfMonth}/${match.date.monthNumber}/${match.date.year} ${match.date.hour}:${match.date.minute.toString().padStart(2, '0')}",
+                style = MaterialTheme.typography.bodySmall,
+                color = White80
+            )
+        }
+    }
 }
 
 @Composable
