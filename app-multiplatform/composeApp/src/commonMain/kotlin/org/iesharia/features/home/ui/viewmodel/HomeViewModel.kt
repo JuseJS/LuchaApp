@@ -264,6 +264,13 @@ class HomeViewModel(
     }
 
     /**
+     * Navega al detalle de un enfrentamiento
+     */
+    fun navigateToMatchDetail(matchId: String) {
+        navigateToEntityDetail(EntityType.MATCH, matchId)
+    }
+
+    /**
      * Recarga los datos
      */
     fun reloadData() {

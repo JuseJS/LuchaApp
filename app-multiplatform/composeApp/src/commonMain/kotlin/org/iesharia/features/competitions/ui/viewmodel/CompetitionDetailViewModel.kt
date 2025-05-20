@@ -66,6 +66,13 @@ class CompetitionDetailViewModel(
         }
     }
 
+    /**
+     * Navega al detalle de un enfrentamiento
+     */
+    fun navigateToMatchDetail(matchId: String) {
+        navigateToEntityDetail(EntityType.MATCH, matchId)
+    }
+
     fun refreshData() {
         updateState { it.copy(isLoading = true, errorMessage = null) }
         loadCompetition()

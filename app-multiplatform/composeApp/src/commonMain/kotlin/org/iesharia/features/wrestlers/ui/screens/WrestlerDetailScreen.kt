@@ -23,6 +23,8 @@ import org.iesharia.core.ui.components.common.EntityHeader
 import org.iesharia.core.ui.screens.BaseContentScreen
 import org.iesharia.core.ui.theme.WrestlingTheme
 import org.iesharia.di.rememberViewModel
+import org.iesharia.features.auth.ui.viewmodel.RoleBasedUIHelper
+import org.iesharia.features.auth.domain.model.Permission
 import org.iesharia.features.wrestlers.ui.components.WrestlerMatchHistorySection
 import org.iesharia.features.wrestlers.ui.components.WrestlerPersonalInfoSection
 import org.iesharia.features.wrestlers.ui.components.WrestlerStatisticsSection
@@ -56,12 +58,14 @@ class WrestlerDetailScreen(private val wrestlerId: String) : BaseContentScreen()
     override fun TopBarActions() {
         val uiState by viewModel.uiState.collectAsState()
 
-        IconButton(onClick = { viewModel.toggleFavorite() }) {
-            Icon(
-                imageVector = if (uiState.isFavorite) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
-                contentDescription = if (uiState.isFavorite) "Quitar de favoritos" else "Agregar a favoritos",
-                tint = if (uiState.isFavorite) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
-            )
+        RoleBasedUIHelper.WithPermission(Permission.MANAGE_FAVORITES) {
+            IconButton(onClick = { viewModel.toggleFavorite() }) {
+                Icon(
+                    imageVector = if (uiState.isFavorite) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
+                    contentDescription = if (uiState.isFavorite) "Quitar de favoritos" else "Agregar a favoritos",
+                    tint = if (uiState.isFavorite) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
         }
     }
 

@@ -186,11 +186,8 @@ private fun HomeContent(
                                 CompetitionItem(
                                     competition = competition,
                                     onClick = { viewModel.navigateToCompetitionDetail(competition.id) },
-                                    modifier = Modifier.padding(
-                                        horizontal = WrestlingTheme.dimensions.spacing_16,
-                                        vertical = WrestlingTheme.dimensions.spacing_4
-                                    ),
-                                    showMatchDays = false
+                                    showMatchDays = true,
+                                    onMatchClick = { matchId -> viewModel.navigateToMatchDetail(matchId) }
                                 )
                             }
 
@@ -405,10 +402,8 @@ private fun HomeContent(
                 CompetitionItem(
                     competition = competition,
                     onClick = { viewModel.navigateToCompetitionDetail(competition.id) },
-                    modifier = Modifier.padding(
-                        horizontal = WrestlingTheme.dimensions.spacing_16,
-                        vertical = WrestlingTheme.dimensions.spacing_8
-                    )
+                    showMatchDays = true,
+                    onMatchClick = { matchId -> viewModel.navigateToMatchDetail(matchId) }
                 )
             }
         }

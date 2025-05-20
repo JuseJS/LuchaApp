@@ -27,6 +27,8 @@ import org.iesharia.core.ui.components.common.*
 import org.iesharia.core.ui.screens.BaseContentScreen
 import org.iesharia.core.ui.theme.WrestlingTheme
 import org.iesharia.di.rememberViewModel
+import org.iesharia.features.auth.ui.viewmodel.RoleBasedUIHelper
+import org.iesharia.features.auth.domain.model.Permission
 import org.iesharia.features.competitions.domain.model.MatchDay
 import org.iesharia.features.competitions.ui.viewmodel.CompetitionDetailUiState
 import org.iesharia.features.competitions.ui.viewmodel.CompetitionDetailViewModel
@@ -58,12 +60,14 @@ class CompetitionDetailScreen(private val competitionId: String) : BaseContentSc
     override fun TopBarActions() {
         val uiState by viewModel.uiState.collectAsState()
 
-        IconButton(onClick = { viewModel.toggleFavorite() }) {
-            Icon(
-                imageVector = if (uiState.isFavorite) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
-                contentDescription = if (uiState.isFavorite) "Quitar de favoritos" else "Agregar a favoritos",
-                tint = if (uiState.isFavorite) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
-            )
+        RoleBasedUIHelper.WithPermission(Permission.MANAGE_FAVORITES) {
+            IconButton(onClick = { viewModel.toggleFavorite() }) {
+                Icon(
+                    imageVector = if (uiState.isFavorite) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
+                    contentDescription = if (uiState.isFavorite) "Quitar de favoritos" else "Agregar a favoritos",
+                    tint = if (uiState.isFavorite) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
         }
     }
 
@@ -84,7 +88,8 @@ class CompetitionDetailScreen(private val competitionId: String) : BaseContentSc
         } else if (!uiState.isLoading) {
             CompetitionDetailContent(
                 uiState = uiState,
-                onTeamClick = { teamId -> viewModel.navigateToTeamDetail(teamId) }
+                onTeamClick = { teamId -> viewModel.navigateToTeamDetail(teamId) },
+                onMatchClick = { matchId -> viewModel.navigateToMatchDetail(matchId) }
             )
         }
 
@@ -104,7 +109,8 @@ class CompetitionDetailScreen(private val competitionId: String) : BaseContentSc
 @Composable
 private fun CompetitionDetailContent(
     uiState: CompetitionDetailUiState,
-    onTeamClick: (String) -> Unit
+    onTeamClick: (String) -> Unit,
+    onMatchClick: (String) -> Unit
 ) {
     val competition = uiState.competition ?: return
 
@@ -267,7 +273,8 @@ private fun CompetitionDetailContent(
                     modifier = Modifier.padding(
                         horizontal = WrestlingTheme.dimensions.spacing_16,
                         vertical = WrestlingTheme.dimensions.spacing_8
-                    )
+                    ),
+                    onMatchClick = onMatchClick
                 )
             }
         }
@@ -282,7 +289,8 @@ private fun CompetitionDetailContent(
 @Composable
 private fun MatchDayCard(
     matchDay: MatchDay,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onMatchClick: (String) -> Unit
 ) {
     Surface(
         color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
@@ -317,7 +325,8 @@ private fun MatchDayCard(
             Spacer(modifier = Modifier.height(WrestlingTheme.dimensions.spacing_8))
 
             MatchDaySection(
-                matchDay = matchDay
+                matchDay = matchDay,
+                onMatchClick = onMatchClick
             )
         }
     }

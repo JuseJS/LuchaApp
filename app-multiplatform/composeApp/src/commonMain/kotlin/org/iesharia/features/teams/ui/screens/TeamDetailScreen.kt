@@ -23,6 +23,8 @@ import org.iesharia.core.ui.components.common.*
 import org.iesharia.core.ui.screens.BaseContentScreen
 import org.iesharia.core.ui.theme.WrestlingTheme
 import org.iesharia.di.rememberViewModel
+import org.iesharia.features.auth.ui.viewmodel.RoleBasedUIHelper
+import org.iesharia.features.auth.domain.model.Permission
 import org.iesharia.features.competitions.domain.model.Competition
 import org.iesharia.features.competitions.domain.model.MatchDay
 import org.iesharia.features.teams.ui.components.MatchDaySection
@@ -56,12 +58,14 @@ class TeamDetailScreen(private val teamId: String) : BaseContentScreen() {
     override fun TopBarActions() {
         val uiState by viewModel.uiState.collectAsState()
 
-        IconButton(onClick = { viewModel.toggleFavorite() }) {
-            Icon(
-                imageVector = if (uiState.isFavorite) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
-                contentDescription = if (uiState.isFavorite) "Quitar de favoritos" else "Agregar a favoritos",
-                tint = if (uiState.isFavorite) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
-            )
+        RoleBasedUIHelper.WithPermission(Permission.MANAGE_FAVORITES) {
+            IconButton(onClick = { viewModel.toggleFavorite() }) {
+                Icon(
+                    imageVector = if (uiState.isFavorite) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
+                    contentDescription = if (uiState.isFavorite) "Quitar de favoritos" else "Agregar a favoritos",
+                    tint = if (uiState.isFavorite) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
         }
     }
 
@@ -270,6 +274,7 @@ private fun TeamDetailContent(
                 lastMatchDay = uiState.competitionMatches[competition.id]?.first,
                 nextMatchDay = uiState.competitionMatches[competition.id]?.second,
                 onCompetitionClick = { viewModel.navigateToCompetitionDetail(competition.id) },
+                onMatchClick = { matchId -> viewModel.navigateToMatchDetail(matchId) },
                 modifier = Modifier.padding(
                     horizontal = WrestlingTheme.dimensions.spacing_16,
                     vertical = WrestlingTheme.dimensions.spacing_8
@@ -354,6 +359,7 @@ private fun CompetitionWithMatchDays(
     lastMatchDay: MatchDay?,
     nextMatchDay: MatchDay?,
     onCompetitionClick: () -> Unit,
+    onMatchClick: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     ItemCard(
@@ -397,7 +403,10 @@ private fun CompetitionWithMatchDays(
 
                 Spacer(modifier = Modifier.height(WrestlingTheme.dimensions.spacing_8))
 
-                MatchDaySection(matchDay = matchDay)
+                MatchDaySection(
+                    matchDay = matchDay,
+                    onMatchClick = { matchId -> onMatchClick(matchId) }
+                )
 
                 Spacer(modifier = Modifier.height(WrestlingTheme.dimensions.spacing_16))
             }
@@ -412,7 +421,10 @@ private fun CompetitionWithMatchDays(
 
                 Spacer(modifier = Modifier.height(WrestlingTheme.dimensions.spacing_8))
 
-                MatchDaySection(matchDay = matchDay)
+                MatchDaySection(
+                    matchDay = matchDay,
+                    onMatchClick = { matchId -> onMatchClick(matchId) }
+                )
             }
         } else {
             Spacer(modifier = Modifier.height(WrestlingTheme.dimensions.spacing_16))

@@ -134,6 +134,13 @@ class TeamDetailViewModel(
     }
 
     /**
+     * Navega al detalle de un enfrentamiento
+     */
+    fun navigateToMatchDetail(matchId: String) {
+        navigateToEntityDetail(EntityType.MATCH, matchId)
+    }
+
+    /**
      * Filtra los luchadores de una categoría según el término de búsqueda
      */
     fun getFilteredWrestlers(category: WrestlerCategory): List<Wrestler> {

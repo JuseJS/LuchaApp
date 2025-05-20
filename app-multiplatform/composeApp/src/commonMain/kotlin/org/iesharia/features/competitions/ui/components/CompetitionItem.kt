@@ -30,7 +30,8 @@ fun CompetitionItem(
     competition: Competition,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
-    showMatchDays: Boolean = true
+    showMatchDays: Boolean = true,
+    onMatchClick: ((String) -> Unit)? = null
 ) {
     EntityListItem(
         onClick = onClick,
@@ -89,7 +90,10 @@ fun CompetitionItem(
                         type = SectionDividerType.SUBTITLE,
                         modifier = Modifier.padding(horizontal = 0.dp)
                     )
-                    MatchDaySection(matchDay = matchDay)
+                    MatchDaySection(
+                        matchDay = matchDay,
+                        onMatchClick = onMatchClick
+                    )
                     Spacer(modifier = Modifier.height(WrestlingTheme.dimensions.spacing_16))
                 }
 
@@ -100,7 +104,10 @@ fun CompetitionItem(
                         type = SectionDividerType.SUBTITLE,
                         modifier = Modifier.padding(horizontal = 0.dp)
                     )
-                    MatchDaySection(matchDay = matchDay)
+                    MatchDaySection(
+                        matchDay = matchDay,
+                        onMatchClick = onMatchClick
+                    )
                 }
             }
         } else null
