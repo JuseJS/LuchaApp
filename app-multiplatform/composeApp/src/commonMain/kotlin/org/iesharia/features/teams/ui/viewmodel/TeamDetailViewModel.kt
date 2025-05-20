@@ -5,7 +5,6 @@ import org.iesharia.core.common.ErrorHandler
 import org.iesharia.core.domain.model.AppError
 import org.iesharia.core.domain.model.Favorite
 import org.iesharia.core.navigation.NavigationManager
-import org.iesharia.core.navigation.Routes
 import org.iesharia.features.common.domain.usecase.GetFavoritesUseCase
 import org.iesharia.features.competitions.domain.repository.CompetitionRepository
 import org.iesharia.features.wrestlers.domain.model.Wrestler
@@ -18,16 +17,16 @@ class TeamDetailViewModel(
     private val competitionRepository: CompetitionRepository,
     private val getWrestlersByTeamIdUseCase: GetWrestlersByTeamIdUseCase,
     private val getFavoritesUseCase: GetFavoritesUseCase,
-    private val navigationManager: NavigationManager,
+    navigationManager: NavigationManager,
     errorHandler: ErrorHandler
-) : BaseViewModel<TeamDetailUiState>(TeamDetailUiState(), errorHandler) {
+) : BaseViewModel<TeamDetailUiState>(TeamDetailUiState(), errorHandler, navigationManager) {
 
     init {
         loadTeamDetails()
     }
 
-    // Método privado para cargar datos
-    fun loadTeamDetails() {
+    // Método para cargar datos
+    private fun loadTeamDetails() {
         updateState { it.copy(isLoading = true, errorMessage = null) }
 
         loadEntity(
@@ -116,22 +115,12 @@ class TeamDetailViewModel(
         updateState { it.copy(searchQuery = query) }
     }
 
-    fun navigateBack() {
-        launchSafe {
-            navigationManager.navigateBack()
-        }
-    }
-
     fun navigateToWrestlerDetail(wrestlerId: String) {
-        launchSafe {
-            navigationManager.navigateWithParams(Routes.Wrestler.Detail(), wrestlerId)
-        }
+        navigateToEntityDetail(EntityType.WRESTLER, wrestlerId)
     }
 
     fun navigateToCompetitionDetail(competitionId: String) {
-        launchSafe {
-            navigationManager.navigateWithParams(Routes.Competition.Detail(), competitionId)
-        }
+        navigateToEntityDetail(EntityType.COMPETITION, competitionId)
     }
 
     /**
