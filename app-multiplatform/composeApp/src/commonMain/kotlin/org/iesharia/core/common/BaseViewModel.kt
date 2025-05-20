@@ -38,12 +38,42 @@ abstract class BaseViewModel<T>(
     }
 
     /**
+     * Función para cargar una entidad con manejo de errores estándar
+     */
+    protected fun <E> loadEntity(
+        entityId: String,
+        fetchEntity: suspend () -> E?,
+        handleError: (AppError) -> T = { error -> updateErrorState(_uiState.value, error) },
+        processEntity: suspend (E) -> T
+    ) {
+        launchSafe(
+            errorHandler = { error ->
+                updateState {
+                    handleError(error)
+                }
+            }
+        ) {
+            // Obtener entidad
+            val entity = fetchEntity()
+                ?: throw AppError.UnknownError(message = "No se encontró la entidad")
+
+            // Procesar entidad y actualizar estado
+            val newState = processEntity(entity)
+            updateState { newState }
+        }
+    }
+
+    /**
+     * Actualizar estado con error
+     */
+    protected open fun updateErrorState(currentState: T, error: AppError): T {
+        // Implementación por defecto, debe ser sobrescrita en subclases si es necesario
+        return currentState
+    }
+
+    /**
      * Lanza una corrutina con manejo de errores.
      * Los errores se emiten automáticamente tanto al flow local como al errorHandler global.
-     *
-     * @param dispatcher El dispatcher a usar
-     * @param errorHandler Función opcional para manejar el error antes de propagarlo
-     * @param block El código a ejecutar
      */
     protected fun launchSafe(
         dispatcher: CoroutineDispatcher = Dispatchers.Main.immediate,
