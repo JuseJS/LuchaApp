@@ -25,7 +25,6 @@ import org.iesharia.di.rememberViewModel
 import org.iesharia.features.competitions.domain.model.DivisionCategory
 import org.iesharia.features.competitions.ui.components.CompetitionItem
 import org.iesharia.features.competitions.ui.components.CompetitionsSection
-import org.iesharia.features.competitions.ui.components.EmptyCompetitions
 import org.iesharia.features.home.ui.components.*
 import org.iesharia.features.home.ui.viewmodel.HomeUiState
 import org.iesharia.features.home.ui.viewmodel.HomeViewModel
@@ -218,7 +217,9 @@ private fun HomeContent(
                     val favorites = viewModel.getFilteredFavorites()
 
                     if (favorites.isEmpty()) {
-                        EmptyFavorites(uiState.selectedFavoriteType)
+                        EmptyStateMessage(
+                            message = AppStrings.Home.noFavorites.format(uiState.selectedFavoriteType.displayName().lowercase())
+                        )
                     } else {
                         // Mostrar favoritos por tipo
                         val competitions = favorites.filterIsInstance<Favorite.CompetitionFavorite>()
@@ -349,7 +350,9 @@ private fun HomeContent(
         val filteredCompetitions = viewModel.getFilteredCompetitions()
         if (filteredCompetitions.isEmpty()) {
             item {
-                EmptyCompetitions()
+                EmptyStateMessage(
+                    message = uiState.errorMessage ?: "No se encontró la competición"
+                )
             }
         } else {
             items(filteredCompetitions) { competition ->
