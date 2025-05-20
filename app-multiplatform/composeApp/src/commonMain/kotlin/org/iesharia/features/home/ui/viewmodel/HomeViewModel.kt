@@ -6,6 +6,9 @@ import org.iesharia.core.domain.model.AppError
 import org.iesharia.core.domain.model.Favorite
 import org.iesharia.core.domain.model.Island
 import org.iesharia.core.navigation.NavigationManager
+import org.iesharia.core.navigation.Routes
+import org.iesharia.features.auth.domain.repository.UserRepository
+import org.iesharia.features.auth.domain.security.SessionManager
 import org.iesharia.features.common.domain.usecase.GetFavoritesUseCase
 import org.iesharia.features.competitions.domain.model.AgeCategory
 import org.iesharia.features.competitions.domain.model.Competition
@@ -24,7 +27,9 @@ class HomeViewModel(
     private val getTeamMatchesUseCase: GetTeamMatchesUseCase,
     private val getWrestlerResultsUseCase: GetWrestlerResultsUseCase,
     navigationManager: NavigationManager,
-    errorHandler: ErrorHandler
+    errorHandler: ErrorHandler,
+    private val userRepository: UserRepository,
+    private val sessionManager: SessionManager
 ) : BaseViewModel<HomeUiState>(HomeUiState(isLoading = true), errorHandler, navigationManager) {
 
     // Datos cacheados para acceso rápido
@@ -54,7 +59,13 @@ class HomeViewModel(
         ) {
             // Cargar datos
             competitions = getCompetitionsUseCase()
-            favorites = getFavoritesUseCase()
+
+            // Solo cargar favoritos si el usuario está autenticado
+            favorites = if (sessionManager.isLoggedIn.value) {
+                getFavoritesUseCase()
+            } else {
+                emptyList()
+            }
 
             // Actualizar estado
             updateState {
@@ -182,6 +193,33 @@ class HomeViewModel(
 
     fun navigateToWrestlerDetail(wrestlerId: String) {
         navigateToEntityDetail(EntityType.WRESTLER, wrestlerId)
+    }
+
+    /**
+     * Navegación a la pantalla de login
+     */
+    fun navigateToLogin() {
+        navigationManager?.let { manager ->
+            launchSafe {
+                manager.navigate(Routes.Auth.Login)
+            }
+        }
+    }
+
+    /**
+     * Cerrar sesión y actualizar la UI
+     */
+    fun logout() {
+        launchSafe {
+            // Solicitar al repositorio cerrar sesión
+            userRepository.logout()
+
+            // Limpiar datos de sesión
+            sessionManager.logout()
+
+            // Recargar datos (ahora con vista de invitado)
+            reloadData()
+        }
     }
 
     fun updateSearchQuery(query: String) {

@@ -14,8 +14,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.times
@@ -27,6 +27,9 @@ import org.iesharia.core.ui.components.common.*
 import org.iesharia.core.ui.screens.BaseContentScreen
 import org.iesharia.core.ui.theme.*
 import org.iesharia.di.rememberViewModel
+import org.iesharia.features.auth.domain.model.Permission
+import org.iesharia.features.auth.domain.security.SessionManager
+import org.iesharia.features.auth.ui.viewmodel.RoleBasedUIHelper
 import org.iesharia.features.competitions.domain.model.DivisionCategory
 import org.iesharia.features.competitions.ui.components.CompetitionItem
 import org.iesharia.features.competitions.ui.components.CompetitionsSection
@@ -37,6 +40,7 @@ import org.iesharia.features.teams.domain.model.Team
 import org.iesharia.features.teams.ui.components.TeamGridCard
 import org.iesharia.features.wrestlers.domain.model.WrestlerCategory
 import org.iesharia.features.wrestlers.ui.components.WrestlerItem
+import org.koin.compose.koinInject
 
 /**
  * Pantalla principal de la aplicación, optimizada para pantallas OLED
@@ -62,7 +66,24 @@ class HomeScreen : BaseContentScreen() {
 
     @Composable
     override fun TopBarActions() {
-        // No hay acciones para esta pantalla
+        val sessionManager = koinInject<SessionManager>()
+        val isLoggedIn = sessionManager.isLoggedIn.collectAsState()
+
+        if (isLoggedIn.value) {
+            // Acción de logout para usuarios logueados
+            WrestlingButton(
+                text = "Cerrar Sesión",
+                onClick = { viewModel.logout() },
+                type = WrestlingButtonType.TEXT
+            )
+        } else {
+            // Acción de login para invitados
+            WrestlingButton(
+                text = "Iniciar Sesión",
+                onClick = { viewModel.navigateToLogin() },
+                type = WrestlingButtonType.TEXT
+            )
+        }
     }
 
     @Composable
@@ -227,119 +248,121 @@ private fun HomeContent(
             }
         }
 
-        // Sección de favoritos
+        // Sección de favoritos - SOLO para usuarios registrados o superiores
         item {
-            Surface(
-                color = DarkSurface3,
-                shape = WrestlingTheme.shapes.medium,
-                modifier = Modifier.padding(horizontal = WrestlingTheme.dimensions.spacing_16)
-            ) {
-                Column(modifier = Modifier.fillMaxWidth()) {
-                    // Encabezado de sección de favoritos con filtros
-                    FavoritesSectionHeader(
-                        selectedType = uiState.selectedFavoriteType,
-                        onTypeSelected = { viewModel.setFavoriteType(it) }
-                    )
-
-                    // Contenido de favoritos basado en el filtro seleccionado
-                    val favorites = viewModel.getFilteredFavorites()
-
-                    if (favorites.isEmpty()) {
-                        EmptyStateMessage(
-                            message = AppStrings.Home.noFavorites.format(uiState.selectedFavoriteType.displayName().lowercase())
+            // Usar RoleBasedUIHelper para mostrar esta sección solo si el usuario tiene el permiso adecuado
+            RoleBasedUIHelper.WithPermission(Permission.MANAGE_FAVORITES) {
+                Surface(
+                    color = DarkSurface3,
+                    shape = WrestlingTheme.shapes.medium,
+                    modifier = Modifier.padding(horizontal = WrestlingTheme.dimensions.spacing_16)
+                ) {
+                    Column(modifier = Modifier.fillMaxWidth()) {
+                        // Encabezado de sección de favoritos con filtros
+                        FavoritesSectionHeader(
+                            selectedType = uiState.selectedFavoriteType,
+                            onTypeSelected = { viewModel.setFavoriteType(it) }
                         )
-                    } else {
-                        // Mostrar favoritos por tipo
-                        val competitions = favorites.filterIsInstance<Favorite.CompetitionFavorite>()
-                        val teams = favorites.filterIsInstance<Favorite.TeamFavorite>()
-                        val wrestlers = favorites.filterIsInstance<Favorite.WrestlerFavorite>()
 
-                        // Sección de competiciones favoritas
-                        if (competitions.isNotEmpty() && shouldShowCompetitions(uiState.selectedFavoriteType)) {
-                            SectionDivider(
-                                title = AppStrings.Competitions.favoriteCompetitions,
-                                type = SectionDividerType.TITLE
+                        // Contenido de favoritos basado en el filtro seleccionado
+                        val favorites = viewModel.getFilteredFavorites()
+
+                        if (favorites.isEmpty()) {
+                            EmptyStateMessage(
+                                message = AppStrings.Home.noFavorites.format(uiState.selectedFavoriteType.displayName().lowercase())
                             )
+                        } else {
+                            // Mostrar favoritos por tipo
+                            val competitions = favorites.filterIsInstance<Favorite.CompetitionFavorite>()
+                            val teams = favorites.filterIsInstance<Favorite.TeamFavorite>()
+                            val wrestlers = favorites.filterIsInstance<Favorite.WrestlerFavorite>()
 
-                            Column(
-                                modifier = Modifier.padding(horizontal = WrestlingTheme.dimensions.spacing_16),
-                                verticalArrangement = Arrangement.spacedBy(WrestlingTheme.dimensions.spacing_12)
-                            ) {
-                                competitions.forEach { favorite ->
-                                    CompetitionItem(
-                                        competition = favorite.competition,
-                                        onClick = { viewModel.navigateToCompetitionDetail(favorite.competition.id) },
-                                        showMatchDays = true
-                                    )
+                            // Sección de competiciones favoritas
+                            if (competitions.isNotEmpty() && shouldShowCompetitions(uiState.selectedFavoriteType)) {
+                                SectionDivider(
+                                    title = AppStrings.Competitions.favoriteCompetitions,
+                                    type = SectionDividerType.TITLE
+                                )
+
+                                Column(
+                                    modifier = Modifier.padding(horizontal = WrestlingTheme.dimensions.spacing_16),
+                                    verticalArrangement = Arrangement.spacedBy(WrestlingTheme.dimensions.spacing_12)
+                                ) {
+                                    competitions.forEach { favorite ->
+                                        CompetitionItem(
+                                            competition = favorite.competition,
+                                            onClick = { viewModel.navigateToCompetitionDetail(favorite.competition.id) },
+                                            showMatchDays = true
+                                        )
+                                    }
+                                }
+
+                                if ((teams.isNotEmpty() && shouldShowTeams(uiState.selectedFavoriteType)) ||
+                                    (wrestlers.isNotEmpty() && shouldShowWrestlers(uiState.selectedFavoriteType))) {
+                                    FavoritesSectionDivider()
                                 }
                             }
 
-                            if ((teams.isNotEmpty() && shouldShowTeams(uiState.selectedFavoriteType)) ||
-                                (wrestlers.isNotEmpty() && shouldShowWrestlers(uiState.selectedFavoriteType))) {
-                                FavoritesSectionDivider()
+                            // Sección de equipos favoritos
+                            if (teams.isNotEmpty() && shouldShowTeams(uiState.selectedFavoriteType)) {
+                                SectionDivider(
+                                    title = AppStrings.Teams.favoriteTeams,
+                                    type = SectionDividerType.TITLE
+                                )
+
+                                TeamsByDivisionSection(
+                                    title = "",
+                                    allTeams = teams.map { it.team },
+                                    onTeamClick = { viewModel.navigateToTeamDetail(it) }
+                                )
+
+                                if (wrestlers.isNotEmpty() && shouldShowWrestlers(uiState.selectedFavoriteType)) {
+                                    FavoritesSectionDivider()
+                                }
                             }
-                        }
 
-                        // Sección de equipos favoritos
-                        if (teams.isNotEmpty() && shouldShowTeams(uiState.selectedFavoriteType)) {
-                            SectionDivider(
-                                title = AppStrings.Teams.favoriteTeams,
-                                type = SectionDividerType.TITLE
-                            )
-
-                            TeamsByDivisionSection(
-                                title = "",
-                                allTeams = teams.map { it.team },
-                                onTeamClick = { viewModel.navigateToTeamDetail(it) }
-                            )
-
+                            // Sección de luchadores favoritos
                             if (wrestlers.isNotEmpty() && shouldShowWrestlers(uiState.selectedFavoriteType)) {
-                                FavoritesSectionDivider()
-                            }
-                        }
+                                SectionDivider(
+                                    title = AppStrings.Wrestlers.favoriteWrestlers,
+                                    type = SectionDividerType.TITLE
+                                )
 
-                        // Sección de luchadores favoritos
-                        if (wrestlers.isNotEmpty() && shouldShowWrestlers(uiState.selectedFavoriteType)) {
-                            SectionDivider(
-                                title = AppStrings.Wrestlers.favoriteWrestlers,
-                                type = SectionDividerType.TITLE
-                            )
+                                // Group wrestlers by category
+                                val wrestlersByCategory = wrestlers.map { it.wrestler }.groupBy { it.category }
 
-                            // Group wrestlers by category
-                            // En HomeScreen.kt o donde se implemente la sección de luchadores favoritos
-                            val wrestlersByCategory = wrestlers.map { it.wrestler }.groupBy { it.category }
+                                WrestlerCategory.entries.forEach { category ->
+                                    val wrestlersInCategory = wrestlersByCategory[category] ?: emptyList()
 
-                            WrestlerCategory.entries.forEach { category ->
-                                val wrestlersInCategory = wrestlersByCategory[category] ?: emptyList()
+                                    if (wrestlersInCategory.isNotEmpty()) {
+                                        SectionDivider(
+                                            title = category.displayName(),
+                                            type = SectionDividerType.SUBTITLE
+                                        )
 
-                                if (wrestlersInCategory.isNotEmpty()) {
-                                    SectionDivider(
-                                        title = category.displayName(),
-                                        type = SectionDividerType.SUBTITLE
-                                    )
+                                        Spacer(modifier = Modifier.height(WrestlingTheme.dimensions.spacing_8))
 
-                                    Spacer(modifier = Modifier.height(WrestlingTheme.dimensions.spacing_8))
+                                        val itemsPerRow = 3
+                                        val rowHeight = 150.dp
+                                        val numRows = (wrestlersInCategory.size + itemsPerRow - 1) / itemsPerRow
+                                        val gridHeight = (numRows * rowHeight) + ((numRows - 1) * WrestlingTheme.dimensions.spacing_8)
 
-                                    val itemsPerRow = 3 // Cambiado de 2 a 3 elementos por fila
-                                    val rowHeight = 150.dp // Altura ajustada para un grid más compacto
-                                    val numRows = (wrestlersInCategory.size + itemsPerRow - 1) / itemsPerRow
-                                    val gridHeight = (numRows * rowHeight) + ((numRows - 1) * WrestlingTheme.dimensions.spacing_8)
-
-                                    LazyVerticalGrid(
-                                        columns = GridCells.Fixed(itemsPerRow), // Cambiado a 3 columnas
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .height(gridHeight.coerceAtMost(330.dp)),
-                                        contentPadding = PaddingValues(horizontal = WrestlingTheme.dimensions.spacing_16),
-                                        horizontalArrangement = Arrangement.spacedBy(WrestlingTheme.dimensions.spacing_8),
-                                        verticalArrangement = Arrangement.spacedBy(WrestlingTheme.dimensions.spacing_8)
-                                    ) {
-                                        items(wrestlersInCategory) { wrestler ->
-                                            WrestlerItem(
-                                                wrestler = wrestler,
-                                                onClick = { viewModel.navigateToWrestlerDetail(wrestler.id) },
-                                                isGridItem = true
-                                            )
+                                        LazyVerticalGrid(
+                                            columns = GridCells.Fixed(itemsPerRow),
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .height(gridHeight.coerceAtMost(330.dp)),
+                                            contentPadding = PaddingValues(horizontal = WrestlingTheme.dimensions.spacing_16),
+                                            horizontalArrangement = Arrangement.spacedBy(WrestlingTheme.dimensions.spacing_8),
+                                            verticalArrangement = Arrangement.spacedBy(WrestlingTheme.dimensions.spacing_8)
+                                        ) {
+                                            items(wrestlersInCategory) { wrestler ->
+                                                WrestlerItem(
+                                                    wrestler = wrestler,
+                                                    onClick = { viewModel.navigateToWrestlerDetail(wrestler.id) },
+                                                    isGridItem = true
+                                                )
+                                            }
                                         }
                                     }
                                 }
@@ -347,19 +370,14 @@ private fun HomeContent(
                         }
                     }
                 }
+
+                Spacer(modifier = Modifier.height(WrestlingTheme.dimensions.spacing_16))
+                HorizontalDivider(
+                    modifier = Modifier.padding(horizontal = WrestlingTheme.dimensions.spacing_16),
+                    color = MaterialTheme.colorScheme.outlineVariant
+                )
+                Spacer(modifier = Modifier.height(WrestlingTheme.dimensions.spacing_16))
             }
-
-            Spacer(modifier = Modifier.height(WrestlingTheme.dimensions.spacing_16))
-
-            // Divisor de sección
-            HorizontalDivider(
-                modifier = Modifier.padding(
-                    horizontal = WrestlingTheme.dimensions.spacing_16,
-                ),
-                color = MaterialTheme.colorScheme.outlineVariant
-            )
-
-            Spacer(modifier = Modifier.height(WrestlingTheme.dimensions.spacing_16))
         }
 
         // Sección de competiciones con filtros
