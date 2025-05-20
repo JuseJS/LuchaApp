@@ -22,29 +22,18 @@ class CompetitionDetailViewModel(
     }
 
     private fun loadCompetition() {
-        launchSafe(
-            errorHandler = { error ->
-                updateState {
-                    it.copy(
-                        isLoading = false,
-                        errorMessage = error.message
-                    )
+        loadEntity(
+            entityId = competitionId,
+            fetchEntity = { competitionRepository.getCompetition(competitionId) },
+            processEntity = { competition ->
+                // Comprobar si es favorito
+                val favorites = getFavoritesUseCase()
+                val isFavorite = favorites.any {
+                    it is Favorite.CompetitionFavorite && it.competition.id == competitionId
                 }
-            }
-        ) {
-            // Obtener la competición específica
-            val competition = competitionRepository.getCompetition(competitionId)
-                ?: throw AppError.UnknownError(message = "No se encontró la competición")
 
-            // Comprobar si esta competición es favorita
-            val favorites = getFavoritesUseCase()
-            val isFavorite = favorites.any {
-                it is Favorite.CompetitionFavorite && it.competition.id == competitionId
-            }
-
-            // Actualizar el estado
-            updateState {
-                it.copy(
+                // Devolver nuevo estado
+                uiState.value.copy(
                     isLoading = false,
                     errorMessage = null,
                     competition = competition,
@@ -53,7 +42,17 @@ class CompetitionDetailViewModel(
                     teams = competition.teams
                 )
             }
-        }
+        )
+    }
+
+    /**
+     * Sobrescribir el método de actualización de estado con error
+     */
+    override fun updateErrorState(currentState: CompetitionDetailUiState, error: AppError): CompetitionDetailUiState {
+        return currentState.copy(
+            isLoading = false,
+            errorMessage = error.message
+        )
     }
 
     fun navigateToTeamDetail(teamId: String) {
