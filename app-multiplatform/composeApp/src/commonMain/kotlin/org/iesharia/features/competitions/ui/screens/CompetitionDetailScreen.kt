@@ -21,6 +21,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.times
+import org.iesharia.core.ui.components.WrestlingButton
+import org.iesharia.core.ui.components.WrestlingButtonType
 import org.iesharia.core.ui.components.common.*
 import org.iesharia.core.ui.screens.BaseContentScreen
 import org.iesharia.core.ui.theme.WrestlingTheme
@@ -84,6 +86,17 @@ class CompetitionDetailScreen(private val competitionId: String) : BaseContentSc
                 uiState = uiState,
                 onTeamClick = { teamId -> viewModel.navigateToTeamDetail(teamId) }
             )
+        }
+
+        // Añadir opción de refresco consistente con las otras pantallas
+        if (uiState.errorMessage != null) {
+            Box(modifier = Modifier.fillMaxWidth().padding(16.dp), contentAlignment = Alignment.Center) {
+                WrestlingButton(
+                    text = "Reintentar",
+                    onClick = { viewModel.refreshData() },
+                    type = WrestlingButtonType.SECONDARY
+                )
+            }
         }
     }
 }
