@@ -118,7 +118,8 @@ abstract class BaseViewModel<T>(
     protected enum class EntityType {
         WRESTLER,
         TEAM,
-        COMPETITION
+        COMPETITION,
+        MATCH
     }
 
     /**
@@ -131,6 +132,7 @@ abstract class BaseViewModel<T>(
                     EntityType.WRESTLER -> Routes.Wrestler.Detail()
                     EntityType.TEAM -> Routes.Team.Detail()
                     EntityType.COMPETITION -> Routes.Competition.Detail()
+                    EntityType.MATCH -> Routes.Match.Detail()
                 }
                 manager.navigateWithParams(route, entityId)
             }
