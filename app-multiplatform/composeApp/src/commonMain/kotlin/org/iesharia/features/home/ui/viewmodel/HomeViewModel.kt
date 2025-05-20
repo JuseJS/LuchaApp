@@ -6,7 +6,6 @@ import org.iesharia.core.domain.model.AppError
 import org.iesharia.core.domain.model.Favorite
 import org.iesharia.core.domain.model.Island
 import org.iesharia.core.navigation.NavigationManager
-import org.iesharia.core.navigation.Routes
 import org.iesharia.features.common.domain.usecase.GetFavoritesUseCase
 import org.iesharia.features.competitions.domain.model.AgeCategory
 import org.iesharia.features.competitions.domain.model.Competition
@@ -24,9 +23,9 @@ class HomeViewModel(
     private val getFavoritesUseCase: GetFavoritesUseCase,
     private val getTeamMatchesUseCase: GetTeamMatchesUseCase,
     private val getWrestlerResultsUseCase: GetWrestlerResultsUseCase,
-    private val navigationManager: NavigationManager,
+    navigationManager: NavigationManager,
     errorHandler: ErrorHandler
-) : BaseViewModel<HomeUiState>(HomeUiState(isLoading = true), errorHandler) {
+) : BaseViewModel<HomeUiState>(HomeUiState(isLoading = true), errorHandler, navigationManager) {
 
     // Datos cacheados para acceso rápido
     private var competitions: List<Competition> = emptyList()
@@ -174,21 +173,15 @@ class HomeViewModel(
 
     // Métodos de navegación
     fun navigateToCompetitionDetail(competitionId: String) {
-        launchSafe {
-            navigationManager.navigateWithParams(Routes.Competition.Detail(), competitionId)
-        }
+        navigateToEntityDetail(EntityType.COMPETITION, competitionId)
     }
 
     fun navigateToTeamDetail(teamId: String) {
-        launchSafe {
-            navigationManager.navigateWithParams(Routes.Team.Detail(), teamId)
-        }
+        navigateToEntityDetail(EntityType.TEAM, teamId)
     }
 
     fun navigateToWrestlerDetail(wrestlerId: String) {
-        launchSafe {
-            navigationManager.navigateWithParams(Routes.Wrestler.Detail(), wrestlerId)
-        }
+        navigateToEntityDetail(EntityType.WRESTLER, wrestlerId)
     }
 
     fun updateSearchQuery(query: String) {
