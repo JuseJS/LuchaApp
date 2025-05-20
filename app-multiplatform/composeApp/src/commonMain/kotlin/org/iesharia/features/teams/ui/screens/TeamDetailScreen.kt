@@ -17,6 +17,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import org.iesharia.core.resources.AppStrings
+import org.iesharia.core.ui.components.WrestlingButton
+import org.iesharia.core.ui.components.WrestlingButtonType
 import org.iesharia.core.ui.components.common.*
 import org.iesharia.core.ui.screens.BaseContentScreen
 import org.iesharia.core.ui.theme.WrestlingTheme
@@ -75,13 +77,36 @@ class TeamDetailScreen(private val teamId: String) : BaseContentScreen() {
 
         if (uiState.team == null && !uiState.isLoading) {
             EmptyStateMessage(
-                message = "No hay luchadores en esta categoría",
-                height = 120.dp
+                message = uiState.errorMessage ?: "No se encontró el equipo"
             )
         } else if (!uiState.isLoading) {
             TeamDetailContent(
                 viewModel = viewModel
             )
+        }
+
+        // Añadir manejo de error más visible con opción de reintento
+        if (uiState.errorMessage != null) {
+            Box(modifier = Modifier.fillMaxWidth().padding(16.dp), contentAlignment = Alignment.Center) {
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text(
+                        text = uiState.errorMessage ?: "",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.error
+                    )
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    WrestlingButton(
+                        text = "Reintentar",
+                        onClick = {
+                            // Método que deberíamos añadir si no existe
+                            viewModel.refreshData()
+                        },
+                        type = WrestlingButtonType.SECONDARY
+                    )
+                }
+            }
         }
     }
 }
