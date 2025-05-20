@@ -20,6 +20,8 @@ import org.iesharia.core.navigation.NavigationManager
 import org.iesharia.features.wrestlers.data.repository.MockWrestlerRepository
 import org.iesharia.features.wrestlers.domain.repository.WrestlerRepository
 import org.iesharia.features.wrestlers.domain.usecase.GetWrestlersByTeamIdUseCase
+import org.iesharia.features.auth.domain.security.SessionManager
+import org.iesharia.features.auth.domain.security.RolePermissionManager
 
 /**
  * Módulo para servicios comunes
@@ -27,6 +29,10 @@ import org.iesharia.features.wrestlers.domain.usecase.GetWrestlersByTeamIdUseCas
 private val commonModule = module {
     // Registrar el ErrorHandler
     single<ErrorHandler> { DefaultErrorHandler() }
+
+    // Registrar gestores de sesión y permisos
+    single { SessionManager() }
+    single { RolePermissionManager(get()) }
 }
 
 /**
@@ -51,6 +57,9 @@ private val useCaseModule = module {
     factory { GetWrestlersByTeamIdUseCase(get()) }
 }
 
+/**
+ * Módulo para la navegación
+ */
 private val navigationModule = module {
     single { NavigationManager() }
 }
@@ -59,7 +68,7 @@ private val navigationModule = module {
  * Lista de todos los módulos del paquete shared
  */
 internal val sharedModules = listOf(
-    commonModule, // Añadir el módulo común
+    commonModule,
     repositoryModule,
     useCaseModule,
     navigationModule

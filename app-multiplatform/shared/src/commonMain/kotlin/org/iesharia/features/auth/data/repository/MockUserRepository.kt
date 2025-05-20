@@ -4,13 +4,41 @@ import org.iesharia.features.auth.domain.repository.UserRepository
 import kotlinx.coroutines.delay
 import org.iesharia.core.data.mock.MockDataGenerator
 import org.iesharia.core.domain.model.AppError
+import org.iesharia.features.auth.domain.model.User
+import org.iesharia.features.auth.domain.model.Role
 
 class MockUserRepository(
     private val mockDataGenerator: MockDataGenerator
 ) : UserRepository {
-    private var isLoggedIn = false
+    private var currentUser: User? = null
 
-    override suspend fun login(email: String, password: String): Boolean {
+    // Base de datos mock de usuarios
+    private val users = mutableMapOf(
+        "admin@test.com" to User(
+            id = "admin1",
+            email = "admin@test.com",
+            name = "Admin",
+            surname = "User",
+            role = Role.DELEGADO_FEDERATIVO
+        ),
+        "coach@test.com" to User(
+            id = "coach1",
+            email = "coach@test.com",
+            name = "Coach",
+            surname = "User",
+            role = Role.ENTRENADOR,
+            associatedTeamId = "team1" // Asociado con el equipo Tegueste
+        ),
+        "user@test.com" to User(
+            id = "user1",
+            email = "user@test.com",
+            name = "Regular",
+            surname = "User",
+            role = Role.USUARIO_REGISTRADO
+        )
+    )
+
+    override suspend fun login(email: String, password: String): User {
         try {
             // Simular latencia de red
             delay(1000)
@@ -20,8 +48,23 @@ class MockUserRepository(
                 throw AppError.AuthError(message = "Credenciales incorrectas")
             }
 
-            isLoggedIn = true
-            return true
+            // Obtener usuario o crear uno nuevo con rol predeterminado
+            val user = users[email] ?: User(
+                id = "user_${users.size + 1}",
+                email = email,
+                name = "New",
+                surname = "User",
+                role = Role.USUARIO_REGISTRADO
+            )
+
+            // Almacenar en la base de datos mock si no existe
+            if (!users.containsKey(email)) {
+                users[email] = user
+            }
+
+            // Establecer como usuario actual
+            currentUser = user
+            return user
         } catch (e: Exception) {
             // Si ya es un AppError, propagarlo
             if (e is AppError) throw e
@@ -31,7 +74,7 @@ class MockUserRepository(
         }
     }
 
-    override suspend fun register(name: String, surname: String, email: String, password: String): Boolean {
+    override suspend fun register(name: String, surname: String, email: String, password: String): User {
         try {
             // Simular latencia de red
             delay(1000)
@@ -41,8 +84,21 @@ class MockUserRepository(
                 throw AppError.ValidationError(message = "El correo ya está registrado")
             }
 
-            isLoggedIn = true
-            return true
+            // Crear nuevo usuario con rol predeterminado
+            val user = User(
+                id = "user_${users.size + 1}",
+                email = email,
+                name = name,
+                surname = surname,
+                role = Role.USUARIO_REGISTRADO
+            )
+
+            // Almacenar en la base de datos mock
+            users[email] = user
+
+            // Establecer como usuario actual
+            currentUser = user
+            return user
         } catch (e: Exception) {
             // Si ya es un AppError, propagarlo
             if (e is AppError) throw e
@@ -52,5 +108,50 @@ class MockUserRepository(
         }
     }
 
-    override suspend fun isUserLoggedIn(): Boolean = isLoggedIn
+    override suspend fun isUserLoggedIn(): Boolean = currentUser != null
+
+    override suspend fun getCurrentUser(): User? = currentUser
+
+    override suspend fun logout() {
+        currentUser = null
+    }
+
+    override suspend fun getUserRole(userId: String): Role {
+        return users.values.find { it.id == userId }?.role ?: Role.INVITADO
+    }
+
+    override suspend fun updateUserRole(userId: String, role: Role): Boolean {
+        val user = users.values.find { it.id == userId } ?: return false
+
+        // Actualizar rol de usuario
+        val updatedUser = user.copy(role = role)
+        users[updatedUser.email] = updatedUser
+
+        // Si es el usuario actual, actualizar también
+        if (currentUser?.id == userId) {
+            currentUser = updatedUser
+        }
+
+        return true
+    }
+
+    override suspend fun assignTeamToCoach(userId: String, teamId: String): Boolean {
+        val user = users.values.find { it.id == userId } ?: return false
+
+        // Asegurar que el usuario sea entrenador
+        if (user.role != Role.ENTRENADOR) {
+            return false
+        }
+
+        // Actualizar usuario con asociación de equipo
+        val updatedUser = user.copy(associatedTeamId = teamId)
+        users[updatedUser.email] = updatedUser
+
+        // Si es el usuario actual, actualizar también
+        if (currentUser?.id == userId) {
+            currentUser = updatedUser
+        }
+
+        return true
+    }
 }
