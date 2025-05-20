@@ -75,4 +75,17 @@ object Routes {
             override fun createRoute(params: String): String = "$baseRoute/$params"
         }
     }
+
+    object Match {
+        /**
+         * Ruta para la pantalla de detalle de enfrentamiento
+         */
+        data class Detail(private val matchId: String? = null) : NavigationRouteWithParams<String> {
+            override val baseRoute: String = "match/detail"
+            override val route: String
+                get() = if (matchId != null) "$baseRoute/$matchId" else "$baseRoute/{matchId}"
+
+            override fun createRoute(params: String): String = "$baseRoute/$params"
+        }
+    }
 }
