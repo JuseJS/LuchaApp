@@ -5,11 +5,40 @@ import org.iesharia.core.common.ErrorHandler
 import org.iesharia.core.domain.model.AppError
 import org.iesharia.core.navigation.NavigationManager
 import org.iesharia.core.resources.AppStrings
+import org.iesharia.features.auth.domain.repository.UserRepository
+import org.iesharia.features.auth.domain.security.SessionManager
 
 class LoginViewModel(
     navigationManager: NavigationManager,
-    errorHandler: ErrorHandler
+    errorHandler: ErrorHandler,
+    private val userRepository: UserRepository,
+    private val sessionManager: SessionManager
 ) : BaseViewModel<LoginUiState>(LoginUiState(), errorHandler, navigationManager) {
+
+    init {
+        // Verificar si el usuario ya tiene sesión iniciada
+        checkLoginStatus()
+    }
+
+    private fun checkLoginStatus() {
+        launchSafe {
+            val isLoggedIn = userRepository.isUserLoggedIn()
+            val currentUser = userRepository.getCurrentUser()
+
+            updateState {
+                it.copy(
+                    isLoggedIn = isLoggedIn,
+                    currentUser = currentUser
+                )
+            }
+
+            // Si ya tiene sesión iniciada, ir a home
+            if (isLoggedIn && currentUser != null) {
+                sessionManager.setCurrentUser(currentUser)
+                navigateToHome()
+            }
+        }
+    }
 
     // Cambiar entre modos login/registro
     fun toggleAuthMode() {
@@ -111,16 +140,22 @@ class LoginViewModel(
             // Iniciar carga
             updateState { it.copy(isLoading = true) }
 
-            // Simulación de login con delay
-            kotlinx.coroutines.delay(1000)
+            // Realizar login y obtener usuario
+            val user = userRepository.login(currentState.loginEmail, currentState.loginPassword)
 
-            // Simulamos una falla ocasional
-            if (currentState.loginEmail == "error@test.com") {
-                throw AppError.AuthError(message = AppStrings.Auth.loginError)
+            // Almacenar usuario en sesión
+            sessionManager.setCurrentUser(user)
+
+            // Actualizar estado
+            updateState {
+                it.copy(
+                    isLoading = false,
+                    isLoggedIn = true,
+                    currentUser = user
+                )
             }
 
-            // Login exitoso
-            updateState { it.copy(isLoading = false) }
+            // Navegación a home
             navigateToHome()
         }
     }
@@ -189,16 +224,46 @@ class LoginViewModel(
             // Iniciar carga
             updateState { it.copy(isLoading = true) }
 
-            // Simulación de registro
-            kotlinx.coroutines.delay(1000)
+            // Realizar registro y obtener usuario
+            val user = userRepository.register(
+                currentState.registerName,
+                currentState.registerSurname,
+                currentState.registerEmail,
+                currentState.registerPassword
+            )
 
-            // Simulamos una falla ocasional
-            if (currentState.registerEmail == "error@test.com") {
-                throw AppError.ServerError(message = AppStrings.Auth.registerError)
+            // Almacenar usuario en sesión
+            sessionManager.setCurrentUser(user)
+
+            // Actualizar estado
+            updateState {
+                it.copy(
+                    isLoading = false,
+                    isLoggedIn = true,
+                    currentUser = user
+                )
             }
 
-            // Registro exitoso
-            updateState { it.copy(isLoading = false) }
+            // Navegación a home
+            navigateToHome()
+        }
+    }
+
+    fun loginAsGuest() {
+        launchSafe {
+            updateState {
+                it.copy(
+                    isLoading = false,
+                    isLoggedIn = false,
+                    currentUser = null
+                )
+            }
+
+            // Limpiar cualquier información existente de sesión
+            userRepository.logout()
+            sessionManager.logout()
+
+            // Navegar a la pantalla principal
             navigateToHome()
         }
     }

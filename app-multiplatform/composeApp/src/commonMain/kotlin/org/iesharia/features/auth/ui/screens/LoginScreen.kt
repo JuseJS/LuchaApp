@@ -5,9 +5,7 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.Surface
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -206,6 +204,40 @@ class LoginScreen : AppScreen() {
                             onClick = viewModel::toggleAuthMode,
                             type = WrestlingButtonType.TEXT,
                             customColor = MaterialTheme.colorScheme.secondary
+                        )
+
+                        Spacer(modifier = Modifier.height(WrestlingTheme.dimensions.spacing_24))
+
+                        // Separador con texto "o"
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            HorizontalDivider(
+                                modifier = Modifier.weight(1f),
+                                color = MaterialTheme.colorScheme.outlineVariant
+                            )
+
+                            Text(
+                                text = "o",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                modifier = Modifier.padding(horizontal = WrestlingTheme.dimensions.spacing_16)
+                            )
+
+                            HorizontalDivider(
+                                modifier = Modifier.weight(1f),
+                                color = MaterialTheme.colorScheme.outlineVariant
+                            )
+                        }
+
+                        Spacer(modifier = Modifier.height(WrestlingTheme.dimensions.spacing_24))
+
+                        // Botón para ingresar como invitado
+                        WrestlingButton(
+                            text = "Continuar como Invitado",
+                            onClick = { viewModel.loginAsGuest() },
+                            type = WrestlingButtonType.SECONDARY
                         )
                     }
 
