@@ -50,105 +50,78 @@ fun WrestlerItem(
     modifier: Modifier = Modifier,
     matchResults: List<WrestlerMatchResult> = emptyList(),
     detailLevel: WrestlerDetailLevel = WrestlerDetailLevel.STANDARD,
-    isGridItem: Boolean = false // Parámetro para layout en grid
+    isGridItem: Boolean = false
 ) {
-    if (isGridItem) {
-        // Diseño centrado con logo a la izquierda y dos filas de información a la derecha
-        ItemCard(
-            onClick = onClick,
-            modifier = modifier,
-            containerColor = DarkSurface2,
-            contentPadding = PaddingValues(
-                horizontal = WrestlingTheme.dimensions.spacing_16,
-                vertical = WrestlingTheme.dimensions.spacing_12
-            ),
-            title = {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.Center
-                ) {
-                    // Avatar (ocupa dos filas de altura)
-                    Box(
-                        modifier = Modifier
-                            .size(48.dp)
-                            .clip(CircleShape)
-                            .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.1f)),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        val hasValidImage = wrestler.imageUrl != null && wrestler.imageUrl!!.isNotEmpty()
-                        if (hasValidImage) {
-                            // Implementar carga real de imagen
-                        } else {
-                            Icon(
-                                imageVector = Icons.Default.Person,
-                                contentDescription = null,
-                                tint = MaterialTheme.colorScheme.primary,
-                                modifier = Modifier.size(28.dp)
-                            )
-                        }
-                    }
-
-                    Spacer(modifier = Modifier.width(WrestlingTheme.dimensions.spacing_16))
-
-                    // Columna con nombre y clasificación
-                    Column(
-                        horizontalAlignment = Alignment.Start,
-                        verticalArrangement = Arrangement.spacedBy(WrestlingTheme.dimensions.spacing_8)
-                    ) {
-                        // Primera fila: Nombre y apodo
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            // Nombre del luchador
-                            Text(
-                                text = wrestler.fullName,
-                                style = MaterialTheme.typography.bodyLarge,
-                                fontWeight = FontWeight.Bold,
-                                color = White90,
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis
-                            )
-
-                            // Apodo si existe, en la misma línea
-                            if (wrestler.nickname != null) {
-                                Spacer(modifier = Modifier.width(WrestlingTheme.dimensions.spacing_8))
-                                Text(
-                                    text = "\"${wrestler.nickname}\"",
-                                    style = MaterialTheme.typography.bodySmall,
-                                    color = SandLight,
-                                    maxLines = 1,
-                                    overflow = TextOverflow.Ellipsis
-                                )
-                            }
-                        }
-
-                        // Segunda fila: Clasificación
-                        InfoBadge(
-                            text = wrestler.classification.displayName(),
-                            color = MaterialTheme.colorScheme.primary,
-                            backgroundColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.15f)
-                        )
-                    }
+    EntityListItem(
+        onClick = onClick,
+        modifier = modifier,
+        containerColor = DarkSurface2,
+        leadingContent = {
+            // Avatar del luchador
+            Box(
+                modifier = Modifier
+                    .size(48.dp)
+                    .clip(CircleShape)
+                    .background(MaterialTheme.colorScheme.primaryContainer),
+                contentAlignment = Alignment.Center
+            ) {
+                val hasValidImage = wrestler.imageUrl != null && wrestler.imageUrl!!.isNotEmpty()
+                if (hasValidImage) {
+                    // Implementación de carga de imagen real (no cambiada del original)
+                } else {
+                    Icon(
+                        imageVector = Icons.Default.Person,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.onPrimaryContainer,
+                        modifier = Modifier.size(32.dp)
+                    )
                 }
             }
-        ) {}
-    } else {
-        // Diseño original para modo no-grid
-        ItemCard(
-            onClick = onClick,
-            modifier = modifier,
-            containerColor = DarkSurface2,
-            contentPadding = PaddingValues(WrestlingTheme.dimensions.spacing_16),
-            title = {
-                WrestlerHeader(
-                    wrestler = wrestler,
-                    detailLevel = detailLevel
+        },
+        titleContent = {
+            Column(horizontalAlignment = Alignment.Start) {
+                Text(
+                    text = wrestler.fullName,
+                    style = MaterialTheme.typography.bodyLarge,
+                    fontWeight = FontWeight.Bold,
+                    color = White90,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+
+                if (wrestler.nickname != null) {
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text(
+                        text = "\"${wrestler.nickname}\"",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = SandLight,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                }
+
+                if (!isGridItem) {
+                    Spacer(modifier = Modifier.height(8.dp))
+                    InfoBadge(
+                        text = wrestler.classification.displayName(),
+                        color = MaterialTheme.colorScheme.primary,
+                        backgroundColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.15f)
+                    )
+                }
+            }
+        },
+        // En vista de grid, mantenemos el chip a la derecha
+        trailingContent = if (isGridItem) {
+            {
+                InfoBadge(
+                    text = wrestler.classification.displayName(),
+                    color = MaterialTheme.colorScheme.primary,
+                    backgroundColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.15f)
                 )
             }
-        ) {
-            if (detailLevel != WrestlerDetailLevel.COMPACT) {
-                // Contenido normal para los otros modos
+        } else null,
+        detailContent = if (detailLevel != WrestlerDetailLevel.COMPACT && !isGridItem) {
+            {
                 if (detailLevel == WrestlerDetailLevel.STANDARD) {
                     WrestlerBasicInfo(wrestler)
                 } else if (detailLevel == WrestlerDetailLevel.DETAILED) {
@@ -159,83 +132,8 @@ fun WrestlerItem(
                     }
                 }
             }
-        }
-    }
-}
-
-@Composable
-private fun WrestlerHeader(
-    wrestler: Wrestler,
-    detailLevel: WrestlerDetailLevel
-) {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        // Avatar más grande o más pequeño según el nivel de detalle
-        val avatarSize = when(detailLevel) {
-            WrestlerDetailLevel.COMPACT -> 40.dp
-            else -> 48.dp
-        }
-
-        // Wrestler avatar
-        Box(
-            modifier = Modifier
-                .size(avatarSize)
-                .clip(CircleShape)
-                .background(MaterialTheme.colorScheme.primaryContainer),
-            contentAlignment = Alignment.Center
-        ) {
-            val hasValidImage = wrestler.imageUrl != null && wrestler.imageUrl!!.isNotEmpty()
-            if (hasValidImage) {
-                // Implement real image loading
-            } else {
-                Icon(
-                    imageVector = Icons.Default.Person,
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.onPrimaryContainer,
-                    modifier = Modifier.size(avatarSize * 0.7f)
-                )
-            }
-        }
-
-        Spacer(modifier = Modifier.width(WrestlingTheme.dimensions.spacing_16))
-
-        // Wrestler basic info
-        Column(modifier = Modifier.weight(1f)) {
-            // Full name
-            Text(
-                text = wrestler.fullName,
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold,
-                color = White90
-            )
-
-            // Nickname (if exists)
-            if (wrestler.nickname != null) {
-                Spacer(modifier = Modifier.height(2.dp))
-                Text(
-                    text = "\"${wrestler.nickname}\"",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = SandLight
-                )
-            }
-
-            Spacer(modifier = Modifier.height(4.dp))
-
-            // Classification
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                Text(
-                    text = wrestler.classification.displayName(),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = White80
-                )
-            }
-        }
-    }
+        } else null
+    )
 }
 
 @Composable
