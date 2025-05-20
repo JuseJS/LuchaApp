@@ -5,7 +5,6 @@ import org.iesharia.core.common.ErrorHandler
 import org.iesharia.core.domain.model.AppError
 import org.iesharia.core.domain.model.Favorite
 import org.iesharia.core.navigation.NavigationManager
-import org.iesharia.core.navigation.Routes
 import org.iesharia.features.common.domain.usecase.GetFavoritesUseCase
 import org.iesharia.features.competitions.domain.repository.CompetitionRepository
 
@@ -13,9 +12,9 @@ class CompetitionDetailViewModel(
     private val competitionId: String,
     private val competitionRepository: CompetitionRepository,
     private val getFavoritesUseCase: GetFavoritesUseCase,
-    private val navigationManager: NavigationManager,
+    navigationManager: NavigationManager,
     errorHandler: ErrorHandler
-) : BaseViewModel<CompetitionDetailUiState>(CompetitionDetailUiState(), errorHandler) {
+) : BaseViewModel<CompetitionDetailUiState>(CompetitionDetailUiState(), errorHandler, navigationManager) {
 
     init {
         loadCompetition()
@@ -56,15 +55,7 @@ class CompetitionDetailViewModel(
     }
 
     fun navigateToTeamDetail(teamId: String) {
-        launchSafe {
-            navigationManager.navigateWithParams(Routes.Team.Detail(), teamId)
-        }
-    }
-
-    fun navigateBack() {
-        launchSafe {
-            navigationManager.navigateBack()
-        }
+        navigateToEntityDetail(EntityType.TEAM, teamId)
     }
 
     // Esta función es un placeholder para la funcionalidad de favoritos
