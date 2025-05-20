@@ -26,70 +26,62 @@ class TeamDetailViewModel(
         loadTeamDetails()
     }
 
-    private fun loadTeamDetails() {
-        launchSafe(
-            errorHandler = { error ->
-                updateState {
-                    it.copy(
-                        isLoading = false,
-                        errorMessage = error.message
-                    )
-                }
-            }
-        ) {
-            // Obtener datos del equipo
-            val competitions = competitionRepository.getCompetitions()
-            val team = competitions.flatMap { it.teams }.find { it.id == teamId }
-                ?: throw AppError.UnknownError(message = "No se encontró el equipo")
+    // Método privado para cargar datos
+    fun loadTeamDetails() {
+        updateState { it.copy(isLoading = true, errorMessage = null) }
 
-            // Obtener luchadores del equipo usando el caso de uso específico
-            val wrestlers = getWrestlersByTeamIdUseCase(teamId)
+        loadEntity(
+            entityId = teamId,
+            fetchEntity = {
+                val competitions = competitionRepository.getCompetitions()
+                competitions.flatMap { it.teams }.find { it.id == teamId }
+            },
+            processEntity = { team ->
+                // Obtener luchadores
+                val wrestlers = getWrestlersByTeamIdUseCase(teamId)
 
-            // Agrupar luchadores por categoría
-            val groupedWrestlers = wrestlers.groupBy { it.category }
-                .mapValues { (category, wrestlers) ->
-                    // Ordenar por clasificación dentro de cada categoría
-                    if (category == WrestlerCategory.REGIONAL) {
-                        wrestlers.sortedBy { wrestler ->
-                            WrestlerClassification.getOrderedValues().indexOf(wrestler.classification)
+                // Agrupar luchadores por categoría
+                val groupedWrestlers = wrestlers.groupBy { it.category }
+                    .mapValues { (category, categoryWrestlers) ->
+                        if (category == WrestlerCategory.REGIONAL) {
+                            categoryWrestlers.sortedBy { wrestler ->
+                                WrestlerClassification.getOrderedValues().indexOf(wrestler.classification)
+                            }
+                        } else {
+                            categoryWrestlers
                         }
-                    } else {
-                        // Para juveniles y cadetes, el orden no importa por clasificación
-                        wrestlers
                     }
+
+                // Obtener competiciones
+                val teamCompetitions = competitionRepository.getCompetitions().filter { competition ->
+                    competition.teams.any { it.id == teamId }
                 }
 
-            // Obtener competiciones en las que participa el equipo
-            val teamCompetitions = competitions.filter { competition ->
-                competition.teams.any { it.id == teamId }
-            }
+                // Obtener enfrentamientos
+                val matchesByCompetition = teamCompetitions.associate { competition ->
+                    val lastMatchDay = competition.lastCompletedMatchDay?.let { matchDay ->
+                        if (matchDay.matches.any { match ->
+                                match.localTeam.id == teamId || match.visitorTeam.id == teamId
+                            }) matchDay else null
+                    }
 
-            // Obtener último y próximo enfrentamiento por competición
-            val matchesByCompetition = teamCompetitions.associate { competition ->
-                val lastMatchDay = competition.lastCompletedMatchDay?.let { matchDay ->
-                    if (matchDay.matches.any { match ->
-                            match.localTeam.id == teamId || match.visitorTeam.id == teamId
-                        }) matchDay else null
+                    val nextMatchDay = competition.nextMatchDay?.let { matchDay ->
+                        if (matchDay.matches.any { match ->
+                                match.localTeam.id == teamId || match.visitorTeam.id == teamId
+                            }) matchDay else null
+                    }
+
+                    competition.id to Pair(lastMatchDay, nextMatchDay)
                 }
 
-                val nextMatchDay = competition.nextMatchDay?.let { matchDay ->
-                    if (matchDay.matches.any { match ->
-                            match.localTeam.id == teamId || match.visitorTeam.id == teamId
-                        }) matchDay else null
+                // Comprobar si es favorito
+                val favorites = getFavoritesUseCase()
+                val isFavorite = favorites.any {
+                    it is Favorite.TeamFavorite && it.team.id == teamId
                 }
 
-                competition.id to Pair(lastMatchDay, nextMatchDay)
-            }
-
-            // Comprobar si este equipo es favorito
-            val favorites = getFavoritesUseCase()
-            val isFavorite = favorites.any {
-                it is Favorite.TeamFavorite && it.team.id == teamId
-            }
-
-            // Actualizar el estado
-            updateState {
-                it.copy(
+                // Devolver nuevo estado
+                uiState.value.copy(
                     isLoading = false,
                     errorMessage = null,
                     team = team,
@@ -99,7 +91,25 @@ class TeamDetailViewModel(
                     isFavorite = isFavorite
                 )
             }
-        }
+        )
+    }
+
+    /**
+     * Sobrescribir el método de actualización de estado con error
+     */
+    override fun updateErrorState(currentState: TeamDetailUiState, error: AppError): TeamDetailUiState {
+        return currentState.copy(
+            isLoading = false,
+            errorMessage = error.message
+        )
+    }
+
+    /**
+     * Método público para recargar datos
+     */
+    fun refreshData() {
+        updateState { it.copy(isLoading = true, errorMessage = null) }
+        loadTeamDetails()
     }
 
     fun updateSearchQuery(query: String) {
@@ -124,7 +134,9 @@ class TeamDetailViewModel(
         }
     }
 
-    // Esta función es un placeholder para la funcionalidad de favoritos
+    /**
+     * Alternar estado de favorito
+     */
     fun toggleFavorite() {
         // Por ahora, solo actualizamos el estado UI
         updateState {
@@ -132,6 +144,9 @@ class TeamDetailViewModel(
         }
     }
 
+    /**
+     * Filtra los luchadores de una categoría según el término de búsqueda
+     */
     fun getFilteredWrestlers(category: WrestlerCategory): List<Wrestler> {
         val wrestlers = uiState.value.wrestlers[category] ?: emptyList()
         val query = uiState.value.searchQuery.lowercase()
