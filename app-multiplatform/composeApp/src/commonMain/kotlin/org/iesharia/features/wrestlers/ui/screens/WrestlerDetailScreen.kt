@@ -13,8 +13,11 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import org.iesharia.core.ui.components.WrestlingButton
+import org.iesharia.core.ui.components.WrestlingButtonType
 import org.iesharia.core.ui.components.common.EmptyStateMessage
 import org.iesharia.core.ui.components.common.EntityHeader
 import org.iesharia.core.ui.screens.BaseContentScreen
@@ -80,6 +83,17 @@ class WrestlerDetailScreen(private val wrestlerId: String) : BaseContentScreen()
             WrestlerDetailContent(
                 viewModel = viewModel
             )
+        }
+
+        // Añadir un botón de refresco cuando hay un error
+        if (uiState.errorMessage != null) {
+            Box(modifier = Modifier.fillMaxWidth().padding(16.dp), contentAlignment = Alignment.Center) {
+                WrestlingButton(
+                    text = "Reintentar",
+                    onClick = { viewModel.refreshData() },
+                    type = WrestlingButtonType.SECONDARY
+                )
+            }
         }
     }
 }
