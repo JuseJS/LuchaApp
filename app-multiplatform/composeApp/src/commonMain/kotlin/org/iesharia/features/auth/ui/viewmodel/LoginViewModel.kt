@@ -4,19 +4,12 @@ import org.iesharia.core.common.BaseViewModel
 import org.iesharia.core.common.ErrorHandler
 import org.iesharia.core.domain.model.AppError
 import org.iesharia.core.navigation.NavigationManager
-import org.iesharia.core.navigation.Routes
 import org.iesharia.core.resources.AppStrings
 
 class LoginViewModel(
-    private val navigationManager: NavigationManager,
+    navigationManager: NavigationManager,
     errorHandler: ErrorHandler
-) : BaseViewModel<LoginUiState>(LoginUiState(), errorHandler) {
-
-    private fun navigateToHome() {
-        launchSafe {
-            navigationManager.navigate(Routes.Home.Main)
-        }
-    }
+) : BaseViewModel<LoginUiState>(LoginUiState(), errorHandler, navigationManager) {
 
     // Cambiar entre modos login/registro
     fun toggleAuthMode() {
@@ -135,7 +128,6 @@ class LoginViewModel(
     // Validación y envío de registro
     fun submitRegister() {
         launchSafe(
-            // Manejador de errores personalizado
             errorHandler = { error ->
                 when (error) {
                     is AppError.ValidationError -> {
