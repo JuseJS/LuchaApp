@@ -34,35 +34,24 @@ class WrestlerDetailViewModel(
      * Carga los detalles del luchador y sus estadísticas
      */
     private fun loadWrestlerDetails() {
-        launchSafe(
-            errorHandler = { error ->
-                updateState {
-                    it.copy(
-                        isLoading = false,
-                        errorMessage = error.message
-                    )
+        loadEntity(
+            entityId = wrestlerId,
+            fetchEntity = { wrestlerRepository.getWrestler(wrestlerId) },
+            processEntity = { wrestler ->
+                // Obtener resultados de enfrentamientos
+                val matchResults = getWrestlerResultsUseCase(wrestlerId)
+
+                // Calcular estadísticas
+                val statisticsByClassification = calculateStatistics(matchResults)
+
+                // Comprobar si es favorito
+                val favorites = getFavoritesUseCase()
+                val isFavorite = favorites.any {
+                    it is Favorite.WrestlerFavorite && it.wrestler.id == wrestlerId
                 }
-            }
-        ) {
-            // Obtener detalles del luchador
-            val wrestler = wrestlerRepository.getWrestler(wrestlerId)
-                ?: throw AppError.UnknownError(message = "No se encontró el luchador")
 
-            // Obtener resultados de enfrentamientos
-            val matchResults = getWrestlerResultsUseCase(wrestlerId)
-
-            // Calcular estadísticas por clasificación
-            val statisticsByClassification = calculateStatistics(matchResults)
-
-            // Comprobar si este luchador es favorito
-            val favorites = getFavoritesUseCase()
-            val isFavorite = favorites.any {
-                it is Favorite.WrestlerFavorite && it.wrestler.id == wrestlerId
-            }
-
-            // Actualizar estado
-            updateState {
-                it.copy(
+                // Devolver nuevo estado
+                uiState.value.copy(
                     isLoading = false,
                     errorMessage = null,
                     wrestler = wrestler,
@@ -71,7 +60,17 @@ class WrestlerDetailViewModel(
                     isFavorite = isFavorite
                 )
             }
-        }
+        )
+    }
+
+    /**
+     * Sobrescribir el método de actualización de estado con error
+     */
+    override fun updateErrorState(currentState: WrestlerDetailUiState, error: AppError): WrestlerDetailUiState {
+        return currentState.copy(
+            isLoading = false,
+            errorMessage = error.message
+        )
     }
 
     /**
