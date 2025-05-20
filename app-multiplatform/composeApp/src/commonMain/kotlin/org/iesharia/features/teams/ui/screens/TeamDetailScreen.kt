@@ -75,7 +75,8 @@ class TeamDetailScreen(private val teamId: String) : BaseContentScreen() {
 
         if (uiState.team == null && !uiState.isLoading) {
             EmptyStateMessage(
-                message = uiState.errorMessage ?: "No se encontró el equipo"
+                message = "No hay luchadores en esta categoría",
+                height = 120.dp
             )
         } else if (!uiState.isLoading) {
             TeamDetailContent(
@@ -302,7 +303,10 @@ private fun WrestlerCategorySection(
         Spacer(modifier = Modifier.height(WrestlingTheme.dimensions.spacing_16))
 
         if (wrestlers.isEmpty()) {
-            EmptyStateMessage(message = "No hay luchadores en esta categoría")
+            EmptyStateMessage(
+                message = "No hay luchadores en esta categoría",
+                height = 120.dp
+            )
         } else {
             // Lista de luchadores
             wrestlers.forEach { wrestler ->
@@ -388,7 +392,10 @@ private fun CompetitionWithMatchDays(
         } else {
             Spacer(modifier = Modifier.height(WrestlingTheme.dimensions.spacing_16))
 
-            EmptyStateMessage(message = "No hay jornadas programadas")
+            EmptyStateMessage(
+                message = "No hay jornadas programadas",
+                height = 120.dp
+            )
         }
     }
 }
