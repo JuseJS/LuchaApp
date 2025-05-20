@@ -7,7 +7,6 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.EmojiEvents
 import androidx.compose.material.icons.filled.Favorite
@@ -18,7 +17,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -27,7 +25,6 @@ import org.iesharia.core.ui.components.common.*
 import org.iesharia.core.ui.screens.BaseContentScreen
 import org.iesharia.core.ui.theme.WrestlingTheme
 import org.iesharia.di.rememberViewModel
-import org.iesharia.features.competitions.domain.model.Competition
 import org.iesharia.features.competitions.domain.model.MatchDay
 import org.iesharia.features.competitions.ui.viewmodel.CompetitionDetailUiState
 import org.iesharia.features.competitions.ui.viewmodel.CompetitionDetailViewModel
@@ -265,129 +262,6 @@ private fun CompetitionDetailContent(
         // Espacio al final
         item {
             Spacer(modifier = Modifier.height(WrestlingTheme.dimensions.spacing_16))
-        }
-    }
-}
-
-@Composable
-private fun CompetitionBanner(competition: Competition) {
-    val season = try {
-        val years = competition.season.split("-")
-        if (years.size == 2) {
-            "${years[0]}/${years[1].takeLast(2)}"
-        } else {
-            competition.season
-        }
-    } catch (e: Exception) {
-        competition.season
-    }
-
-    Surface(
-        color = MaterialTheme.colorScheme.primaryContainer,
-        modifier = Modifier.fillMaxWidth()
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = WrestlingTheme.dimensions.spacing_16,
-                    vertical = WrestlingTheme.dimensions.spacing_16),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            // Icono de trofeo
-            Box(
-                modifier = Modifier
-                    .size(80.dp)
-                    .clip(CircleShape)
-                    .background(Color(0x20FFFFFF)),
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(
-                    imageVector = Icons.Default.EmojiEvents,
-                    contentDescription = null,
-                    modifier = Modifier.size(48.dp),
-                    tint = Color.White.copy(alpha = 0.9f)
-                )
-            }
-
-            Spacer(modifier = Modifier.width(WrestlingTheme.dimensions.spacing_16))
-
-            // Información de la competición
-            Column(
-                modifier = Modifier.weight(1f)
-            ) {
-                Text(
-                    text = competition.name,
-                    style = MaterialTheme.typography.headlineSmall,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.White
-                )
-
-                Text(
-                    text = "Temporada $season",
-                    style = MaterialTheme.typography.titleMedium,
-                    color = Color.White.copy(alpha = 0.8f),
-                    modifier = Modifier.padding(vertical = WrestlingTheme.dimensions.spacing_4)
-                )
-
-                // Chips de filtros
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = WrestlingTheme.dimensions.spacing_8),
-                    horizontalArrangement = Arrangement.spacedBy(WrestlingTheme.dimensions.spacing_8)
-                ) {
-                    // Primera
-                    FilterChip(
-                        selected = false,
-                        onClick = { },
-                        label = {
-                            Text(
-                                text = competition.divisionCategory.displayName(),
-                                style = MaterialTheme.typography.bodyMedium,
-                                fontWeight = FontWeight.Medium
-                            )
-                        },
-                        colors = FilterChipDefaults.filterChipColors(
-                            containerColor = MaterialTheme.colorScheme.primary,
-                            labelColor = Color.White
-                        )
-                    )
-
-                    // Regional
-                    FilterChip(
-                        selected = false,
-                        onClick = { },
-                        label = {
-                            Text(
-                                text = competition.ageCategory.displayName(),
-                                style = MaterialTheme.typography.bodyMedium,
-                                fontWeight = FontWeight.Medium
-                            )
-                        },
-                        colors = FilterChipDefaults.filterChipColors(
-                            containerColor = MaterialTheme.colorScheme.secondary,
-                            labelColor = Color.White
-                        )
-                    )
-
-                    // Tenerife
-                    FilterChip(
-                        selected = false,
-                        onClick = { },
-                        label = {
-                            Text(
-                                text = competition.island.displayName(),
-                                style = MaterialTheme.typography.bodyMedium,
-                                fontWeight = FontWeight.Medium
-                            )
-                        },
-                        colors = FilterChipDefaults.filterChipColors(
-                            containerColor = MaterialTheme.colorScheme.tertiary,
-                            labelColor = Color.White
-                        )
-                    )
-                }
-            }
         }
     }
 }
