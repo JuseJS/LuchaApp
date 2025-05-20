@@ -10,14 +10,19 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.times
 import org.iesharia.core.domain.model.Favorite
 import org.iesharia.core.resources.AppStrings
+import org.iesharia.core.ui.components.WrestlingButton
+import org.iesharia.core.ui.components.WrestlingButtonType
 import org.iesharia.core.ui.components.common.*
 import org.iesharia.core.ui.screens.BaseContentScreen
 import org.iesharia.core.ui.theme.*
@@ -70,16 +75,39 @@ class HomeScreen : BaseContentScreen() {
     override fun ContentImpl() {
         val uiState by viewModel.uiState.collectAsState()
 
-        // Aplicamos el color de fondo negro puro para optimizar pantallas OLED
         Box(
             modifier = Modifier
                 .fillMaxSize()
                 .background(DarkBackground)
         ) {
-            HomeContent(
-                uiState = uiState,
-                viewModel = viewModel
-            )
+            if (uiState.errorMessage != null) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(WrestlingTheme.dimensions.spacing_16),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(
+                        text = uiState.errorMessage ?: "Error desconocido",
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = MaterialTheme.colorScheme.error,
+                        textAlign = TextAlign.Center
+                    )
+
+                    Spacer(modifier = Modifier.height(WrestlingTheme.dimensions.spacing_16))
+
+                    WrestlingButton(
+                        text = "Reintentar",
+                        onClick = { viewModel.reloadData() },
+                        type = WrestlingButtonType.PRIMARY
+                    )
+                }
+            } else {
+                HomeContent(
+                    uiState = uiState,
+                    viewModel = viewModel
+                )
+            }
         }
     }
 }
