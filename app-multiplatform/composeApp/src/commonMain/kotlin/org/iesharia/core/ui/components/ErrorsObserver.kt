@@ -7,16 +7,15 @@ import kotlinx.coroutines.flow.SharedFlow
 import org.iesharia.core.domain.model.AppError
 
 /**
- * Componente que observa múltiples flujos de errores y los muestra en un SnackbarHostState.
- * Permite centralizar la observación de errores desde múltiples fuentes (ViewModels, managers, etc.)
- * en un solo lugar para mostrarlos en la UI.
- *
- * Este componente reemplaza la necesidad de tener varios ErrorObserver para diferentes ViewModels.
- *
- * @param errorFlows Array de SharedFlow<AppError> a observar
- * @param snackbarHostState SnackbarHostState donde se mostrarán los errores
- * @param actionLabel Etiqueta opcional para la acción del Snackbar (por defecto "OK")
- * @param onAction Callback opcional que se invoca cuando el usuario pulsa la acción
+ * Interfaz que deben implementar los ViewModels que emiten errores
+ */
+interface ErrorEmitting {
+    val errors: SharedFlow<AppError>
+}
+
+/**
+ * Componente unificado para manejar errores de múltiples fuentes
+ * Reemplaza completamente ErrorObserver y ViewModelErrorHandler
  */
 @Composable
 fun ErrorsObserver(
@@ -34,8 +33,8 @@ fun ErrorsObserver(
                     message = error.message,
                     actionLabel = actionLabel
                 )
-                
-                // Si se pulsa la acción, invocar el callback con el error
+
+                // Sí se pulsa la acción, invocar el callback con el error
                 if (result == androidx.compose.material3.SnackbarResult.ActionPerformed) {
                     onAction(error)
                 }
@@ -45,13 +44,7 @@ fun ErrorsObserver(
 }
 
 /**
- * Versión simplificada que acepta un solo ViewModel y observa su flujo de errores.
- * Es similar al componente ErrorObserver original pero con parámetros mejorados.
- *
- * @param viewModel ViewModel con un flujo de errores (debe implementar ErrorEmitting)
- * @param snackbarHostState SnackbarHostState donde se mostrarán los errores
- * @param actionLabel Etiqueta opcional para la acción del Snackbar
- * @param onAction Callback opcional que se invoca cuando el usuario pulsa la acción
+ * Versión optimizada para un solo ViewModel
  */
 @Composable
 fun <T : ErrorEmitting> ViewModelErrorObserver(
@@ -66,11 +59,4 @@ fun <T : ErrorEmitting> ViewModelErrorObserver(
         actionLabel = actionLabel,
         onAction = onAction
     )
-}
-
-/**
- * Interfaz que deben implementar los ViewModels que emiten errores
- */
-interface ErrorEmitting {
-    val errors: SharedFlow<AppError>
 }
