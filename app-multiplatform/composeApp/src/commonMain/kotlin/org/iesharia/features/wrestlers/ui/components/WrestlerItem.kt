@@ -207,16 +207,20 @@ private fun WrestlerResultsSection(
 /**
  * Component to display a wrestling match
  */
+/**
+ * Component to display a wrestling match
+ */
 @Composable
 fun WrestlerMatchResultView(
     result: WrestlerMatchResult,
     wrestler: Wrestler
 ) {
-    ItemCard(
+    EntityListItem(
+        onClick = { /* No acción en este caso */ },
         modifier = Modifier.fillMaxWidth(),
         containerColor = DarkSurface2,
-        contentPadding = PaddingValues(WrestlingTheme.dimensions.spacing_12),
-        title = {
+        leadingContent = null,
+        titleContent = {
             // Date and result
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -243,81 +247,82 @@ fun WrestlerMatchResultView(
                     status = status
                 )
             }
-        }
-    ) {
-        Spacer(modifier = Modifier.height(WrestlingTheme.dimensions.spacing_12))
+        },
+        detailContent = {
+            Spacer(modifier = Modifier.height(WrestlingTheme.dimensions.spacing_12))
 
-        // Match between wrestlers
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            // Main wrestler
-            WrestlerInfoColumn(
-                name = wrestler.fullName,
-                classification = wrestler.classification.displayName(),
-                fouls = result.fouls,
-                modifier = Modifier.weight(1f)
-            )
-
-            // Center separator
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier.padding(horizontal = 8.dp)
+            // Match between wrestlers
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Text(
-                    text = AppStrings.Wrestlers.vs,
-                    style = MaterialTheme.typography.bodyMedium,
-                    fontWeight = FontWeight.Bold,
-                    color = CanaryBlueLight
+                // Main wrestler
+                WrestlerInfoColumn(
+                    name = wrestler.fullName,
+                    classification = wrestler.classification.displayName(),
+                    fouls = result.fouls,
+                    modifier = Modifier.weight(1f)
                 )
 
-                // Category
-                Spacer(modifier = Modifier.height(4.dp))
-                Text(
-                    text = result.category,
-                    style = MaterialTheme.typography.labelSmall,
-                    color = White80,
-                    textAlign = TextAlign.Center
+                // Center separator
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier.padding(horizontal = 8.dp)
+                ) {
+                    Text(
+                        text = AppStrings.Wrestlers.vs,
+                        style = MaterialTheme.typography.bodyMedium,
+                        fontWeight = FontWeight.Bold,
+                        color = CanaryBlueLight
+                    )
+
+                    // Category
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text(
+                        text = result.category,
+                        style = MaterialTheme.typography.labelSmall,
+                        color = White80,
+                        textAlign = TextAlign.Center
+                    )
+                }
+
+                // Opponent
+                WrestlerInfoColumn(
+                    name = result.opponentName,
+                    classification = result.classification,
+                    fouls = result.opponentFouls,
+                    modifier = Modifier.weight(1f)
                 )
             }
 
-            // Opponent
-            WrestlerInfoColumn(
-                name = result.opponentName,
-                classification = result.classification,
-                fouls = result.opponentFouls,
-                modifier = Modifier.weight(1f)
-            )
-        }
+            // Grips section
+            Spacer(modifier = Modifier.height(WrestlingTheme.dimensions.spacing_12))
 
-        // Grips section
-        Spacer(modifier = Modifier.height(WrestlingTheme.dimensions.spacing_12))
-
-        Text(
-            text = AppStrings.Wrestlers.agarradas,
-            style = MaterialTheme.typography.labelMedium,
-            fontWeight = FontWeight.Medium,
-            color = SandLight
-        )
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        // Get grips from result
-        val grips = createGripsFromResult(result, wrestler.fullName)
-
-        // Display grips
-        grips.forEachIndexed { index, grip ->
-            GripItem(
-                grip = grip,
-                gripNumber = index + 1
+            Text(
+                text = AppStrings.Wrestlers.agarradas,
+                style = MaterialTheme.typography.labelMedium,
+                fontWeight = FontWeight.Medium,
+                color = SandLight
             )
 
-            if (index < grips.size - 1) {
-                Spacer(modifier = Modifier.height(4.dp))
+            Spacer(modifier = Modifier.height(8.dp))
+
+            // Get grips from result
+            val grips = createGripsFromResult(result, wrestler.fullName)
+
+            // Display grips
+            grips.forEachIndexed { index, grip ->
+                GripItem(
+                    grip = grip,
+                    gripNumber = index + 1
+                )
+
+                if (index < grips.size - 1) {
+                    Spacer(modifier = Modifier.height(4.dp))
+                }
             }
         }
-    }
+    )
 }
 
 /**
