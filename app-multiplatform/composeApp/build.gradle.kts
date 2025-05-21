@@ -54,6 +54,9 @@ kotlin {
             implementation(libs.koin.compose)
         }
     }
+    sourceSets.commonMain.dependencies {
+        implementation(kotlin("reflect"))
+    }
 }
 
 android {
