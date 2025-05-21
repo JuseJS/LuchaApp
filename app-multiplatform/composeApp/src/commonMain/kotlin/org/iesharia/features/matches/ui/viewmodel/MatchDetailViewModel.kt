@@ -4,6 +4,7 @@ import org.iesharia.core.common.BaseViewModel
 import org.iesharia.core.common.ErrorHandler
 import org.iesharia.core.domain.model.AppError
 import org.iesharia.core.navigation.NavigationManager
+import org.iesharia.core.navigation.Routes
 import org.iesharia.features.matches.domain.repository.MatchRepository
 import org.iesharia.features.matches.domain.usecase.GetMatchDetailsUseCase
 
@@ -98,6 +99,17 @@ class MatchDetailViewModel(
      */
     fun navigateToWrestlerDetail(wrestlerId: String) {
         navigateToEntityDetail(EntityType.WRESTLER, wrestlerId)
+    }
+
+    /**
+     * Navega a la pantalla de acta del enfrentamiento
+     */
+    fun navigateToMatchAct() {
+        navigationManager?.let { manager ->
+            launchSafe {
+                manager.navigateWithParams(Routes.Match.Act(), matchId)
+            }
+        }
     }
 
     /**
