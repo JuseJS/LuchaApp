@@ -14,6 +14,7 @@ import kotlinx.datetime.toJavaLocalDate
 import org.iesharia.core.ui.components.common.InfoRow
 import org.iesharia.core.ui.components.common.InfoRowStyle
 import org.iesharia.core.ui.components.common.SectionDivider
+import org.iesharia.core.ui.components.common.SectionDividerType
 import org.iesharia.core.ui.theme.WrestlingTheme
 import org.iesharia.features.wrestlers.domain.model.Wrestler
 import java.time.format.DateTimeFormatter
@@ -34,8 +35,11 @@ fun WrestlerPersonalInfoSection(
             .fillMaxWidth()
             .padding(horizontal = WrestlingTheme.dimensions.spacing_16)
     ) {
-        // Usar SectionDivider en lugar del título simple
-        SectionDivider(title = "Información Personal")
+        // Usar SectionDivider con tipo para mantener consistencia
+        SectionDivider(
+            title = "Información Personal",
+            type = SectionDividerType.PRIMARY
+        )
 
         Spacer(modifier = Modifier.height(WrestlingTheme.dimensions.spacing_16))
 
@@ -73,46 +77,30 @@ fun WrestlerPersonalInfoSection(
                         .padding(vertical = WrestlingTheme.dimensions.spacing_8),
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    // Altura
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally,
+                    // Altura - usando InfoRow en estilo centrado
+                    InfoRow(
+                        label = "Altura",
+                        value = wrestler.height?.toString()?.plus(" cm") ?: "-",
+                        style = InfoRowStyle.CENTERED,
+                        labelColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                        valueColor = MaterialTheme.colorScheme.onSurface,
                         modifier = Modifier.weight(1f)
-                    ) {
-                        Text(
-                            text = "Altura",
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                        Text(
-                            text = wrestler.height?.toString()?.plus(" cm") ?: "-",
-                            style = MaterialTheme.typography.titleLarge,
-                            fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.onSurface
-                        )
-                    }
+                    )
 
                     VerticalDivider(
                         modifier = Modifier.height(40.dp),
                         color = MaterialTheme.colorScheme.outlineVariant
                     )
 
-                    // Peso
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally,
+                    // Peso - usando InfoRow en estilo centrado
+                    InfoRow(
+                        label = "Peso",
+                        value = wrestler.weight?.toString()?.plus(" kg") ?: "-",
+                        style = InfoRowStyle.CENTERED,
+                        labelColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                        valueColor = MaterialTheme.colorScheme.onSurface,
                         modifier = Modifier.weight(1f)
-                    ) {
-                        Text(
-                            text = "Peso",
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                        Text(
-                            text = wrestler.weight?.toString()?.plus(" kg") ?: "-",
-                            style = MaterialTheme.typography.titleLarge,
-                            fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.onSurface
-                        )
-                    }
+                    )
                 }
 
                 HorizontalDivider(
