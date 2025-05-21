@@ -4,6 +4,7 @@ import cafe.adriel.voyager.core.screen.Screen
 import org.iesharia.features.auth.ui.screens.LoginScreen
 import org.iesharia.features.competitions.ui.screens.CompetitionDetailScreen
 import org.iesharia.features.home.ui.screens.HomeScreen
+import org.iesharia.features.matches.ui.screens.MatchActScreen
 import org.iesharia.features.matches.ui.screens.MatchDetailScreen
 import org.iesharia.features.teams.ui.screens.TeamDetailScreen
 import org.iesharia.features.wrestlers.ui.screens.WrestlerDetailScreen
@@ -41,7 +42,15 @@ class NavigationFactory {
             // Enfrentamientos
             is Routes.Match.Detail -> {
                 val matchId = getLastPathSegment(navigationRoute.route)
+                println("NavigationFactory: Creando MatchDetailScreen con ID: $matchId") // Debug
                 MatchDetailScreen(matchId)
+            }
+
+            // Acta de enfrentamiento
+            is Routes.Match.Act -> {
+                val matchId = getLastPathSegment(navigationRoute.route)
+                println("NavigationFactory: Creando MatchActScreen con ID: $matchId") // Debug
+                MatchActScreen(matchId)
             }
 
             // Ruta desconocida
