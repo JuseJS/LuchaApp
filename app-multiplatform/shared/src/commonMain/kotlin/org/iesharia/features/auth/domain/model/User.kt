@@ -5,7 +5,7 @@ data class User(
     val email: String,
     val name: String,
     val surname: String,
-    val role: Role = Role.INVITADO,
+    val role: Role = Role.GUEST,
     val associatedTeamId: String? = null // Solo para rol ENTRENADOR
 ) {
     val fullName: String get() = "$name $surname"
@@ -15,6 +15,6 @@ data class User(
     }
 
     fun isTeamCoach(teamId: String): Boolean {
-        return role == Role.ENTRENADOR && associatedTeamId == teamId
+        return role == Role.COACH && associatedTeamId == teamId
     }
 }

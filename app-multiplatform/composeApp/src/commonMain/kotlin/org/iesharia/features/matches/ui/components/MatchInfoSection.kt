@@ -9,6 +9,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import org.iesharia.core.ui.util.FormatUtils
 import org.iesharia.features.teams.domain.model.Match
 
 /**
@@ -19,16 +20,11 @@ fun MatchInfoSection(
     match: Match,
     modifier: Modifier = Modifier
 ) {
-    // Format date without deprecated method
-    val dateTime = match.date
-    val formattedDate = "${dateTime.dayOfMonth.toString().padStart(2, '0')}/${dateTime.monthNumber.toString().padStart(2, '0')}/${dateTime.year}"
-    val formattedTime = "${dateTime.hour.toString().padStart(2, '0')}:${dateTime.minute.toString().padStart(2, '0')}"
-
     Column(modifier = modifier) {
-        // Fecha y hora del enfrentamiento
+        // Fecha y hora del enfrentamiento utilizando FormatUtils para estandarizar
         MatchInfoRow(
             icon = Icons.Default.Schedule,
-            text = "$formattedDate - $formattedTime"
+            text = FormatUtils.Date.formatShortDateTime(match.date)
         )
 
         Spacer(modifier = Modifier.height(8.dp))

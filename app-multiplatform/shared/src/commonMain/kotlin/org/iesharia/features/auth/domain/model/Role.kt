@@ -1,26 +1,26 @@
 package org.iesharia.features.auth.domain.model
 
 enum class Role {
-    INVITADO,
-    USUARIO_REGISTRADO,
-    ENTRENADOR,
-    DELEGADO_FEDERATIVO;
+    GUEST,
+    REGISTERED_USER,
+    COACH,
+    FEDERATIVE_DELEGATE;
 
     /**
      * Obtiene los permisos para este rol, incluyendo permisos heredados
      */
     fun getPermissions(): Set<Permission> {
         return when (this) {
-            INVITADO -> setOf(
+            GUEST -> setOf(
                 Permission.VIEW_PUBLIC_CONTENT
             )
-            USUARIO_REGISTRADO -> INVITADO.getPermissions() + setOf(
+            REGISTERED_USER -> GUEST.getPermissions() + setOf(
                 Permission.MANAGE_FAVORITES
             )
-            ENTRENADOR -> USUARIO_REGISTRADO.getPermissions() + setOf(
+            COACH -> REGISTERED_USER.getPermissions() + setOf(
                 Permission.MANAGE_TEAM_WRESTLERS
             )
-            DELEGADO_FEDERATIVO -> USUARIO_REGISTRADO.getPermissions() + setOf(
+            FEDERATIVE_DELEGATE -> REGISTERED_USER.getPermissions() + setOf(
                 Permission.MODIFY_MATCH_SCHEDULE,
                 Permission.MANAGE_MATCH_RECORDS
             )
