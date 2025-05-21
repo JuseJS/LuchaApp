@@ -1,73 +1,12 @@
 package org.iesharia.core.ui.components
 
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Snackbar
-import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
-import kotlinx.coroutines.flow.SharedFlow
-import org.iesharia.core.domain.model.AppError
-
 /**
- * Componente para observar errores de un ViewModel y mostrarlos en un SnackbarHostState
+ * Este archivo sirve como punto de entrada para importar todos los componentes de manejo de errores.
+ * Reemplaza al antiguo archivo que contenía múltiples composables.
+ * 
+ * Ahora los componentes están separados en archivos individuales para mejor mantenimiento.
+ * 
+ * Componentes disponibles:
+ * - ErrorObserver: para observar flujos de errores y mostrarlos en un SnackbarHostState
+ * - ErrorSnackbarHost: componente personalizado para mostrar notificaciones de error
  */
-@Composable
-fun ErrorObserver(
-    errorFlow: SharedFlow<AppError>,
-    snackbarHostState: SnackbarHostState,
-    actionLabel: String? = "OK"
-) {
-    LaunchedEffect(errorFlow) {
-        errorFlow.collect { error ->
-            snackbarHostState.showSnackbar(
-                message = error.message,
-                actionLabel = actionLabel
-            )
-        }
-    }
-}
-
-/**
- * Host para snackbar de errores con estilos consistentes
- */
-@Composable
-fun ErrorSnackbarHost(
-    snackbarHostState: SnackbarHostState,
-    modifier: Modifier = Modifier,
-    onAction: () -> Unit = {}
-) {
-    SnackbarHost(
-        hostState = snackbarHostState,
-        modifier = modifier,
-        snackbar = { data ->
-            Snackbar(
-                modifier = Modifier.padding(16.dp),
-                containerColor = MaterialTheme.colorScheme.errorContainer,
-                contentColor = MaterialTheme.colorScheme.onErrorContainer,
-                action = {
-                    data.visuals.actionLabel?.let { actionLabel ->
-                        TextButton(
-                            onClick = {
-                                data.performAction()
-                                onAction()
-                            }
-                        ) {
-                            Text(
-                                text = actionLabel,
-                                color = MaterialTheme.colorScheme.error
-                            )
-                        }
-                    }
-                }
-            ) {
-                Text(text = data.visuals.message)
-            }
-        }
-    )
-}
