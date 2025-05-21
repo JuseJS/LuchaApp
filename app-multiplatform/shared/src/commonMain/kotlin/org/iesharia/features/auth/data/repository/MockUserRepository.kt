@@ -19,14 +19,14 @@ class MockUserRepository(
             email = "admin@test.com",
             name = "Admin",
             surname = "User",
-            role = Role.DELEGADO_FEDERATIVO
+            role = Role.FEDERATIVE_DELEGATE
         ),
         "coach@test.com" to User(
             id = "coach1",
             email = "coach@test.com",
             name = "Coach",
             surname = "User",
-            role = Role.ENTRENADOR,
+            role = Role.COACH,
             associatedTeamId = "team1" // Asociado con el equipo Tegueste
         ),
         "user@test.com" to User(
@@ -34,7 +34,7 @@ class MockUserRepository(
             email = "user@test.com",
             name = "Regular",
             surname = "User",
-            role = Role.USUARIO_REGISTRADO
+            role = Role.REGISTERED_USER
         )
     )
 
@@ -54,7 +54,7 @@ class MockUserRepository(
                 email = email,
                 name = "New",
                 surname = "User",
-                role = Role.USUARIO_REGISTRADO
+                role = Role.REGISTERED_USER
             )
 
             // Almacenar en la base de datos mock si no existe
@@ -90,7 +90,7 @@ class MockUserRepository(
                 email = email,
                 name = name,
                 surname = surname,
-                role = Role.USUARIO_REGISTRADO
+                role = Role.REGISTERED_USER
             )
 
             // Almacenar en la base de datos mock
@@ -117,7 +117,7 @@ class MockUserRepository(
     }
 
     override suspend fun getUserRole(userId: String): Role {
-        return users.values.find { it.id == userId }?.role ?: Role.INVITADO
+        return users.values.find { it.id == userId }?.role ?: Role.GUEST
     }
 
     override suspend fun updateUserRole(userId: String, role: Role): Boolean {
@@ -139,7 +139,7 @@ class MockUserRepository(
         val user = users.values.find { it.id == userId } ?: return false
 
         // Asegurar que el usuario sea entrenador
-        if (user.role != Role.ENTRENADOR) {
+        if (user.role != Role.COACH) {
             return false
         }
 
