@@ -16,48 +16,26 @@ import org.iesharia.features.wrestlers.ui.viewmodel.WrestlerStatistics
 fun WrestlerStatisticsSection(
     statisticsByClassification: Map<WrestlerClassification, WrestlerStatistics>
 ) {
-    // Calcular totales para el resumen
-    val totalMatches = statisticsByClassification.values.sumOf { it.total }
-    val totalWins = statisticsByClassification.values.sumOf { it.wins }
-    val totalLosses = statisticsByClassification.values.sumOf { it.losses }
-    val totalDraws = statisticsByClassification.values.sumOf { it.draws }
-    val totalPoints = statisticsByClassification.values.sumOf { it.points }
-    val overallEffectiveness = if (totalMatches > 0) {
-        (totalPoints / totalMatches) * 100.0
-    } else {
-        0.0
-    }
-
-    // Categorizar por tipo de luchador
-    val puntalesMatches = statisticsByClassification
-        .filter { it.key in listOf(WrestlerClassification.PUNTAL_A, WrestlerClassification.PUNTAL_B, WrestlerClassification.PUNTAL_C) }
-        .values.sumOf { it.total }
-
-    val destacadosMatches = statisticsByClassification
-        .filter { it.key in listOf(WrestlerClassification.DESTACADO_A, WrestlerClassification.DESTACADO_B, WrestlerClassification.DESTACADO_C) }
-        .values.sumOf { it.total }
-
-    val otherMatches = statisticsByClassification
-        .filter { it.key == WrestlerClassification.NONE }
-        .values.sumOf { it.total }
+    // Calcular estadísticas agregadas del luchador
+    val statistics = calculateWrestlerStatistics(statisticsByClassification)
 
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = WrestlingTheme.dimensions.spacing_16)
     ) {
-        // Reemplazado el título con el componente SectionDivider
+        // Título de la sección
         SectionDivider(title = "Rendimiento")
 
         Spacer(modifier = Modifier.height(WrestlingTheme.dimensions.spacing_16))
 
         // Resumen de temporada con mejor visualización
         SeasonSummaryCard(
-            totalMatches = totalMatches,
-            wins = totalWins,
-            losses = totalLosses,
-            draws = totalDraws,
-            effectivenessPercentage = overallEffectiveness
+            totalMatches = statistics.totalMatches,
+            wins = statistics.wins,
+            losses = statistics.losses,
+            draws = statistics.draws,
+            effectivenessPercentage = statistics.effectivenessPercentage
         )
 
         Spacer(modifier = Modifier.height(WrestlingTheme.dimensions.spacing_16))
@@ -69,9 +47,9 @@ fun WrestlerStatisticsSection(
 
         // Enfrentamientos por tipo de luchador
         OpponentTypeBreakdown(
-            puntalesMatches = puntalesMatches,
-            destacadosMatches = destacadosMatches,
-            otherMatches = otherMatches
+            puntalesMatches = statistics.puntalesMatches,
+            destacadosMatches = statistics.destacadosMatches,
+            otherMatches = statistics.otherMatches
         )
     }
 }
