@@ -79,25 +79,25 @@ class WrestlerDetailScreen(private val wrestlerId: String) : BaseContentScreen()
     override fun ContentImpl() {
         val uiState by viewModel.uiState.collectAsState()
 
-        if (uiState.wrestler == null && !uiState.isLoading) {
-            EmptyStateMessage(
-                message = uiState.errorMessage ?: "No se encontró el luchador"
-            )
-        } else if (!uiState.isLoading) {
-            WrestlerDetailContent(
-                viewModel = viewModel
-            )
-        }
-
-        // Añadir un botón de refresco cuando hay un error
         if (uiState.errorMessage != null) {
-            Box(modifier = Modifier.fillMaxWidth().padding(16.dp), contentAlignment = Alignment.Center) {
+            Column(
+                modifier = Modifier.fillMaxWidth().padding(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                EmptyStateMessage(
+                    message = uiState.errorMessage ?: "No se encontró el luchador"
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
                 WrestlingButton(
                     text = "Reintentar",
                     onClick = { viewModel.refreshData() },
                     type = WrestlingButtonType.SECONDARY
                 )
             }
+        } else if (uiState.wrestler != null) {
+            WrestlerDetailContent(viewModel = viewModel)
         }
     }
 }
