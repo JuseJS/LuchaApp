@@ -16,6 +16,8 @@ import org.iesharia.core.ui.components.common.EmptyStateMessage
 import org.iesharia.core.ui.screens.BaseContentScreen
 import org.iesharia.core.ui.theme.WrestlingTheme
 import org.iesharia.di.rememberViewModel
+import org.iesharia.features.auth.domain.model.Permission
+import org.iesharia.features.auth.ui.viewmodel.RoleBasedUIHelper
 import org.iesharia.features.matches.ui.components.MatchHeader
 import org.iesharia.features.matches.ui.components.MatchStatsSection
 import org.iesharia.features.matches.ui.components.RefereeSection
@@ -193,6 +195,24 @@ private fun MatchDetailContent(
                 }
             }
             Spacer(modifier = Modifier.height(WrestlingTheme.dimensions.spacing_24))
+        }
+
+        item {
+            // Asumimos que podemos acceder a la jornada a través del match
+            val match = uiState.match
+            if (match != null && !match.completed && !match.hasAct) {
+                RoleBasedUIHelper.WithPermission(Permission.MANAGE_MATCH_RECORDS) {
+                    Spacer(modifier = Modifier.height(WrestlingTheme.dimensions.spacing_24))
+                    Box(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)) {
+                        WrestlingButton(
+                            text = "Iniciar Acta",
+                            onClick = { viewModel.navigateToMatchAct() },
+                            type = WrestlingButtonType.PRIMARY,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    }
+                }
+            }
         }
     }
 }
