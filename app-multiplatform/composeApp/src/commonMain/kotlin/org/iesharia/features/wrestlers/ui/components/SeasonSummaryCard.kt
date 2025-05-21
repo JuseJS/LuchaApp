@@ -10,8 +10,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import org.iesharia.core.ui.components.common.DataDisplayBox
 import org.iesharia.core.ui.theme.WrestlingTheme
-import org.iesharia.features.wrestlers.ui.util.getEffectivenessColor
+import org.iesharia.core.ui.util.FormatUtils
 
 /**
  * Tarjeta de resumen de temporada
@@ -27,7 +28,6 @@ fun SeasonSummaryCard(
     Card(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(
-            // Usar color del tema con transparencia para mantener consistencia
             containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
         ),
         shape = WrestlingTheme.shapes.medium
@@ -51,38 +51,43 @@ fun SeasonSummaryCard(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                // Luchadas
-                StatisticBox(
+                // Luchadas - ahora usando DataDisplayBox
+                DataDisplayBox(
                     label = "Luchadas",
                     value = totalMatches.toString(),
                     color = MaterialTheme.colorScheme.primary,
+                    backgroundColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.1f),
+                    useCard = true,
                     modifier = Modifier.weight(1f)
                 )
 
-                // Victorias
-                StatisticBox(
+                // Victorias - ahora usando DataDisplayBox
+                DataDisplayBox(
                     label = "Victorias",
                     value = wins.toString(),
                     color = MaterialTheme.colorScheme.tertiary,
                     backgroundColor = MaterialTheme.colorScheme.tertiaryContainer,
+                    useCard = true,
                     modifier = Modifier.weight(1f)
                 )
 
-                // Derrotas
-                StatisticBox(
+                // Derrotas - ahora usando DataDisplayBox
+                DataDisplayBox(
                     label = "Derrotas",
                     value = losses.toString(),
                     color = MaterialTheme.colorScheme.error,
                     backgroundColor = MaterialTheme.colorScheme.errorContainer,
+                    useCard = true,
                     modifier = Modifier.weight(1f)
                 )
 
-                // Empates
-                StatisticBox(
+                // Empates - ahora usando DataDisplayBox
+                DataDisplayBox(
                     label = "Empates",
                     value = draws.toString(),
                     color = MaterialTheme.colorScheme.primary,
                     backgroundColor = MaterialTheme.colorScheme.primaryContainer,
+                    useCard = true,
                     modifier = Modifier.weight(1f)
                 )
             }
@@ -109,7 +114,7 @@ fun SeasonSummaryCard(
                         text = String.format("%.2f%%", effectivenessPercentage),
                         style = MaterialTheme.typography.bodyLarge,
                         fontWeight = FontWeight.Bold,
-                        color = getEffectivenessColor(effectivenessPercentage)
+                        color = FormatUtils.Number.getPerformanceColor(effectivenessPercentage)
                     )
                 }
 
@@ -128,7 +133,7 @@ fun SeasonSummaryCard(
                             .fillMaxWidth(effectivenessPercentage.toFloat() / 100f)
                             .height(8.dp)
                             .clip(RoundedCornerShape(4.dp))
-                            .background(getEffectivenessColor(effectivenessPercentage))
+                            .background(FormatUtils.Number.getPerformanceColor(effectivenessPercentage))
                     )
                 }
             }
