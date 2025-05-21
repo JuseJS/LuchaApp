@@ -87,5 +87,16 @@ object Routes {
 
             override fun createRoute(params: String): String = "$baseRoute/$params"
         }
+
+        /**
+         * Ruta para la pantalla de acta de enfrentamiento
+         */
+        data class Act(private val matchId: String? = null) : NavigationRouteWithParams<String> {
+            override val baseRoute: String = "match/act"
+            override val route: String
+                get() = if (matchId != null) "$baseRoute/$matchId" else "$baseRoute/{matchId}"
+
+            override fun createRoute(params: String): String = "$baseRoute/$params"
+        }
     }
 }
