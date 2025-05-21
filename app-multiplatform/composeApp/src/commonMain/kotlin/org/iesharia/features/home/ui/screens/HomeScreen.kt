@@ -1,24 +1,17 @@
 package org.iesharia.features.home.ui.screens
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
-import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.style.TextAlign
 import org.iesharia.core.resources.AppStrings
 import org.iesharia.core.ui.components.WrestlingButton
 import org.iesharia.core.ui.components.WrestlingButtonType
-import org.iesharia.core.ui.components.common.EmptyStateMessage
-import org.iesharia.core.ui.components.common.SearchBar
 import org.iesharia.core.ui.screens.BaseContentScreen
-import org.iesharia.core.ui.theme.*
+import org.iesharia.core.ui.theme.DarkBackground
 import org.iesharia.di.rememberViewModel
 import org.iesharia.features.auth.domain.security.SessionManager
 import org.iesharia.features.home.ui.viewmodel.HomeViewModel
