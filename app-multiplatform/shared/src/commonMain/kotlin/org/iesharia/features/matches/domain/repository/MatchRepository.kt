@@ -1,11 +1,9 @@
 package org.iesharia.features.matches.domain.repository
 
+import org.iesharia.features.competitions.domain.model.MatchDay
 import org.iesharia.features.teams.domain.model.Match
 import org.iesharia.features.wrestlers.domain.model.Wrestler
 
-/**
- * Repositorio para operaciones relacionadas con enfrentamientos
- */
 interface MatchRepository {
     /**
      * Obtiene un enfrentamiento por su ID
@@ -28,4 +26,9 @@ interface MatchRepository {
      * Obtiene estadísticas adicionales del enfrentamiento
      */
     suspend fun getMatchStatistics(matchId: String): Map<String, Any>
+
+    /**
+     * Obtiene la jornada a la que pertenece un enfrentamiento
+     */
+    suspend fun getMatchDay(matchId: String): MatchDay?
 }
