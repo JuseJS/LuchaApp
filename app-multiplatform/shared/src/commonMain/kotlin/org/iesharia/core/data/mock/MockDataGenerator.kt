@@ -401,7 +401,7 @@ class MockDataGenerator {
 
         // Enfrentamientos para jornada 1
         val match1 = Match(
-            id = "match1",
+            id = "match1",  // ID explícito
             localTeam = _teams[0], // Tegueste
             visitorTeam = _teams[2], // Unión Sardina
             localScore = 12,
@@ -469,21 +469,24 @@ class MockDataGenerator {
             id = "matchday1",
             number = 1,
             matches = listOf(match1, match2),
-            competitionId = "comp1"
+            competitionId = "comp1",
+            ended = true
         )
 
         val matchDay2 = MatchDay(
             id = "matchday2",
             number = 2,
             matches = listOf(match3, match4),
-            competitionId = "comp1"
+            competitionId = "comp1",
+            ended = true
         )
 
         val matchDay3 = MatchDay(
             id = "matchday3",
             number = 3,
             matches = listOf(match5, match6),
-            competitionId = "comp1"
+            competitionId = "comp1",
+            ended = false
         )
 
         // Competiciones
