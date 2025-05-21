@@ -13,7 +13,8 @@ data class Match(
     val visitorScore: Int? = null,
     val date: LocalDateTime,
     val venue: String, // Terrero donde se celebra
-    val completed: Boolean = false
+    val completed: Boolean = false,
+    val hasAct: Boolean = false
 ) {
     /**
      * Determina el equipo ganador del enfrentamiento
