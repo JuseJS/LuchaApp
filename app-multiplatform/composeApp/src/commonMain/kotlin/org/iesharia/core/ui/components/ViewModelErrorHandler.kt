@@ -2,7 +2,6 @@ package org.iesharia.core.ui.components
 
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import org.iesharia.core.common.BaseViewModel
 import org.iesharia.core.common.ErrorHandler
 import org.koin.compose.koinInject
@@ -21,19 +20,9 @@ fun <T> ViewModelErrorHandler(
     snackbarHostState: SnackbarHostState,
     errorHandler: ErrorHandler = koinInject()
 ) {
-    // Observar errores locales del ViewModel
-    ErrorObserver(
-        errorFlow = viewModel.errors,
+    // Observar todos los flujos de errores
+    ErrorsObserver(
+        errorFlows = arrayOf(viewModel.errors, errorHandler.errors),
         snackbarHostState = snackbarHostState
     )
-
-    // Observar errores globales del ErrorHandler
-    LaunchedEffect(Unit) {
-        errorHandler.errors.collect { error ->
-            snackbarHostState.showSnackbar(
-                message = error.message,
-                actionLabel = "OK"
-            )
-        }
-    }
 }
