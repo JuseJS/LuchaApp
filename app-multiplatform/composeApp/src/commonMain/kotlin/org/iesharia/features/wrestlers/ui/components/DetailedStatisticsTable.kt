@@ -11,9 +11,10 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import org.iesharia.core.ui.components.common.DataDisplayBox
 import org.iesharia.core.ui.theme.WrestlingTheme
+import org.iesharia.core.ui.util.FormatUtils
 import org.iesharia.features.wrestlers.domain.model.WrestlerClassification
-import org.iesharia.features.wrestlers.ui.util.getPerformanceColor
 import org.iesharia.features.wrestlers.ui.viewmodel.WrestlerStatistics
 
 /**
@@ -123,15 +124,19 @@ fun DetailedStatisticsTable(
                                 modifier = Modifier.weight(1f),
                                 textAlign = TextAlign.Center
                             )
-                            // Porcentaje de efectividad con color según rendimiento
-                            Text(
-                                text = String.format("%.1f%%", stats.effectivenessPercentage),
-                                style = MaterialTheme.typography.bodyMedium,
-                                fontWeight = FontWeight.SemiBold,
-                                color = getPerformanceColor(stats.effectivenessPercentage),
-                                modifier = Modifier.weight(1.2f),
-                                textAlign = TextAlign.Center
-                            )
+
+                            // Usar DataDisplayBox para la efectividad
+                            Box(modifier = Modifier.weight(1.2f)) {
+                                DataDisplayBox(
+                                    label = "",
+                                    value = String.format("%.1f%%", stats.effectivenessPercentage),
+                                    color = FormatUtils.Number.getPerformanceColor(stats.effectivenessPercentage),
+                                    valueStyle = MaterialTheme.typography.bodyMedium,
+                                    padding = PaddingValues(0.dp),
+                                    textAlign = TextAlign.Center,
+                                    useCard = false
+                                )
+                            }
                         }
 
                         // Añadir divisor excepto para el último elemento
