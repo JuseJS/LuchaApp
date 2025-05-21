@@ -2,8 +2,8 @@ package org.iesharia.core.ui.util
 
 import androidx.compose.runtime.Composable
 import kotlinx.datetime.LocalDateTime
-import org.iesharia.features.wrestlers.ui.util.getEffectivenessColor
 import androidx.compose.ui.graphics.Color
+import androidx.compose.material3.MaterialTheme
 
 /**
  * Utilidades para formateo de datos en la UI.
@@ -84,7 +84,12 @@ object FormatUtils {
          */
         @Composable
         fun getPerformanceColor(effectivenessPercentage: Double): Color {
-            return getEffectivenessColor(effectivenessPercentage)
+            return when {
+                effectivenessPercentage >= 85.0 -> MaterialTheme.colorScheme.primary
+                effectivenessPercentage >= 70.0 -> MaterialTheme.colorScheme.secondary
+                effectivenessPercentage >= 50.0 -> MaterialTheme.colorScheme.tertiary
+                else -> MaterialTheme.colorScheme.error
+            }
         }
     }
     
