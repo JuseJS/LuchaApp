@@ -28,74 +28,26 @@ fun FiltersDialog(
         text = {
             Column(modifier = Modifier.fillMaxWidth()) {
                 // Filtro de categoría por edad
-                Text(
-                    text = AppStrings.Competitions.category,
-                    style = MaterialTheme.typography.titleMedium,
-                    modifier = Modifier.padding(vertical = WrestlingTheme.dimensions.spacing_8)
+                AgeCategoryFilter(
+                    selectedCategory = selectedAgeCategory,
+                    onCategorySelected = { selectedAgeCategory = it }
                 )
-
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(WrestlingTheme.dimensions.spacing_8)
-                ) {
-                    AgeCategory.entries.forEach { category ->
-                        FilterChip(
-                            selected = selectedAgeCategory == category,
-                            onClick = {
-                                selectedAgeCategory = if (selectedAgeCategory == category) null else category
-                            },
-                            label = { Text(category.displayName()) }
-                        )
-                    }
-                }
 
                 Spacer(modifier = Modifier.height(WrestlingTheme.dimensions.spacing_16))
 
                 // Filtro de división
-                Text(
-                    text = AppStrings.Competitions.division,
-                    style = MaterialTheme.typography.titleMedium,
-                    modifier = Modifier.padding(vertical = WrestlingTheme.dimensions.spacing_8)
+                DivisionCategoryFilter(
+                    selectedDivision = selectedDivisionCategory,
+                    onDivisionSelected = { selectedDivisionCategory = it }
                 )
-
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(WrestlingTheme.dimensions.spacing_8)
-                ) {
-                    DivisionCategory.entries.forEach { division ->
-                        FilterChip(
-                            selected = selectedDivisionCategory == division,
-                            onClick = {
-                                selectedDivisionCategory = if (selectedDivisionCategory == division) null else division
-                            },
-                            label = { Text(division.displayName()) }
-                        )
-                    }
-                }
 
                 Spacer(modifier = Modifier.height(WrestlingTheme.dimensions.spacing_16))
 
                 // Filtro de isla
-                Text(
-                    text = AppStrings.Competitions.island,
-                    style = MaterialTheme.typography.titleMedium,
-                    modifier = Modifier.padding(vertical = WrestlingTheme.dimensions.spacing_8)
+                IslandFilter(
+                    selectedIsland = selectedIsland,
+                    onIslandSelected = { selectedIsland = it }
                 )
-
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(WrestlingTheme.dimensions.spacing_8)
-                ) {
-                    Island.entries.forEach { island ->
-                        FilterChip(
-                            selected = selectedIsland == island,
-                            onClick = {
-                                selectedIsland = if (selectedIsland == island) null else island
-                            },
-                            label = { Text(island.displayName()) }
-                        )
-                    }
-                }
             }
         },
         confirmButton = {
