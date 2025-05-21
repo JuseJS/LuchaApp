@@ -81,27 +81,30 @@ class CompetitionDetailScreen(private val competitionId: String) : BaseContentSc
     override fun ContentImpl() {
         val uiState by viewModel.uiState.collectAsState()
 
-        if (uiState.competition == null && !uiState.isLoading) {
-            EmptyStateMessage(
-                message = uiState.errorMessage ?: "No se encontró la competición"
-            )
-        } else if (!uiState.isLoading) {
-            CompetitionDetailContent(
-                uiState = uiState,
-                onTeamClick = { teamId -> viewModel.navigateToTeamDetail(teamId) },
-                onMatchClick = { matchId -> viewModel.navigateToMatchDetail(matchId) }
-            )
-        }
-
-        // Añadir opción de refresco consistente con las otras pantallas
+        // Simplificar lógica de manejo de errores para ser consistente con otras pantallas
         if (uiState.errorMessage != null) {
-            Box(modifier = Modifier.fillMaxWidth().padding(16.dp), contentAlignment = Alignment.Center) {
+            Column(
+                modifier = Modifier.fillMaxWidth().padding(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                EmptyStateMessage(
+                    message = uiState.errorMessage ?: "No se encontró la competición"
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
                 WrestlingButton(
                     text = "Reintentar",
                     onClick = { viewModel.refreshData() },
                     type = WrestlingButtonType.SECONDARY
                 )
             }
+        } else if (uiState.competition != null) {
+            CompetitionDetailContent(
+                uiState = uiState,
+                onTeamClick = { teamId -> viewModel.navigateToTeamDetail(teamId) },
+                onMatchClick = { matchId -> viewModel.navigateToMatchDetail(matchId) }
+            )
         }
     }
 }
