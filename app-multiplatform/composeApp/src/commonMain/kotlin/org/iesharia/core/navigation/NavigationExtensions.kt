@@ -32,6 +32,8 @@ fun Navigator.HandleNavigationManager(
                         is Routes.Competition.Detail -> Routes.Competition.Detail(params as String)
                         is Routes.Team.Detail -> Routes.Team.Detail(params as String)
                         is Routes.Wrestler.Detail -> Routes.Wrestler.Detail(params as String)
+                        is Routes.Match.Detail -> Routes.Match.Detail(params as String)
+                        is Routes.Match.Act -> Routes.Match.Act(params as String)
                         else -> route
                     }
 
