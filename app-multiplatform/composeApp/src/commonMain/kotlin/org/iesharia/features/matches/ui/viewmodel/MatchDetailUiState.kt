@@ -1,5 +1,6 @@
 package org.iesharia.features.matches.ui.viewmodel
 
+import org.iesharia.features.competitions.domain.model.MatchDay
 import org.iesharia.features.teams.domain.model.Match
 import org.iesharia.features.wrestlers.domain.model.Wrestler
 
@@ -10,6 +11,7 @@ data class MatchDetailUiState(
     val isLoading: Boolean = true,
     val errorMessage: String? = null,
     val match: Match? = null,
+    val matchDay: MatchDay? = null,
     val localTeamWrestlers: List<Wrestler> = emptyList(),
     val visitorTeamWrestlers: List<Wrestler> = emptyList(),
     val referee: String? = null,
