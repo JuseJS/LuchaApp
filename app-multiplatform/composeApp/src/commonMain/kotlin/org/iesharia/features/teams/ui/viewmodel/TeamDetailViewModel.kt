@@ -2,7 +2,6 @@ package org.iesharia.features.teams.ui.viewmodel
 
 import org.iesharia.core.common.BaseViewModel
 import org.iesharia.core.common.ErrorHandler
-import org.iesharia.core.domain.model.AppError
 import org.iesharia.core.domain.model.Favorite
 import org.iesharia.core.navigation.NavigationManager
 import org.iesharia.features.common.domain.usecase.GetFavoritesUseCase
@@ -25,10 +24,11 @@ class TeamDetailViewModel(
         loadTeamDetails()
     }
 
-    // Método para cargar datos
+    // Método para cargar datos usando la función existente en BaseViewModel
     private fun loadTeamDetails() {
         updateState { it.copy(isLoading = true, errorMessage = null) }
 
+        // Usar la función loadEntity de BaseViewModel
         loadEntity(
             entityId = teamId,
             fetchEntity = {
@@ -94,20 +94,9 @@ class TeamDetailViewModel(
     }
 
     /**
-     * Sobrescribir el método de actualización de estado con error
-     */
-    override fun updateErrorState(currentState: TeamDetailUiState, error: AppError): TeamDetailUiState {
-        return currentState.copy(
-            isLoading = false,
-            errorMessage = error.message
-        )
-    }
-
-    /**
      * Método público para recargar datos
      */
     fun refreshData() {
-        updateState { it.copy(isLoading = true, errorMessage = null) }
         loadTeamDetails()
     }
 
