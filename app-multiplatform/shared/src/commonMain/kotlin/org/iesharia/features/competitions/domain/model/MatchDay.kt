@@ -10,7 +10,8 @@ data class MatchDay(
     val id: String,
     val number: Int,
     val matches: List<Match>,
-    val competitionId: String
+    val competitionId: String,
+    val ended: Boolean = false
 ) {
     /**
      * Fecha del primer enfrentamiento de la jornada
