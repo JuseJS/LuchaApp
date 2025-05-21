@@ -2,6 +2,7 @@ package org.iesharia.features.matches.data.repository
 
 import org.iesharia.core.data.mock.MockDataGenerator
 import org.iesharia.core.domain.model.AppError
+import org.iesharia.features.competitions.domain.model.MatchDay
 import org.iesharia.features.matches.domain.repository.MatchRepository
 import org.iesharia.features.teams.domain.model.Match
 import org.iesharia.features.wrestlers.domain.model.Wrestler
@@ -12,7 +13,7 @@ class MockMatchRepository(
 ) : MatchRepository {
 
     override suspend fun getMatch(matchId: String): Match? {
-        println("Buscando match con ID: $matchId")
+        println("Buscando match con ID: $matchId") // Corregir la interpolación de cadenas
 
         try {
             // Primero busca el enfrentamiento y guarda resultados intermedios
@@ -24,16 +25,22 @@ class MockMatchRepository(
 
             println("Total de matches encontrados: ${allMatches.size}")
 
+            // Debug adicional para encontrar el problema
+            allMatches.forEach { match ->
+                println("Match disponible: ID=${match.id}, ${match.localTeam.name} vs ${match.visitorTeam.name}")
+            }
+
             // Busca el match específico e imprime información
             val match = allMatches.find { it.id == matchId }
             if (match != null) {
                 println("Match encontrado: ${match.localTeam.name} vs ${match.visitorTeam.name}")
+                return match
             } else {
                 println("No se encontró match con ID: $matchId")
-                return allMatches.firstOrNull()
+                // Aquí está el problema - no debería devolver el primero si no encuentra ninguno
+                // Cambiemos esto para devolver null
+                return null
             }
-
-            return match
         } catch (e: Exception) {
             println("Error al buscar match: ${e.message}")
             throw AppError.ServerError(message = "Error al obtener enfrentamiento: ${e.message}")
@@ -46,7 +53,6 @@ class MockMatchRepository(
         // Obtener luchadores de cada equipo
         val localTeamWrestlers = mockDataGenerator.wrestlers.filter { it.teamId == match.localTeam.id }
             .sortedBy { wrestler ->
-                // Ordenar por clasificación (Puntales primero, luego Destacados, etc.)
                 WrestlerClassification.getOrderedValues().indexOf(wrestler.classification)
             }
 
@@ -56,6 +62,30 @@ class MockMatchRepository(
             }
 
         return Triple(match, localTeamWrestlers, visitorTeamWrestlers)
+    }
+
+    override suspend fun getMatchDay(matchId: String): MatchDay? {
+        try {
+            // Mejorar la búsqueda de la jornada
+            for (competition in mockDataGenerator.competitions) {
+                for (matchDay in competition.matchDays) {
+                    // Imprimir información de diagnóstico
+                    val matchIds = matchDay.matches.map { it.id }
+                    println("Jornada ${matchDay.id} contiene matches: $matchIds")
+
+                    // Buscar el match en esta jornada
+                    if (matchDay.matches.any { it.id == matchId }) {
+                        println("¡Encontrada jornada ${matchDay.id} para match $matchId!")
+                        return matchDay
+                    }
+                }
+            }
+            println("No se encontró ninguna jornada para el match $matchId")
+            return null
+        } catch (e: Exception) {
+            println("Error al obtener jornada: ${e.message}")
+            throw AppError.ServerError(message = "Error al obtener la jornada: ${e.message}")
+        }
     }
 
     override suspend fun getMatchReferees(matchId: String): Pair<String, List<String>> {
