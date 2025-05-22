@@ -130,12 +130,127 @@ private fun MatchActContent(viewModel: MatchActViewModel) {
             Spacer(modifier = Modifier.height(WrestlingTheme.dimensions.spacing_24))
         }
 
+        // NUEVA SECCIÓN DE COMENTARIOS
+        item {
+            MatchActCommentsSection(viewModel = viewModel)
+            Spacer(modifier = Modifier.height(WrestlingTheme.dimensions.spacing_24))
+        }
+
         item {
             WrestlingButton(
                 text = "Finalizar Acta",
                 onClick = { viewModel.finishAct() },
                 type = WrestlingButtonType.PRIMARY,
                 modifier = Modifier.fillMaxWidth()
+            )
+        }
+    }
+}
+
+/**
+ * Nueva sección de comentarios siguiendo el patrón de diseño del proyecto
+ */
+@Composable
+private fun MatchActCommentsSection(viewModel: MatchActViewModel) {
+    val uiState by viewModel.uiState.collectAsState()
+
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
+        ),
+        shape = WrestlingTheme.shapes.medium
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(WrestlingTheme.dimensions.spacing_16)
+        ) {
+            SectionDivider(
+                title = "Comentarios",
+                type = SectionDividerType.PRIMARY
+            )
+
+            Spacer(modifier = Modifier.height(WrestlingTheme.dimensions.spacing_16))
+
+            // Fila con las tres columnas de comentarios
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(WrestlingTheme.dimensions.spacing_16)
+            ) {
+                // Comentarios Equipo Local
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = "Equipo Local",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.padding(bottom = WrestlingTheme.dimensions.spacing_8)
+                    )
+
+                    WrestlingTextField(
+                        value = uiState.localTeamComments,
+                        onValueChange = { viewModel.setLocalTeamComments(it) },
+                        label = "Comentarios del equipo local",
+                        placeholder = "Ingrese observaciones sobre el equipo local...",
+                        singleLine = false,
+                        maxLines = 6,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+
+                // Comentarios Equipo Visitante
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = "Equipo Visitante",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.secondary,
+                        modifier = Modifier.padding(bottom = WrestlingTheme.dimensions.spacing_8)
+                    )
+
+                    WrestlingTextField(
+                        value = uiState.visitorTeamComments,
+                        onValueChange = { viewModel.setVisitorTeamComments(it) },
+                        label = "Comentarios del equipo visitante",
+                        placeholder = "Ingrese observaciones sobre el equipo visitante...",
+                        singleLine = false,
+                        maxLines = 6,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+
+                // Comentarios Árbitro
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = "Árbitro",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.tertiary,
+                        modifier = Modifier.padding(bottom = WrestlingTheme.dimensions.spacing_8)
+                    )
+
+                    WrestlingTextField(
+                        value = uiState.refereeComments,
+                        onValueChange = { viewModel.setRefereeComments(it) },
+                        label = "Comentarios del arbitraje",
+                        placeholder = "Ingrese observaciones sobre el desarrollo del arbitraje...",
+                        singleLine = false,
+                        maxLines = 6,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(WrestlingTheme.dimensions.spacing_12))
+
+            // Nota informativa usando el estilo del proyecto
+            Text(
+                text = "* Los comentarios quedarán registrados en el acta oficial del enfrentamiento",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.fillMaxWidth(),
+                textAlign = TextAlign.Center
             )
         }
     }

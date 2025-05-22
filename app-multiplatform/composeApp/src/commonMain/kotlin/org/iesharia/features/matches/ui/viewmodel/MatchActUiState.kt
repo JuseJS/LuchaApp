@@ -1,7 +1,6 @@
 package org.iesharia.features.matches.ui.viewmodel
 
 import org.iesharia.features.competitions.domain.model.MatchDay
-import org.iesharia.features.matches.domain.model.Referee
 import org.iesharia.features.teams.domain.model.Match
 
 /**
@@ -49,7 +48,12 @@ data class MatchActUiState(
     // Desarrollo de la luchada
     val bouts: List<MatchActBout> = listOf(MatchActBout()),
     val localTeamScore: String = "",
-    val visitorTeamScore: String = ""
+    val visitorTeamScore: String = "",
+
+    // Comentarios - NUEVOS CAMPOS
+    val localTeamComments: String = "",
+    val visitorTeamComments: String = "",
+    val refereeComments: String = ""
 )
 
 /**

@@ -1,18 +1,11 @@
 package org.iesharia.features.wrestlers.ui.components
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Person
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -33,15 +26,7 @@ enum class WrestlerDetailLevel {
 }
 
 /**
- * Model representing a grip in canarian wrestling
- */
-data class Grip(
-    val winner: String = "", // Full name of winner
-    val isSeparated: Boolean = false // Indicates if the grip was separated
-)
-
-/**
- * Item to display a wrestler with different detail levels
+ * Item optimizado para mostrar un luchador usando componentes reutilizables
  */
 @Composable
 fun WrestlerItem(
@@ -57,60 +42,18 @@ fun WrestlerItem(
         modifier = modifier,
         containerColor = DarkSurface2,
         leadingContent = {
-            // Avatar del luchador
-            Box(
-                modifier = Modifier
-                    .size(48.dp)
-                    .clip(CircleShape)
-                    .background(MaterialTheme.colorScheme.primaryContainer),
-                contentAlignment = Alignment.Center
-            ) {
-                val hasValidImage = wrestler.imageUrl != null && wrestler.imageUrl!!.isNotEmpty()
-                if (hasValidImage) {
-                    // Implementación de carga de imagen real (no cambiada del original)
-                } else {
-                    Icon(
-                        imageVector = Icons.Default.Person,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.onPrimaryContainer,
-                        modifier = Modifier.size(32.dp)
-                    )
-                }
-            }
+            AvatarBox(
+                size = 48.dp,
+                avatarType = AvatarType.WRESTLER,
+                imageUrl = wrestler.imageUrl,
+                fallbackText = wrestler.fullName,
+                backgroundColor = MaterialTheme.colorScheme.primaryContainer,
+                contentColor = MaterialTheme.colorScheme.onPrimaryContainer
+            )
         },
         titleContent = {
-            Column(horizontalAlignment = Alignment.Start) {
-                Text(
-                    text = wrestler.fullName,
-                    style = MaterialTheme.typography.bodyLarge,
-                    fontWeight = FontWeight.Bold,
-                    color = White90,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
-
-                if (wrestler.nickname != null) {
-                    Spacer(modifier = Modifier.height(4.dp))
-                    Text(
-                        text = "\"${wrestler.nickname}\"",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = SandLight,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
-                    )
-                }
-
-                if (!isGridItem) {
-                    Spacer(modifier = Modifier.height(8.dp))
-                    InfoBadge(
-                        text = wrestler.classification.displayName(),
-                        color = MaterialTheme.colorScheme.primary,
-                        backgroundColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.15f)
-                    )
-                }
-            }
+            WrestlerTitleContent(wrestler, isGridItem)
         },
-        // En vista de grid, mantenemos el chip a la derecha
         trailingContent = if (isGridItem) {
             {
                 InfoBadge(
@@ -122,29 +65,75 @@ fun WrestlerItem(
         } else null,
         detailContent = if (detailLevel != WrestlerDetailLevel.COMPACT && !isGridItem) {
             {
-                if (detailLevel == WrestlerDetailLevel.STANDARD) {
-                    WrestlerBasicInfo(wrestler)
-                } else if (detailLevel == WrestlerDetailLevel.DETAILED) {
-                    WrestlerBasicInfo(wrestler)
-                    if (matchResults.isNotEmpty()) {
-                        Spacer(modifier = Modifier.height(WrestlingTheme.dimensions.spacing_16))
-                        WrestlerResultsSection(wrestler, matchResults)
-                    }
-                }
+                WrestlerDetailContent(
+                    wrestler = wrestler,
+                    matchResults = matchResults,
+                    detailLevel = detailLevel
+                )
             }
         } else null
     )
 }
 
 @Composable
+private fun WrestlerTitleContent(wrestler: Wrestler, isGridItem: Boolean) {
+    Column(horizontalAlignment = Alignment.Start) {
+        Text(
+            text = wrestler.fullName,
+            style = MaterialTheme.typography.bodyLarge,
+            fontWeight = FontWeight.Bold,
+            color = White90,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis
+        )
+
+        wrestler.nickname?.let { nickname ->
+            Spacer(modifier = Modifier.height(4.dp))
+            Text(
+                text = "\"$nickname\"",
+                style = MaterialTheme.typography.bodySmall,
+                color = SandLight,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+        }
+
+        if (!isGridItem) {
+            Spacer(modifier = Modifier.height(8.dp))
+            InfoBadge(
+                text = wrestler.classification.displayName(),
+                color = MaterialTheme.colorScheme.primary,
+                backgroundColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.15f)
+            )
+        }
+    }
+}
+
+@Composable
+private fun WrestlerDetailContent(
+    wrestler: Wrestler,
+    matchResults: List<WrestlerMatchResult>,
+    detailLevel: WrestlerDetailLevel
+) {
+    if (detailLevel == WrestlerDetailLevel.STANDARD) {
+        WrestlerBasicInfo(wrestler)
+    } else if (detailLevel == WrestlerDetailLevel.DETAILED) {
+        WrestlerBasicInfo(wrestler)
+        if (matchResults.isNotEmpty()) {
+            Spacer(modifier = Modifier.height(WrestlingTheme.dimensions.spacing_16))
+            WrestlerResultsSection(wrestler, matchResults)
+        }
+    }
+}
+
+@Composable
 private fun WrestlerBasicInfo(wrestler: Wrestler) {
-    // Additional info row (license, weight, height)
     Spacer(modifier = Modifier.height(WrestlingTheme.dimensions.spacing_8))
+
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        // License number
         InfoRow(
             label = "Licencia",
             value = wrestler.licenseNumber,
@@ -185,33 +174,23 @@ private fun WrestlerResultsSection(
     wrestler: Wrestler,
     matchResults: List<WrestlerMatchResult>
 ) {
-    Text(
-        text = AppStrings.Wrestlers.recentMatches,
-        style = MaterialTheme.typography.titleSmall,
-        color = CanaryBlueLight,
-        fontWeight = FontWeight.Bold
+    SectionDivider(
+        title = AppStrings.Wrestlers.recentMatches,
+        type = SectionDividerType.SUBTITLE,
+        textColor = CanaryBlueLight
     )
 
-    Spacer(modifier = Modifier.height(WrestlingTheme.dimensions.spacing_8))
-
-    // Results list
     matchResults.forEach { result ->
-        WrestlerMatchResultView(
-            result = result,
-            wrestler = wrestler
-        )
+        WrestlerMatchResultCard(result = result, wrestler = wrestler)
         Spacer(modifier = Modifier.height(WrestlingTheme.dimensions.spacing_8))
     }
 }
 
 /**
- * Component to display a wrestling match
- */
-/**
- * Component to display a wrestling match
+ * Tarjeta de resultado de enfrentamiento optimizada usando EntityListItem
  */
 @Composable
-fun WrestlerMatchResultView(
+fun WrestlerMatchResultCard(
     result: WrestlerMatchResult,
     wrestler: Wrestler
 ) {
@@ -219,9 +198,7 @@ fun WrestlerMatchResultView(
         onClick = { /* No acción en este caso */ },
         modifier = Modifier.fillMaxWidth(),
         containerColor = DarkSurface2,
-        leadingContent = null,
         titleContent = {
-            // Date and result
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -233,7 +210,6 @@ fun WrestlerMatchResultView(
                     color = White80
                 )
 
-                // Result badge
                 val status = when(result.result) {
                     WrestlerMatchResult.Result.WIN -> BadgeStatus.SUCCESS
                     WrestlerMatchResult.Result.LOSS -> BadgeStatus.ERROR
@@ -249,85 +225,79 @@ fun WrestlerMatchResultView(
             }
         },
         detailContent = {
-            Spacer(modifier = Modifier.height(WrestlingTheme.dimensions.spacing_12))
-
-            // Match between wrestlers
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                // Main wrestler
-                WrestlerInfoColumn(
-                    name = wrestler.fullName,
-                    classification = wrestler.classification.displayName(),
-                    fouls = result.fouls,
-                    modifier = Modifier.weight(1f)
-                )
-
-                // Center separator
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    modifier = Modifier.padding(horizontal = 8.dp)
-                ) {
-                    Text(
-                        text = AppStrings.Wrestlers.vs,
-                        style = MaterialTheme.typography.bodyMedium,
-                        fontWeight = FontWeight.Bold,
-                        color = CanaryBlueLight
-                    )
-
-                    // Category
-                    Spacer(modifier = Modifier.height(4.dp))
-                    Text(
-                        text = result.category,
-                        style = MaterialTheme.typography.labelSmall,
-                        color = White80,
-                        textAlign = TextAlign.Center
-                    )
-                }
-
-                // Opponent
-                WrestlerInfoColumn(
-                    name = result.opponentName,
-                    classification = result.classification,
-                    fouls = result.opponentFouls,
-                    modifier = Modifier.weight(1f)
-                )
-            }
-
-            // Grips section
-            Spacer(modifier = Modifier.height(WrestlingTheme.dimensions.spacing_12))
-
-            Text(
-                text = AppStrings.Wrestlers.agarradas,
-                style = MaterialTheme.typography.labelMedium,
-                fontWeight = FontWeight.Medium,
-                color = SandLight
-            )
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            // Get grips from result
-            val grips = createGripsFromResult(result, wrestler.fullName)
-
-            // Display grips
-            grips.forEachIndexed { index, grip ->
-                GripItem(
-                    grip = grip,
-                    gripNumber = index + 1
-                )
-
-                if (index < grips.size - 1) {
-                    Spacer(modifier = Modifier.height(4.dp))
-                }
-            }
+            WrestlerMatchResultDetail(result, wrestler)
         }
     )
 }
 
-/**
- * Column displaying wrestler information
- */
+@Composable
+private fun WrestlerMatchResultDetail(
+    result: WrestlerMatchResult,
+    wrestler: Wrestler
+) {
+    Spacer(modifier = Modifier.height(WrestlingTheme.dimensions.spacing_12))
+
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        WrestlerInfoColumn(
+            name = wrestler.fullName,
+            classification = wrestler.classification.displayName(),
+            fouls = result.fouls,
+            modifier = Modifier.weight(1f)
+        )
+
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier.padding(horizontal = 8.dp)
+        ) {
+            Text(
+                text = AppStrings.Wrestlers.vs,
+                style = MaterialTheme.typography.bodyMedium,
+                fontWeight = FontWeight.Bold,
+                color = CanaryBlueLight
+            )
+
+            Spacer(modifier = Modifier.height(4.dp))
+            Text(
+                text = result.category,
+                style = MaterialTheme.typography.labelSmall,
+                color = White80,
+                textAlign = TextAlign.Center
+            )
+        }
+
+        WrestlerInfoColumn(
+            name = result.opponentName,
+            classification = result.classification,
+            fouls = result.opponentFouls,
+            modifier = Modifier.weight(1f)
+        )
+    }
+
+    Spacer(modifier = Modifier.height(WrestlingTheme.dimensions.spacing_12))
+
+    SectionDivider(
+        title = AppStrings.Wrestlers.agarradas,
+        type = SectionDividerType.SUBTITLE,
+        textColor = SandLight
+    )
+
+    val grips = createGripsFromResult(result, wrestler.fullName)
+    grips.forEachIndexed { index, grip ->
+        GripDisplayCard(
+            gripNumber = index + 1,
+            winnerName = grip.winner,
+            isSeparated = grip.isSeparated
+        )
+
+        if (index < grips.size - 1) {
+            Spacer(modifier = Modifier.height(4.dp))
+        }
+    }
+}
+
 @Composable
 private fun WrestlerInfoColumn(
     name: String,
@@ -339,7 +309,6 @@ private fun WrestlerInfoColumn(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier
     ) {
-        // Name
         Text(
             text = name,
             style = MaterialTheme.typography.bodyMedium,
@@ -352,7 +321,6 @@ private fun WrestlerInfoColumn(
 
         Spacer(modifier = Modifier.height(4.dp))
 
-        // Classification badge
         InfoBadge(
             text = classification,
             color = CanaryBlueLight,
@@ -361,7 +329,6 @@ private fun WrestlerInfoColumn(
 
         Spacer(modifier = Modifier.height(4.dp))
 
-        // Fouls badge
         InfoBadge(
             text = AppStrings.Wrestlers.foulsFormat.format(fouls),
             color = if (fouls > 0) TraditionalRedLight else White80,
@@ -373,68 +340,58 @@ private fun WrestlerInfoColumn(
     }
 }
 
-/**
- * Component to display an individual grip
- */
 @Composable
-private fun GripItem(
-    grip: Grip,
-    gripNumber: Int
+private fun GripDisplayCard(
+    gripNumber: Int,
+    winnerName: String,
+    isSeparated: Boolean
 ) {
-    Surface(
-        shape = WrestlingTheme.shapes.small,
-        color = DarkSurface2,
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 8.dp, vertical = 6.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            // Grip number
-            Surface(
-                shape = CircleShape,
-                color = MaterialTheme.colorScheme.primaryContainer,
-                modifier = Modifier.size(24.dp)
+    ItemCard(
+        onClick = null,
+        containerColor = DarkSurface2,
+        contentPadding = PaddingValues(horizontal = 8.dp, vertical = 6.dp),
+        title = {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Box(contentAlignment = Alignment.Center) {
-                    Text(
-                        text = "$gripNumber",
-                        style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.onPrimaryContainer
-                    )
-                }
-            }
-
-            Spacer(modifier = Modifier.width(8.dp))
-
-            // Grip information
-            if (grip.isSeparated) {
-                Text(
-                    text = AppStrings.Wrestlers.separated,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = LaurisilvaGreenLight,
-                    fontWeight = FontWeight.Medium
+                AvatarBox(
+                    size = 24.dp,
+                    fallbackText = gripNumber.toString(),
+                    backgroundColor = MaterialTheme.colorScheme.primaryContainer,
+                    contentColor = MaterialTheme.colorScheme.onPrimaryContainer
                 )
-            } else if (grip.winner.isNotEmpty()) {
+
+                Spacer(modifier = Modifier.width(8.dp))
+
                 Text(
-                    text = grip.winner,
+                    text = when {
+                        isSeparated -> AppStrings.Wrestlers.separated
+                        winnerName.isNotEmpty() -> winnerName
+                        else -> AppStrings.Wrestlers.noResult
+                    },
                     style = MaterialTheme.typography.bodyMedium,
-                    color = White90
-                )
-            } else {
-                Text(
-                    text = AppStrings.Wrestlers.noResult,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = White80
+                    color = when {
+                        isSeparated -> LaurisilvaGreenLight
+                        winnerName.isNotEmpty() -> White90
+                        else -> White80
+                    }
                 )
             }
         }
-    }
+    )
 }
 
 /**
- * Creates grips from match result
+ * Modelo para representar una agarrada
+ */
+data class Grip(
+    val winner: String = "",
+    val isSeparated: Boolean = false
+)
+
+/**
+ * Crea agarradas a partir del resultado del enfrentamiento
  */
 private fun createGripsFromResult(result: WrestlerMatchResult, wrestlerName: String): List<Grip> {
     return when (result.result) {

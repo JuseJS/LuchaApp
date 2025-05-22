@@ -154,7 +154,11 @@ class MatchActViewModel(
                     )
                 },
                 localTeamScore = act.localTeamScore.toString(),
-                visitorTeamScore = act.visitorTeamScore.toString()
+                visitorTeamScore = act.visitorTeamScore.toString(),
+                // NUEVOS CAMPOS DE COMENTARIOS - AÑADIDO
+                localTeamComments = act.localTeamComments ?: "",
+                visitorTeamComments = act.visitorTeamComments ?: "",
+                refereeComments = act.refereeComments ?: ""
             )
         }
     }
@@ -333,7 +337,7 @@ class MatchActViewModel(
     }
 
     /**
-     * Crea un objeto MatchAct a partir del estado UI actual
+     * Crea un objeto MatchAct a partir del estado UI actual - MÉTODO ACTUALIZADO
      */
     private fun createMatchActFromState(state: MatchActUiState): MatchAct {
         val match = state.match ?: throw IllegalStateException("No hay enfrentamiento asociado")
@@ -464,7 +468,11 @@ class MatchActViewModel(
             visitorTeamScore = state.visitorTeamScore.toIntOrNull() ?: 0,
             isDraft = true,
             isCompleted = false,
-            isSigned = false
+            isSigned = false,
+            // NUEVOS CAMPOS DE COMENTARIOS - AÑADIDO
+            localTeamComments = state.localTeamComments,
+            visitorTeamComments = state.visitorTeamComments,
+            refereeComments = state.refereeComments
         )
     }
 
@@ -645,5 +653,18 @@ class MatchActViewModel(
 
     fun setVisitorTeamScore(value: String) {
         updateState { it.copy(visitorTeamScore = value) }
+    }
+
+    // NUEVOS MÉTODOS PARA COMENTARIOS - AÑADIDO
+    fun setLocalTeamComments(value: String) {
+        updateState { it.copy(localTeamComments = value) }
+    }
+
+    fun setVisitorTeamComments(value: String) {
+        updateState { it.copy(visitorTeamComments = value) }
+    }
+
+    fun setRefereeComments(value: String) {
+        updateState { it.copy(refereeComments = value) }
     }
 }

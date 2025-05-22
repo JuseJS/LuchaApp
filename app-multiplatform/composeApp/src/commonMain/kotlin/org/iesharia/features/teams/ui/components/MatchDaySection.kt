@@ -9,6 +9,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import org.iesharia.core.resources.AppStrings
+import org.iesharia.core.ui.components.common.InfoBadge
 import org.iesharia.core.ui.components.common.ItemCard
 import org.iesharia.core.ui.theme.*
 import org.iesharia.features.competitions.domain.model.MatchDay
@@ -20,11 +21,7 @@ fun MatchDaySection(
     modifier: Modifier = Modifier,
     onMatchClick: ((String) -> Unit)? = null
 ) {
-    Column(
-        modifier = modifier
-            .fillMaxWidth()
-    ) {
-        // Fechas de la jornada
+    Column(modifier = modifier.fillMaxWidth()) {
         Text(
             text = matchDay.getDateRangeFormatted(),
             style = MaterialTheme.typography.bodyMedium,
@@ -33,7 +30,6 @@ fun MatchDaySection(
 
         Spacer(modifier = Modifier.height(WrestlingTheme.dimensions.spacing_8))
 
-        // Lista de enfrentamientos
         matchDay.matches.forEach { match ->
             MatchItemCard(
                 match = match,
@@ -55,63 +51,62 @@ fun MatchItemCard(
         modifier = modifier.fillMaxWidth(),
         containerColor = DarkSurface3.copy(alpha = 0.8f),
         title = {
-            Column(
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                // Equipos y resultado
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceEvenly,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    // Equipo local
-                    TeamScore(
-                        teamName = match.localTeam.name,
-                        score = match.localScore,
-                        isWinner = match.winner == match.localTeam,
-                        isDrawn = match.isDrawn,
-                        modifier = Modifier.weight(2f)
-                    )
-
-                    // Separador
-                    Text(
-                        text = AppStrings.Teams.vs,
-                        style = MaterialTheme.typography.bodySmall,
-                        color = White80,
-                        modifier = Modifier.padding(horizontal = WrestlingTheme.dimensions.spacing_8)
-                    )
-
-                    // Equipo visitante
-                    TeamScore(
-                        teamName = match.visitorTeam.name,
-                        score = match.visitorScore,
-                        isWinner = match.winner == match.visitorTeam,
-                        isDrawn = match.isDrawn,
-                        modifier = Modifier.weight(2f)
-                    )
-                }
-            }
+            MatchTeamsRow(match)
         }
     ) {
-        // Información adicional
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            // Terrero
-            Text(
-                text = match.venue,
-                style = MaterialTheme.typography.bodySmall,
-                color = White80
-            )
+        MatchInfoRow(match)
+    }
+}
 
-            // Fecha
-            Text(
-                text = "${match.date.dayOfMonth}/${match.date.monthNumber}/${match.date.year} ${match.date.hour}:${match.date.minute.toString().padStart(2, '0')}",
-                style = MaterialTheme.typography.bodySmall,
-                color = White80
-            )
-        }
+@Composable
+private fun MatchTeamsRow(match: Match) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceEvenly,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        TeamScore(
+            teamName = match.localTeam.name,
+            score = match.localScore,
+            isWinner = match.winner == match.localTeam,
+            isDrawn = match.isDrawn,
+            modifier = Modifier.weight(2f)
+        )
+
+        Text(
+            text = AppStrings.Teams.vs,
+            style = MaterialTheme.typography.bodySmall,
+            color = White80,
+            modifier = Modifier.padding(horizontal = WrestlingTheme.dimensions.spacing_8)
+        )
+
+        TeamScore(
+            teamName = match.visitorTeam.name,
+            score = match.visitorScore,
+            isWinner = match.winner == match.visitorTeam,
+            isDrawn = match.isDrawn,
+            modifier = Modifier.weight(2f)
+        )
+    }
+}
+
+@Composable
+private fun MatchInfoRow(match: Match) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        InfoBadge(
+            text = match.venue,
+            color = MaterialTheme.colorScheme.tertiary,
+            backgroundColor = MaterialTheme.colorScheme.tertiary.copy(alpha = 0.1f)
+        )
+
+        InfoBadge(
+            text = "${match.date.dayOfMonth}/${match.date.monthNumber}/${match.date.year} ${match.date.hour}:${match.date.minute.toString().padStart(2, '0')}",
+            color = MaterialTheme.colorScheme.secondary,
+            backgroundColor = MaterialTheme.colorScheme.secondary.copy(alpha = 0.1f)
+        )
     }
 }
 
@@ -127,7 +122,6 @@ private fun TeamScore(
         modifier = modifier,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // Nombre del equipo
         Text(
             text = teamName,
             style = MaterialTheme.typography.bodyMedium,
@@ -136,11 +130,10 @@ private fun TeamScore(
             textAlign = TextAlign.Center
         )
 
-        // Puntuación
         val scoreText = score?.toString() ?: "-"
         val scoreColor = when {
-            !isDrawn && isWinner -> LaurisilvaGreenLight // Verde para el ganador
-            isDrawn -> AccentGold // Dorado para empate
+            !isDrawn && isWinner -> LaurisilvaGreenLight
+            isDrawn -> AccentGold
             else -> White90
         }
 
