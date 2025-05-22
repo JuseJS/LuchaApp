@@ -1,6 +1,7 @@
 package org.iesharia.features.matches.ui.viewmodel
 
 import org.iesharia.features.competitions.domain.model.MatchDay
+import org.iesharia.features.matches.domain.model.Referee
 import org.iesharia.features.teams.domain.model.Match
 
 /**
@@ -14,12 +15,14 @@ data class MatchActUiState(
     // Datos del enfrentamiento
     val match: Match? = null,
     val matchDay: MatchDay? = null,
+    val actId: String? = null,
 
     // Encabezado del acta
     val isInsular: Boolean = false,
     val isRegional: Boolean = false,
     val season: String = "",
     val category: String = "",
+    val competitionId: String = "",
     val competitionName: String = "",
     val venue: String = "",
     val day: String = "",
@@ -29,6 +32,7 @@ data class MatchActUiState(
     val endTime: String = "",
     val referee: String = "",
     val refereeLicense: String = "",
+    val assistantReferees: List<AssistantReferee> = emptyList(),
     val fieldDelegate: String = "",
     val fieldDelegateDni: String = "",
 
@@ -49,9 +53,18 @@ data class MatchActUiState(
 )
 
 /**
+ * Datos de un árbitro auxiliar en el acta
+ */
+data class AssistantReferee(
+    val name: String = "",
+    val licenseNumber: String = ""
+)
+
+/**
  * Datos de un luchador en el acta
  */
 data class MatchActWrestler(
+    val id: String = "",
     val licenseNumber: String = ""
 )
 
@@ -63,15 +76,19 @@ data class MatchActBout(
     val localWrestlerNumber: String = "",
     val localCheck1: Boolean = false,
     val localCheck2: Boolean = false,
+    val localCheck3: Boolean = false, // NUEVA: tercera agarrada
     val localPenalty: String = "",
 
     // Datos del luchador visitante
     val visitorWrestlerNumber: String = "",
     val visitorCheck1: Boolean = false,
     val visitorCheck2: Boolean = false,
+    val visitorCheck3: Boolean = false, // NUEVA: tercera agarrada
     val visitorPenalty: String = "",
 
     // Resultado
+    val localScore: String = "0",
+    val visitorScore: String = "0",
     val localWin: Boolean = false,
     val visitorWin: Boolean = false
 )
