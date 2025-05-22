@@ -10,9 +10,13 @@ import org.iesharia.features.auth.domain.repository.UserRepository
 import org.iesharia.features.auth.domain.usecase.LoginUseCase
 import org.iesharia.features.common.domain.usecase.GetFavoritesUseCase
 import org.iesharia.features.competitions.domain.usecase.GetCompetitionsUseCase
+import org.iesharia.features.matches.data.repository.MockMatchActRepository
 import org.iesharia.features.matches.data.repository.MockMatchRepository
+import org.iesharia.features.matches.domain.repository.MatchActRepository
 import org.iesharia.features.matches.domain.repository.MatchRepository
+import org.iesharia.features.matches.domain.usecase.GetMatchActUseCase
 import org.iesharia.features.matches.domain.usecase.GetMatchDetailsUseCase
+import org.iesharia.features.matches.domain.usecase.SaveMatchActUseCase
 import org.iesharia.features.teams.domain.usecase.GetTeamMatchesUseCase
 import org.iesharia.features.wrestlers.domain.usecase.GetWrestlerResultsUseCase
 import org.koin.core.KoinApplication
@@ -47,6 +51,7 @@ private val repositoryModule = module {
     single<UserRepository> { MockUserRepository(get()) }
     single<WrestlerRepository> { MockWrestlerRepository(get()) }
     single<MatchRepository> { MockMatchRepository(get()) }
+    single<MatchActRepository> { MockMatchActRepository() }
 }
 
 /**
@@ -60,6 +65,8 @@ private val useCaseModule = module {
     factory { LoginUseCase(get()) }
     factory { GetWrestlersByTeamIdUseCase(get()) }
     factory { GetMatchDetailsUseCase(get()) }
+    factory { GetMatchActUseCase(get()) }
+    factory { SaveMatchActUseCase(get()) }
 }
 
 /**
