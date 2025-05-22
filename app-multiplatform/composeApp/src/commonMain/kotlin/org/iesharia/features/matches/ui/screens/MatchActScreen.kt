@@ -5,6 +5,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
@@ -16,7 +17,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.onFocusChanged
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
@@ -24,6 +24,8 @@ import androidx.compose.ui.unit.dp
 import org.iesharia.core.ui.components.WrestlingButton
 import org.iesharia.core.ui.components.WrestlingButtonType
 import org.iesharia.core.ui.components.WrestlingTextField
+import org.iesharia.core.ui.components.common.InfoRow
+import org.iesharia.core.ui.components.common.InfoRowStyle
 import org.iesharia.core.ui.components.common.SectionDivider
 import org.iesharia.core.ui.components.common.SectionDividerType
 import org.iesharia.core.ui.screens.BaseContentScreen
@@ -47,20 +49,13 @@ class MatchActScreen(private val matchId: String) : BaseContentScreen() {
     }
 
     @Composable
-    override fun ScreenTitle(): String {
-        val uiState by viewModel.uiState.collectAsState()
-        return "Acta de Enfrentamiento"
-    }
+    override fun ScreenTitle(): String = "Acta de Enfrentamiento"
 
     @Composable
-    override fun OnNavigateBack(): () -> Unit {
-        return { viewModel.navigateBack() }
-    }
+    override fun OnNavigateBack(): () -> Unit = { viewModel.navigateBack() }
 
     @Composable
     override fun TopBarActions() {
-        val uiState by viewModel.uiState.collectAsState()
-
         IconButton(onClick = { viewModel.saveAct() }) {
             Icon(
                 imageVector = Icons.Default.Check,
@@ -81,58 +76,62 @@ class MatchActScreen(private val matchId: String) : BaseContentScreen() {
         val uiState by viewModel.uiState.collectAsState()
 
         if (uiState.match == null && !uiState.isLoading) {
-            Column(
-                modifier = Modifier.fillMaxWidth().padding(16.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Text(
-                    text = uiState.errorMessage ?: "No se encontró el enfrentamiento",
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = MaterialTheme.colorScheme.error
-                )
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                WrestlingButton(
-                    text = "Volver",
-                    onClick = { viewModel.navigateBack() },
-                    type = WrestlingButtonType.SECONDARY
-                )
-            }
+            ErrorStateContent(
+                errorMessage = uiState.errorMessage ?: "No se encontró el enfrentamiento",
+                onRetry = { viewModel.navigateBack() }
+            )
         } else if (!uiState.isLoading) {
             MatchActContent(viewModel = viewModel)
+        }
+    }
+
+    @Composable
+    private fun ErrorStateContent(
+        errorMessage: String,
+        onRetry: () -> Unit
+    ) {
+        Column(
+            modifier = Modifier.fillMaxWidth().padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                text = errorMessage,
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.error
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            WrestlingButton(
+                text = "Volver",
+                onClick = onRetry,
+                type = WrestlingButtonType.SECONDARY
+            )
         }
     }
 }
 
 @Composable
 private fun MatchActContent(viewModel: MatchActViewModel) {
-    val uiState by viewModel.uiState.collectAsState()
-    val match = uiState.match ?: return
-
     LazyColumn(
         modifier = Modifier.fillMaxSize().padding(horizontal = WrestlingTheme.dimensions.spacing_16),
         contentPadding = PaddingValues(bottom = 24.dp, top = 16.dp)
     ) {
-        // Encabezado
         item {
-            MatchActHeader(viewModel = viewModel)
+            MatchActHeaderSection(viewModel = viewModel)
             Spacer(modifier = Modifier.height(WrestlingTheme.dimensions.spacing_24))
         }
 
-        // Sección de luchadores - ahora con la nueva interfaz mejorada
         item {
-            MatchActWrestlersImprovedSection(viewModel = viewModel)
+            MatchActTeamsSection(viewModel = viewModel)
             Spacer(modifier = Modifier.height(WrestlingTheme.dimensions.spacing_24))
         }
 
-        // Sección de desarrollo de la luchada
         item {
             MatchActDevelopmentSection(viewModel = viewModel)
             Spacer(modifier = Modifier.height(WrestlingTheme.dimensions.spacing_24))
         }
 
-        // Botón de finalizar
         item {
             WrestlingButton(
                 text = "Finalizar Acta",
@@ -140,473 +139,77 @@ private fun MatchActContent(viewModel: MatchActViewModel) {
                 type = WrestlingButtonType.PRIMARY,
                 modifier = Modifier.fillMaxWidth()
             )
-            Spacer(modifier = Modifier.height(WrestlingTheme.dimensions.spacing_24))
         }
     }
 }
 
+// Componente reutilizable para dropdowns
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun MatchActHeader(viewModel: MatchActViewModel) {
-    val uiState by viewModel.uiState.collectAsState()
-    val match = uiState.match ?: return
-    val competitions = viewModel.getAvailableCompetitions()
+private fun DropdownField(
+    value: String,
+    onValueChange: (String) -> Unit,
+    label: String,
+    options: List<String>,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+    readOnly: Boolean = false
+) {
+    var expanded by remember { mutableStateOf(false) }
 
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
-        ),
-        shape = WrestlingTheme.shapes.medium
+    ExposedDropdownMenuBox(
+        expanded = expanded,
+        onExpandedChange = { expanded = it && enabled && !readOnly },
+        modifier = modifier
     ) {
-        Column(
+        OutlinedTextField(
+            value = value,
+            onValueChange = if (readOnly) { _ -> } else onValueChange,
+            readOnly = readOnly,
+            enabled = enabled,
+            label = { Text(label) },
+            trailingIcon = if (!readOnly) {
+                { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) }
+            } else null,
             modifier = Modifier
+                .menuAnchor(type = MenuAnchorType.PrimaryNotEditable, enabled = enabled && !readOnly)
                 .fillMaxWidth()
-                .padding(WrestlingTheme.dimensions.spacing_16)
-        ) {
-            SectionDivider(
-                title = "Acta de la Luchada",
-                type = SectionDividerType.PRIMARY
-            )
+        )
 
-            Spacer(modifier = Modifier.height(WrestlingTheme.dimensions.spacing_16))
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(WrestlingTheme.dimensions.spacing_8)
+        if (options.isNotEmpty()) {
+            ExposedDropdownMenu(
+                expanded = expanded,
+                onDismissRequest = { expanded = false }
             ) {
-                // CAMBIO: Usar el nombre de la competición en lugar del ID
-                // Dropdown para regional/insular
-                val typeOptions = listOf("Insular", "Regional")
-                var typeExpanded by remember { mutableStateOf(false) }
-                val selectedMatchType = if (uiState.isRegional) "Regional" else "Insular"
-
-                OutlinedTextField(
-                    value = uiState.competitionName,
-                    onValueChange = {},
-                    readOnly = true,
-                    modifier = Modifier.weight(2f),
-                    label = { Text("Competición") }
-                )
-
-                // Temporada
-                WrestlingTextField(
-                    value = uiState.season,
-                    onValueChange = { viewModel.setSeason(it) },
-                    label = "Temporada",
-                    modifier = Modifier.weight(1f)
-                )
-
-                ExposedDropdownMenuBox(
-                    expanded = typeExpanded,
-                    onExpandedChange = { typeExpanded = it },
-                    modifier = Modifier.weight(1f)
-                ) {
-                    OutlinedTextField(
-                        value = selectedMatchType,
-                        onValueChange = {},
-                        readOnly = true,
-                        trailingIcon = {
-                            ExposedDropdownMenuDefaults.TrailingIcon(expanded = typeExpanded)
-                        },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .menuAnchor(),
-                        label = { Text("Tipo") }
+                options.forEach { option ->
+                    DropdownMenuItem(
+                        text = { Text(option) },
+                        onClick = {
+                            onValueChange(option)
+                            expanded = false
+                        }
                     )
-
-                    ExposedDropdownMenu(
-                        expanded = typeExpanded,
-                        onDismissRequest = { typeExpanded = false }
-                    ) {
-                        typeOptions.forEach { option ->
-                            DropdownMenuItem(
-                                text = { Text(option) },
-                                onClick = {
-                                    if (option == "Regional") {
-                                        viewModel.setIsRegional(true)
-                                    } else {
-                                        viewModel.setIsInsular(true)
-                                    }
-                                    typeExpanded = false
-                                }
-                            )
-                        }
-                    }
                 }
-
-                // Dropdown para categoría
-                var categoryExpanded by remember { mutableStateOf(false) }
-                val categories = listOf(
-                    AgeCategory.REGIONAL.displayName(),
-                    AgeCategory.JUVENIL.displayName()
-                )
-
-                ExposedDropdownMenuBox(
-                    expanded = categoryExpanded,
-                    onExpandedChange = { categoryExpanded = it },
-                    modifier = Modifier.weight(1f)
-                ) {
-                    OutlinedTextField(
-                        value = uiState.category,
-                        onValueChange = {},
-                        readOnly = true,
-                        trailingIcon = {
-                            ExposedDropdownMenuDefaults.TrailingIcon(expanded = categoryExpanded)
-                        },
-                        modifier = Modifier.menuAnchor().fillMaxWidth(),
-                        label = { Text("Categoría") }
-                    )
-
-                    ExposedDropdownMenu(
-                        expanded = categoryExpanded,
-                        onDismissRequest = { categoryExpanded = false }
-                    ) {
-                        categories.forEach { option ->
-                            DropdownMenuItem(
-                                text = { Text(option) },
-                                onClick = {
-                                    viewModel.setCategory(option)
-                                    categoryExpanded = false
-                                }
-                            )
-                        }
-                    }
-                }
-            }
-
-            Spacer(modifier = Modifier.height(WrestlingTheme.dimensions.spacing_16))
-
-            // Fila 4: Lugar y fecha
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(WrestlingTheme.dimensions.spacing_8)
-            ) {
-                // Lugar
-                WrestlingTextField(
-                    value = uiState.venue,
-                    onValueChange = { viewModel.setVenue(it) },
-                    label = "Celebrada en",
-                    modifier = Modifier.weight(2f)
-                )
-
-                // Día
-                WrestlingTextField(
-                    value = uiState.day,
-                    onValueChange = { viewModel.setDay(it) },
-                    label = "Día",
-                    keyboardType = KeyboardType.Number,
-                    modifier = Modifier.weight(0.5f)
-                )
-
-                // Mes
-                WrestlingTextField(
-                    value = uiState.month,
-                    onValueChange = { viewModel.setMonth(it) },
-                    label = "Mes",
-                    modifier = Modifier.weight(1f)
-                )
-
-                // Año
-                WrestlingTextField(
-                    value = uiState.year,
-                    onValueChange = { viewModel.setYear(it) },
-                    label = "Año",
-                    keyboardType = KeyboardType.Number,
-                    modifier = Modifier.weight(0.7f)
-                )
-            }
-
-            Spacer(modifier = Modifier.height(WrestlingTheme.dimensions.spacing_16))
-
-            // CAMBIO: Selectores de hora mejorados
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(WrestlingTheme.dimensions.spacing_8)
-            ) {
-                // Hora inicial
-                TimePickerField(
-                    label = "Hora Inicial",
-                    time = uiState.startTime,
-                    onTimeSelected = { viewModel.setStartTime(it) },
-                    modifier = Modifier.weight(1f)
-                )
-
-                // Hora final
-                TimePickerField(
-                    label = "Hora Final",
-                    time = uiState.endTime,
-                    onTimeSelected = { viewModel.setEndTime(it) },
-                    modifier = Modifier.weight(1f)
-                )
-            }
-
-            Spacer(modifier = Modifier.height(WrestlingTheme.dimensions.spacing_8))
-
-            // CAMBIO: Selector de árbitro y licencia en la misma fila
-            val referees = viewModel.getAvailableReferees()
-            var refereeExpanded by remember { mutableStateOf(false) }
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(WrestlingTheme.dimensions.spacing_8)
-            ) {
-                // Selector de árbitro
-                ExposedDropdownMenuBox(
-                    expanded = refereeExpanded,
-                    onExpandedChange = { refereeExpanded = it },
-                    modifier = Modifier.weight(2f)
-                ) {
-                    OutlinedTextField(
-                        value = uiState.referee,
-                        onValueChange = { viewModel.setReferee(it) },
-                        trailingIcon = {
-                            ExposedDropdownMenuDefaults.TrailingIcon(expanded = refereeExpanded)
-                        },
-                        modifier = Modifier.menuAnchor().fillMaxWidth(),
-                        label = { Text("Árbitro Principal") }
-                    )
-
-                    ExposedDropdownMenu(
-                        expanded = refereeExpanded,
-                        onDismissRequest = { refereeExpanded = false }
-                    ) {
-                        referees.forEach { domainReferee ->
-                            val referee = Referee(domainReferee)
-                            DropdownMenuItem(
-                                text = { Text(referee.name) },
-                                onClick = {
-                                    viewModel.setReferee(referee.name)
-                                    viewModel.setRefereeLicense(referee.licenseNumber)
-                                    refereeExpanded = false
-                                }
-                            )
-                        }
-                    }
-                }
-
-                // Nº Licencia (Solo lectura, se autocomplementa al seleccionar árbitro)
-                OutlinedTextField(
-                    value = uiState.refereeLicense,
-                    onValueChange = { },
-                    readOnly = true,
-                    label = { Text("Nº Licencia") },
-                    modifier = Modifier.weight(1f)
-                )
-            }
-
-            Spacer(modifier = Modifier.height(WrestlingTheme.dimensions.spacing_16))
-
-            // Sección de árbitros auxiliares - CÓDIGO ACTUALIZADO
-            Text(
-                text = "Árbitros Auxiliares",
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.primary
-            )
-
-            Spacer(modifier = Modifier.height(WrestlingTheme.dimensions.spacing_8))
-
-            // Tabla de árbitros auxiliares - Solo se muestra si hay árbitros
-            if (uiState.assistantReferees.isNotEmpty()) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 8.dp)
-                ) {
-                    uiState.assistantReferees.forEachIndexed { index, assistant ->
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(vertical = 4.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            // Número del árbitro
-                            Text(
-                                text = "${index + 1}.",
-                                style = MaterialTheme.typography.bodyMedium,
-                                modifier = Modifier.width(40.dp)
-                            )
-
-                            // Nombre del árbitro
-                            Text(
-                                text = assistant.name,
-                                style = MaterialTheme.typography.bodyMedium,
-                                modifier = Modifier.weight(1f)
-                            )
-
-                            // Licencia
-                            Text(
-                                text = assistant.licenseNumber,
-                                style = MaterialTheme.typography.bodyMedium,
-                                modifier = Modifier.width(120.dp)
-                            )
-
-                            // Botón eliminar
-                            IconButton(
-                                onClick = { viewModel.removeAssistantReferee(index) },
-                                modifier = Modifier.size(40.dp)
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Default.Delete,
-                                    contentDescription = "Eliminar",
-                                    tint = MaterialTheme.colorScheme.error
-                                )
-                            }
-                        }
-
-                        if (index < uiState.assistantReferees.size - 1) {
-                            HorizontalDivider(
-                                color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
-                            )
-                        }
-                    }
-                }
-            } else {
-                // Mensaje cuando no hay árbitros
-                Text(
-                    text = "Aquí iría la tabla con los árbitros",
-                    style = MaterialTheme.typography.bodyMedium,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 8.dp)
-                        .background(
-                            color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
-                            shape = RoundedCornerShape(8.dp)
-                        )
-                        .padding(12.dp),
-                    textAlign = TextAlign.Center
-                )
-            }
-
-            Spacer(modifier = Modifier.height(12.dp))
-
-            // Selector para añadir un árbitro auxiliar - Siempre visible
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                var assistantRefExpanded by remember { mutableStateOf(false) }
-                var selectedAssistant by remember { mutableStateOf<Referee?>(null) }
-
-                // VERSIÓN CORREGIDA: Usamos ExposedDropdownMenuBox que es el componente oficial
-                ExposedDropdownMenuBox(
-                    expanded = assistantRefExpanded,
-                    onExpandedChange = { assistantRefExpanded = it },
-                    modifier = Modifier.weight(1f)
-                ) {
-                    OutlinedTextField(
-                        value = selectedAssistant?.name ?: "",
-                        onValueChange = { /* Solo lectura */ },
-                        readOnly = true, // Importante: debe ser de solo lectura
-                        label = { Text("Seleccionar Árbitro") },
-                        trailingIcon = {
-                            ExposedDropdownMenuDefaults.TrailingIcon(expanded = assistantRefExpanded)
-                        },
-                        modifier = Modifier
-                            .menuAnchor() // Importante: esto conecta el campo con el menú
-                            .fillMaxWidth()
-                    )
-
-                    ExposedDropdownMenu(
-                        expanded = assistantRefExpanded,
-                        onDismissRequest = { assistantRefExpanded = false }
-                    ) {
-                        // Obtener árbitros disponibles (que no sean el principal ni ya estén añadidos)
-                        val availableReferees = viewModel.getAvailableReferees().filter { domainReferee ->
-                            domainReferee.name != uiState.referee &&
-                                    !uiState.assistantReferees.any { it.name == domainReferee.name }
-                        }.map { Referee(it) }
-
-                        if (availableReferees.isEmpty()) {
-                            DropdownMenuItem(
-                                text = { Text("No hay árbitros disponibles") },
-                                onClick = { /* No hacer nada */ },
-                                enabled = false
-                            )
-                        } else {
-                            availableReferees.forEach { referee ->
-                                DropdownMenuItem(
-                                    text = { Text(referee.name) },
-                                    onClick = {
-                                        selectedAssistant = referee
-                                        assistantRefExpanded = false
-                                    }
-                                )
-                            }
-                        }
-                    }
-                }
-
-                // Botón de añadir
-                Button(
-                    onClick = {
-                        selectedAssistant?.let {
-                            viewModel.addAssistantReferee(it.name, it.licenseNumber)
-                            selectedAssistant = null
-                        }
-                    },
-                    enabled = selectedAssistant != null,
-                    modifier = Modifier.padding(start = 8.dp)
-                ) {
-                    Text("Añadir")
-                }
-            }
-
-            Spacer(modifier = Modifier.height(WrestlingTheme.dimensions.spacing_16))
-
-            // Fila 7: Delegado terrero y DNI
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(WrestlingTheme.dimensions.spacing_8)
-            ) {
-                // Delegado terrero
-                WrestlingTextField(
-                    value = uiState.fieldDelegate,
-                    onValueChange = { viewModel.setFieldDelegate(it) },
-                    label = "Delegado Terrero",
-                    modifier = Modifier.weight(2f)
-                )
-
-                // DNI
-                WrestlingTextField(
-                    value = uiState.fieldDelegateDni,
-                    onValueChange = { viewModel.setFieldDelegateDni(it) },
-                    label = "D.N.I.",
-                    modifier = Modifier.weight(1f)
-                )
             }
         }
     }
 }
 
-// CAMBIO: Clase para manejar árbitros en la UI
-data class Referee(val name: String, val licenseNumber: String) {
-    constructor(domainReferee: DomainReferee) : this(
-        name = domainReferee.name,
-        licenseNumber = domainReferee.licenseNumber
-    )
-}
-
-// CAMBIO: Widget para selección de hora usando entrada de texto simple
+// Componente reutilizable para campos de tiempo
 @Composable
-fun TimePickerField(
+private fun TimeField(
+    value: String,
+    onValueChange: (String) -> Unit,
     label: String,
-    time: String,
-    onTimeSelected: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    var internalValue by remember(time) { mutableStateOf(time) }
+    var internalValue by remember(value) { mutableStateOf(value) }
 
-    // Función de validación más simple que solo valida al perder el foco
-    fun validateTimeOnFocusLost(input: String): String {
+    fun validateTime(input: String): String {
         if (input.isEmpty()) return ""
 
-        // Limpiar caracteres no válidos
         val cleanInput = input.replace(Regex("[^0-9:]"), "")
 
-        // Si contiene ":", validar formato HH:MM
         if (":" in cleanInput) {
             val parts = cleanInput.split(":")
             if (parts.size == 2) {
@@ -617,9 +220,7 @@ fun TimePickerField(
                     return "${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}"
                 }
             }
-        }
-        // Si son solo números, intentar formatear como HHMM
-        else if (cleanInput.all { it.isDigit() } && cleanInput.length <= 4) {
+        } else if (cleanInput.all { it.isDigit() } && cleanInput.length <= 4) {
             when (cleanInput.length) {
                 1, 2 -> {
                     val hours = cleanInput.toIntOrNull()?.coerceIn(0, 23)
@@ -644,16 +245,14 @@ fun TimePickerField(
             }
         }
 
-        // Si no se puede validar, devolver el input limpio
         return cleanInput
     }
 
     OutlinedTextField(
         value = internalValue,
         onValueChange = { newValue ->
-            // Solo aplicar limpieza básica, no formateo completo
             val cleaned = newValue.replace(Regex("[^0-9:]"), "")
-            if (cleaned.length <= 5) { // Máximo "HH:MM"
+            if (cleaned.length <= 5) {
                 internalValue = cleaned
             }
         },
@@ -669,22 +268,496 @@ fun TimePickerField(
             .fillMaxWidth()
             .onFocusChanged { focusState ->
                 if (!focusState.isFocused) {
-                    // Solo validar y formatear cuando pierde el foco
-                    val validated = validateTimeOnFocusLost(internalValue)
+                    val validated = validateTime(internalValue)
                     internalValue = validated
-                    onTimeSelected(validated)
+                    onValueChange(validated)
                 }
             },
         placeholder = { Text("HH:MM") }
     )
 }
 
-// CAMBIO IMPORTANTE: Nueva implementación de la sección de luchadores con tablas y selección mediante dropdown
 @Composable
-private fun MatchActWrestlersImprovedSection(viewModel: MatchActViewModel) {
+private fun MatchActHeaderSection(viewModel: MatchActViewModel) {
     val uiState by viewModel.uiState.collectAsState()
-    val localTeam = uiState.match?.localTeam
-    val visitorTeam = uiState.match?.visitorTeam
+    val referees = viewModel.getAvailableReferees()
+
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
+        ),
+        shape = WrestlingTheme.shapes.medium
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(WrestlingTheme.dimensions.spacing_16)
+        ) {
+            SectionDivider(
+                title = "Acta de la Luchada",
+                type = SectionDividerType.PRIMARY
+            )
+
+            Spacer(modifier = Modifier.height(WrestlingTheme.dimensions.spacing_16))
+
+            // Información básica
+            BasicInfoSection(viewModel, uiState)
+
+            Spacer(modifier = Modifier.height(WrestlingTheme.dimensions.spacing_16))
+
+            // Fecha y lugar
+            DateAndVenueSection(viewModel, uiState)
+
+            Spacer(modifier = Modifier.height(WrestlingTheme.dimensions.spacing_16))
+
+            // Horarios
+            TimeSection(viewModel, uiState)
+
+            Spacer(modifier = Modifier.height(WrestlingTheme.dimensions.spacing_16))
+
+            // Árbitros
+            RefereesSection(viewModel, uiState, referees)
+
+            Spacer(modifier = Modifier.height(WrestlingTheme.dimensions.spacing_16))
+
+            // Delegado terrero
+            DelegateSection(viewModel, uiState)
+        }
+    }
+}
+
+@Composable
+private fun BasicInfoSection(
+    viewModel: MatchActViewModel,
+    uiState: org.iesharia.features.matches.ui.viewmodel.MatchActUiState
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(WrestlingTheme.dimensions.spacing_8)
+    ) {
+        // Competición (solo lectura)
+        DropdownField(
+            value = uiState.competitionName,
+            onValueChange = {},
+            label = "Competición",
+            options = emptyList(),
+            readOnly = true,
+            modifier = Modifier.weight(2f)
+        )
+
+        // Temporada
+        WrestlingTextField(
+            value = uiState.season,
+            onValueChange = { viewModel.setSeason(it) },
+            label = "Temporada",
+            modifier = Modifier.weight(1f)
+        )
+
+        // Tipo (Regional/Insular)
+        DropdownField(
+            value = if (uiState.isRegional) "Regional" else "Insular",
+            onValueChange = { value ->
+                when (value) {
+                    "Regional" -> viewModel.setIsRegional(true)
+                    "Insular" -> viewModel.setIsInsular(true)
+                }
+            },
+            label = "Tipo",
+            options = listOf("Insular", "Regional"),
+            modifier = Modifier.weight(1f)
+        )
+
+        // Categoría
+        DropdownField(
+            value = uiState.category,
+            onValueChange = { viewModel.setCategory(it) },
+            label = "Categoría",
+            options = listOf(
+                AgeCategory.REGIONAL.displayName(),
+                AgeCategory.JUVENIL.displayName()
+            ),
+            modifier = Modifier.weight(1f)
+        )
+    }
+}
+
+@Composable
+private fun DateAndVenueSection(
+    viewModel: MatchActViewModel,
+    uiState: org.iesharia.features.matches.ui.viewmodel.MatchActUiState
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(WrestlingTheme.dimensions.spacing_8)
+    ) {
+        WrestlingTextField(
+            value = uiState.venue,
+            onValueChange = { viewModel.setVenue(it) },
+            label = "Celebrada en",
+            modifier = Modifier.weight(2f)
+        )
+
+        WrestlingTextField(
+            value = uiState.day,
+            onValueChange = { viewModel.setDay(it) },
+            label = "Día",
+            keyboardType = KeyboardType.Number,
+            modifier = Modifier.weight(0.5f)
+        )
+
+        WrestlingTextField(
+            value = uiState.month,
+            onValueChange = { viewModel.setMonth(it) },
+            label = "Mes",
+            modifier = Modifier.weight(1f)
+        )
+
+        WrestlingTextField(
+            value = uiState.year,
+            onValueChange = { viewModel.setYear(it) },
+            label = "Año",
+            keyboardType = KeyboardType.Number,
+            modifier = Modifier.weight(0.7f)
+        )
+    }
+}
+
+@Composable
+private fun TimeSection(
+    viewModel: MatchActViewModel,
+    uiState: org.iesharia.features.matches.ui.viewmodel.MatchActUiState
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(WrestlingTheme.dimensions.spacing_8)
+    ) {
+        TimeField(
+            value = uiState.startTime,
+            onValueChange = { viewModel.setStartTime(it) },
+            label = "Hora Inicial",
+            modifier = Modifier.weight(1f)
+        )
+
+        TimeField(
+            value = uiState.endTime,
+            onValueChange = { viewModel.setEndTime(it) },
+            label = "Hora Final",
+            modifier = Modifier.weight(1f)
+        )
+    }
+}
+
+@Composable
+private fun RefereesSection(
+    viewModel: MatchActViewModel,
+    uiState: org.iesharia.features.matches.ui.viewmodel.MatchActUiState,
+    referees: List<DomainReferee>
+) {
+    // Árbitro principal y licencia
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(WrestlingTheme.dimensions.spacing_8)
+    ) {
+        DropdownField(
+            value = uiState.referee,
+            onValueChange = { selectedName ->
+                viewModel.setReferee(selectedName)
+                val referee = referees.find { it.name == selectedName }
+                referee?.let { viewModel.setRefereeLicense(it.licenseNumber) }
+            },
+            label = "Árbitro Principal",
+            options = referees.map { it.name },
+            modifier = Modifier.weight(2f)
+        )
+
+        DropdownField(
+            value = uiState.refereeLicense,
+            onValueChange = {},
+            label = "Nº Licencia",
+            options = emptyList(),
+            readOnly = true,
+            modifier = Modifier.weight(1f)
+        )
+    }
+
+    Spacer(modifier = Modifier.height(WrestlingTheme.dimensions.spacing_16))
+
+    // Árbitros auxiliares
+    AssistantRefereesSection(viewModel, uiState, referees)
+}
+
+@Composable
+private fun AssistantRefereesSection(
+    viewModel: MatchActViewModel,
+    uiState: org.iesharia.features.matches.ui.viewmodel.MatchActUiState,
+    referees: List<DomainReferee>
+) {
+    Text(
+        text = "Árbitros Auxiliares",
+        style = MaterialTheme.typography.titleMedium,
+        fontWeight = FontWeight.Bold,
+        color = MaterialTheme.colorScheme.primary
+    )
+
+    Spacer(modifier = Modifier.height(WrestlingTheme.dimensions.spacing_8))
+
+    // Lista de árbitros auxiliares
+    if (uiState.assistantReferees.isNotEmpty()) {
+        AssistantRefereesList(
+            assistantReferees = uiState.assistantReferees,
+            onRemove = { index -> viewModel.removeAssistantReferee(index) }
+        )
+    } else {
+        Text(
+            text = "No hay árbitros auxiliares añadidos",
+            style = MaterialTheme.typography.bodyMedium,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 8.dp)
+                .background(
+                    color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
+                    shape = RoundedCornerShape(8.dp)
+                )
+                .padding(12.dp),
+            textAlign = TextAlign.Center
+        )
+    }
+
+    Spacer(modifier = Modifier.height(12.dp))
+
+    // Selector para añadir árbitro auxiliar
+    AssistantRefereeSelector(viewModel, uiState, referees)
+}
+
+@Composable
+private fun AssistantRefereesList(
+    assistantReferees: List<org.iesharia.features.matches.ui.viewmodel.AssistantReferee>,
+    onRemove: (Int) -> Unit
+) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.1f)
+        ),
+        shape = WrestlingTheme.shapes.small
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(12.dp)
+        ) {
+            // Cabecera de la tabla
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(
+                        color = MaterialTheme.colorScheme.primary.copy(alpha = 0.1f),
+                        shape = WrestlingTheme.shapes.small
+                    )
+                    .padding(horizontal = 12.dp, vertical = 8.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "Nº",
+                    style = MaterialTheme.typography.labelMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.width(30.dp)
+                )
+
+                Text(
+                    text = "Nombre del Árbitro",
+                    style = MaterialTheme.typography.labelMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.weight(1.5f)
+                )
+
+                Text(
+                    text = "Nº Licencia",
+                    style = MaterialTheme.typography.labelMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.width(140.dp),
+                    textAlign = TextAlign.Center
+                )
+
+                // Espacio para el botón de eliminar
+                Spacer(modifier = Modifier.width(48.dp))
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            // Lista de árbitros
+            assistantReferees.forEachIndexed { index, assistant ->
+                AssistantRefereeRow(
+                    index = index,
+                    assistant = assistant,
+                    onRemove = { onRemove(index) }
+                )
+
+                if (index < assistantReferees.size - 1) {
+                    HorizontalDivider(
+                        modifier = Modifier.padding(vertical = 6.dp),
+                        color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.3f)
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun AssistantRefereeRow(
+    index: Int,
+    assistant: org.iesharia.features.matches.ui.viewmodel.AssistantReferee,
+    onRemove: () -> Unit
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 12.dp, vertical = 8.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        // Número del árbitro
+        Box(
+            modifier = Modifier
+                .width(30.dp)
+                .background(
+                    color = MaterialTheme.colorScheme.secondary.copy(alpha = 0.1f),
+                    shape = CircleShape
+                )
+                .padding(4.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                text = "${index + 1}",
+                style = MaterialTheme.typography.bodyMedium,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.secondary
+            )
+        }
+
+        Spacer(modifier = Modifier.width(12.dp))
+
+        // Nombre del árbitro
+        Text(
+            text = assistant.name,
+            style = MaterialTheme.typography.bodyLarge,
+            color = MaterialTheme.colorScheme.onSurface,
+            modifier = Modifier.weight(1.5f)
+        )
+
+        // Número de licencia
+        Box(
+            modifier = Modifier
+                .width(140.dp)
+                .background(
+                    color = MaterialTheme.colorScheme.tertiaryContainer.copy(alpha = 0.3f),
+                    shape = WrestlingTheme.shapes.small
+                )
+                .padding(horizontal = 12.dp, vertical = 4.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                text = assistant.licenseNumber,
+                style = MaterialTheme.typography.bodyMedium,
+                fontWeight = FontWeight.Medium,
+                color = MaterialTheme.colorScheme.onTertiaryContainer,
+                textAlign = TextAlign.Center
+            )
+        }
+
+        Spacer(modifier = Modifier.width(8.dp))
+
+        // Botón de eliminar
+        IconButton(
+            onClick = onRemove,
+            modifier = Modifier.size(40.dp)
+        ) {
+            Icon(
+                imageVector = Icons.Default.Delete,
+                contentDescription = "Eliminar árbitro auxiliar",
+                tint = MaterialTheme.colorScheme.error,
+                modifier = Modifier.size(20.dp)
+            )
+        }
+    }
+}
+
+@Composable
+private fun AssistantRefereeSelector(
+    viewModel: MatchActViewModel,
+    uiState: org.iesharia.features.matches.ui.viewmodel.MatchActUiState,
+    referees: List<DomainReferee>
+) {
+    var selectedReferee by remember { mutableStateOf<String?>(null) }
+
+    val availableReferees = referees.filter { referee ->
+        referee.name != uiState.referee &&
+                !uiState.assistantReferees.any { it.name == referee.name }
+    }
+
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        DropdownField(
+            value = selectedReferee ?: "",
+            onValueChange = { selectedReferee = it },
+            label = "Seleccionar Árbitro",
+            options = availableReferees.map { it.name },
+            modifier = Modifier.weight(1f)
+        )
+
+        Button(
+            onClick = {
+                selectedReferee?.let { name ->
+                    val referee = availableReferees.find { it.name == name }
+                    referee?.let {
+                        viewModel.addAssistantReferee(it.name, it.licenseNumber)
+                        selectedReferee = null
+                    }
+                }
+            },
+            enabled = selectedReferee != null,
+            modifier = Modifier.padding(start = 8.dp)
+        ) {
+            Text("Añadir")
+        }
+    }
+}
+
+@Composable
+private fun DelegateSection(
+    viewModel: MatchActViewModel,
+    uiState: org.iesharia.features.matches.ui.viewmodel.MatchActUiState
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(WrestlingTheme.dimensions.spacing_8)
+    ) {
+        WrestlingTextField(
+            value = uiState.fieldDelegate,
+            onValueChange = { viewModel.setFieldDelegate(it) },
+            label = "Delegado Terrero",
+            modifier = Modifier.weight(2f)
+        )
+
+        WrestlingTextField(
+            value = uiState.fieldDelegateDni,
+            onValueChange = { viewModel.setFieldDelegateDni(it) },
+            label = "D.N.I.",
+            modifier = Modifier.weight(1f)
+        )
+    }
+}
+
+@Composable
+private fun MatchActTeamsSection(viewModel: MatchActViewModel) {
+    val uiState by viewModel.uiState.collectAsState()
 
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -706,276 +779,162 @@ private fun MatchActWrestlersImprovedSection(viewModel: MatchActViewModel) {
             Spacer(modifier = Modifier.height(WrestlingTheme.dimensions.spacing_16))
 
             // Nombres de equipos
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(WrestlingTheme.dimensions.spacing_16)
-            ) {
-                // Equipo Local
-                Column(modifier = Modifier.weight(1f)) {
-                    Text(
-                        text = "Equipo Local",
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.primary
-                    )
-
-                    Spacer(modifier = Modifier.height(8.dp))
-
-                    // Nombre del club local
-                    WrestlingTextField(
-                        value = uiState.localClubName,
-                        onValueChange = { viewModel.setLocalClubName(it) },
-                        label = "Nombre del Club",
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                }
-
-                // Equipo Visitante
-                Column(modifier = Modifier.weight(1f)) {
-                    Text(
-                        text = "Equipo Visitante",
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.secondary
-                    )
-
-                    Spacer(modifier = Modifier.height(8.dp))
-
-                    // Nombre del club visitante
-                    WrestlingTextField(
-                        value = uiState.visitorClubName,
-                        onValueChange = { viewModel.setVisitorClubName(it) },
-                        label = "Nombre del Club",
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                }
-            }
+            TeamNamesSection(viewModel, uiState)
 
             Spacer(modifier = Modifier.height(WrestlingTheme.dimensions.spacing_16))
 
             // Tablas de luchadores
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(WrestlingTheme.dimensions.spacing_16)
-            ) {
-                // Tabla de luchadores locales
-                WrestlerSelectionTable(
-                    isLocal = true,
-                    teamName = localTeam?.name ?: "",
-                    wrestlers = uiState.localWrestlers,
-                    availableWrestlers = viewModel.getAvailableWrestlers(true),
-                    onWrestlerSelected = { index, wrestler ->
-                        viewModel.updateWrestler(index, wrestler.id, wrestler.licenseNumber, true)
-                    },
-                    onRemoveWrestler = { index ->
-                        viewModel.removeWrestler(index, true)
-                    },
-                    modifier = Modifier.weight(1f)
-                )
-
-                // Tabla de luchadores visitantes
-                WrestlerSelectionTable(
-                    isLocal = false,
-                    teamName = visitorTeam?.name ?: "",
-                    wrestlers = uiState.visitorWrestlers,
-                    availableWrestlers = viewModel.getAvailableWrestlers(false),
-                    onWrestlerSelected = { index, wrestler ->
-                        viewModel.updateWrestler(index, wrestler.id, wrestler.licenseNumber, false)
-                    },
-                    onRemoveWrestler = { index ->
-                        viewModel.removeWrestler(index, false)
-                    },
-                    modifier = Modifier.weight(1f)
-                )
-            }
+            WrestlerTablesSection(viewModel, uiState)
 
             Spacer(modifier = Modifier.height(WrestlingTheme.dimensions.spacing_16))
 
-            // Capitán y Entrenador
-            @OptIn(ExperimentalMaterial3Api::class)
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(WrestlingTheme.dimensions.spacing_16)
-            ) {
-                // Capitán y Entrenador Local
-                Column(modifier = Modifier.weight(1f)) {
-                    // Selector de capitán local
-                    val localWrestlerNames = viewModel.getAvailableWrestlers(true).map { it.fullName }
-                    var localCaptainExpanded by remember { mutableStateOf(false) }
-
-                    ExposedDropdownMenuBox(
-                        expanded = localCaptainExpanded,
-                        onExpandedChange = { localCaptainExpanded = it },
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        OutlinedTextField(
-                            value = uiState.localCaptain,
-                            onValueChange = { viewModel.setLocalCaptain(it) },
-                            label = { Text("Capitán Local") },
-                            trailingIcon = {
-                                ExposedDropdownMenuDefaults.TrailingIcon(expanded = localCaptainExpanded)
-                            },
-                            modifier = Modifier.menuAnchor().fillMaxWidth(),
-                        )
-
-                        ExposedDropdownMenu(
-                            expanded = localCaptainExpanded,
-                            onDismissRequest = { localCaptainExpanded = false }
-                        ) {
-                            localWrestlerNames.forEach { name ->
-                                DropdownMenuItem(
-                                    text = { Text(name) },
-                                    onClick = {
-                                        viewModel.setLocalCaptain(name)
-                                        localCaptainExpanded = false
-                                    }
-                                )
-                            }
-                        }
-                    }
-
-                    Spacer(modifier = Modifier.height(8.dp))
-
-                    // Selector de entrenador local
-                    var localCoachExpanded by remember { mutableStateOf(false) }
-
-                    ExposedDropdownMenuBox(
-                        expanded = localCoachExpanded,
-                        onExpandedChange = { localCoachExpanded = it },
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        OutlinedTextField(
-                            value = uiState.localCoach,
-                            onValueChange = { viewModel.setLocalCoach(it) },
-                            label = { Text("Entrenador Local") },
-                            trailingIcon = {
-                                ExposedDropdownMenuDefaults.TrailingIcon(expanded = localCoachExpanded)
-                            },
-                            modifier = Modifier.menuAnchor().fillMaxWidth(),
-                        )
-
-                        ExposedDropdownMenu(
-                            expanded = localCoachExpanded,
-                            onDismissRequest = { localCoachExpanded = false }
-                        ) {
-                            // Añadir opción vacía para permitir entrada personalizada
-                            DropdownMenuItem(
-                                text = { Text("Otro...") },
-                                onClick = {
-                                    localCoachExpanded = false
-                                }
-                            )
-
-                            // Añadir capitanes como posibles entrenadores
-                            localWrestlerNames.forEach { name ->
-                                DropdownMenuItem(
-                                    text = { Text(name) },
-                                    onClick = {
-                                        viewModel.setLocalCoach(name)
-                                        localCoachExpanded = false
-                                    }
-                                )
-                            }
-                        }
-                    }
-                }
-
-                // Capitán y Entrenador Visitante
-                Column(modifier = Modifier.weight(1f)) {
-                    // Selector de capitán visitante
-                    val visitorWrestlerNames = viewModel.getAvailableWrestlers(false).map { it.fullName }
-                    var visitorCaptainExpanded by remember { mutableStateOf(false) }
-
-                    ExposedDropdownMenuBox(
-                        expanded = visitorCaptainExpanded,
-                        onExpandedChange = { visitorCaptainExpanded = it },
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        OutlinedTextField(
-                            value = uiState.visitorCaptain,
-                            onValueChange = { viewModel.setVisitorCaptain(it) },
-                            label = { Text("Capitán Visitante") },
-                            trailingIcon = {
-                                ExposedDropdownMenuDefaults.TrailingIcon(expanded = visitorCaptainExpanded)
-                            },
-                            modifier = Modifier.menuAnchor().fillMaxWidth(),
-                        )
-
-                        ExposedDropdownMenu(
-                            expanded = visitorCaptainExpanded,
-                            onDismissRequest = { visitorCaptainExpanded = false }
-                        ) {
-                            visitorWrestlerNames.forEach { name ->
-                                DropdownMenuItem(
-                                    text = { Text(name) },
-                                    onClick = {
-                                        viewModel.setVisitorCaptain(name)
-                                        visitorCaptainExpanded = false
-                                    }
-                                )
-                            }
-                        }
-                    }
-
-                    Spacer(modifier = Modifier.height(8.dp))
-
-                    // Selector de entrenador visitante
-                    var visitorCoachExpanded by remember { mutableStateOf(false) }
-
-                    ExposedDropdownMenuBox(
-                        expanded = visitorCoachExpanded,
-                        onExpandedChange = { visitorCoachExpanded = it },
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        OutlinedTextField(
-                            value = uiState.visitorCoach,
-                            onValueChange = { viewModel.setVisitorCoach(it) },
-                            label = { Text("Entrenador Visitante") },
-                            trailingIcon = {
-                                ExposedDropdownMenuDefaults.TrailingIcon(expanded = visitorCoachExpanded)
-                            },
-                            modifier = Modifier.menuAnchor().fillMaxWidth(),
-                        )
-
-                        ExposedDropdownMenu(
-                            expanded = visitorCoachExpanded,
-                            onDismissRequest = { visitorCoachExpanded = false }
-                        ) {
-                            // Añadir opción vacía para permitir entrada personalizada
-                            DropdownMenuItem(
-                                text = { Text("Otro...") },
-                                onClick = {
-                                    visitorCoachExpanded = false
-                                }
-                            )
-
-                            // Añadir luchadores como posibles entrenadores
-                            visitorWrestlerNames.forEach { name ->
-                                DropdownMenuItem(
-                                    text = { Text(name) },
-                                    onClick = {
-                                        viewModel.setVisitorCoach(name)
-                                        visitorCoachExpanded = false
-                                    }
-                                )
-                            }
-                        }
-                    }
-                }
-            }
+            // Capitanes y entrenadores
+            CaptainsAndCoachesSection(viewModel, uiState)
         }
     }
 }
 
-// Tabla de selección de luchadores por equipo
+@Composable
+private fun TeamNamesSection(
+    viewModel: MatchActViewModel,
+    uiState: org.iesharia.features.matches.ui.viewmodel.MatchActUiState
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(WrestlingTheme.dimensions.spacing_16)
+    ) {
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                text = "Equipo Local",
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.primary
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            WrestlingTextField(
+                value = uiState.localClubName,
+                onValueChange = { viewModel.setLocalClubName(it) },
+                label = "Nombre del Club",
+                modifier = Modifier.fillMaxWidth()
+            )
+        }
+
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                text = "Equipo Visitante",
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.secondary
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            WrestlingTextField(
+                value = uiState.visitorClubName,
+                onValueChange = { viewModel.setVisitorClubName(it) },
+                label = "Nombre del Club",
+                modifier = Modifier.fillMaxWidth()
+            )
+        }
+    }
+}
+
+@Composable
+private fun WrestlerTablesSection(
+    viewModel: MatchActViewModel,
+    uiState: org.iesharia.features.matches.ui.viewmodel.MatchActUiState
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(WrestlingTheme.dimensions.spacing_16)
+    ) {
+        WrestlerSelectionTable(
+            isLocal = true,
+            wrestlers = uiState.localWrestlers,
+            availableWrestlers = viewModel.getAvailableWrestlers(true),
+            onWrestlerSelected = { index, wrestler ->
+                viewModel.updateWrestler(index, wrestler.id, wrestler.licenseNumber, true)
+            },
+            modifier = Modifier.weight(1f)
+        )
+
+        WrestlerSelectionTable(
+            isLocal = false,
+            wrestlers = uiState.visitorWrestlers,
+            availableWrestlers = viewModel.getAvailableWrestlers(false),
+            onWrestlerSelected = { index, wrestler ->
+                viewModel.updateWrestler(index, wrestler.id, wrestler.licenseNumber, false)
+            },
+            modifier = Modifier.weight(1f)
+        )
+    }
+}
+
+@Composable
+private fun CaptainsAndCoachesSection(
+    viewModel: MatchActViewModel,
+    uiState: org.iesharia.features.matches.ui.viewmodel.MatchActUiState
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(WrestlingTheme.dimensions.spacing_16)
+    ) {
+        // Equipo Local
+        Column(modifier = Modifier.weight(1f)) {
+            val localWrestlerNames = viewModel.getAvailableWrestlers(true).map { it.fullName }
+
+            DropdownField(
+                value = uiState.localCaptain,
+                onValueChange = { viewModel.setLocalCaptain(it) },
+                label = "Capitán Local",
+                options = localWrestlerNames,
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            DropdownField(
+                value = uiState.localCoach,
+                onValueChange = { viewModel.setLocalCoach(it) },
+                label = "Entrenador Local",
+                options = listOf("Otro...") + localWrestlerNames,
+                modifier = Modifier.fillMaxWidth()
+            )
+        }
+
+        // Equipo Visitante
+        Column(modifier = Modifier.weight(1f)) {
+            val visitorWrestlerNames = viewModel.getAvailableWrestlers(false).map { it.fullName }
+
+            DropdownField(
+                value = uiState.visitorCaptain,
+                onValueChange = { viewModel.setVisitorCaptain(it) },
+                label = "Capitán Visitante",
+                options = visitorWrestlerNames,
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            DropdownField(
+                value = uiState.visitorCoach,
+                onValueChange = { viewModel.setVisitorCoach(it) },
+                label = "Entrenador Visitante",
+                options = listOf("Otro...") + visitorWrestlerNames,
+                modifier = Modifier.fillMaxWidth()
+            )
+        }
+    }
+}
+
 @Composable
 private fun WrestlerSelectionTable(
     isLocal: Boolean,
-    teamName: String,
     wrestlers: List<MatchActWrestler>,
     availableWrestlers: List<Wrestler>,
     onWrestlerSelected: (Int, Wrestler) -> Unit,
-    onRemoveWrestler: (Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val teamColor = if (isLocal) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.secondary
@@ -1025,9 +984,7 @@ private fun WrestlerSelectionTable(
                 index = index,
                 wrestler = wrestlerData,
                 availableWrestlers = availableWrestlers,
-                onWrestlerSelected = { wrestler -> onWrestlerSelected(index, wrestler) },
-                onRemove = { if (wrestlers.size > index) onRemoveWrestler(index) },
-                teamColor = teamColor
+                onWrestlerSelected = { wrestler -> onWrestlerSelected(index, wrestler) }
             )
 
             Spacer(modifier = Modifier.height(4.dp))
@@ -1035,19 +992,13 @@ private fun WrestlerSelectionTable(
     }
 }
 
-// Fila individual para selección de luchador
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun WrestlerSelectionRow(
     index: Int,
     wrestler: MatchActWrestler,
     availableWrestlers: List<Wrestler>,
-    onWrestlerSelected: (Wrestler) -> Unit,
-    onRemove: () -> Unit,
-    teamColor: Color
+    onWrestlerSelected: (Wrestler) -> Unit
 ) {
-    var dropdownExpanded by remember { mutableStateOf(false) }
-
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -1055,7 +1006,6 @@ private fun WrestlerSelectionRow(
         horizontalArrangement = Arrangement.spacedBy(4.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        // Número
         Text(
             text = "${index + 1}",
             style = MaterialTheme.typography.bodyMedium,
@@ -1063,56 +1013,26 @@ private fun WrestlerSelectionRow(
             textAlign = TextAlign.Center
         )
 
-        // Selector de luchador
-        ExposedDropdownMenuBox(
-            expanded = dropdownExpanded,
-            onExpandedChange = { dropdownExpanded = it },
+        val selectedWrestler = availableWrestlers.find { it.licenseNumber == wrestler.licenseNumber }
+
+        DropdownField(
+            value = selectedWrestler?.fullName ?: "",
+            onValueChange = { selectedName ->
+                val selectedWrestlerObject = availableWrestlers.find { it.fullName == selectedName }
+                selectedWrestlerObject?.let { onWrestlerSelected(it) }
+            },
+            label = "Luchador",
+            options = availableWrestlers.map { it.fullName },
             modifier = Modifier.weight(2f)
-        ) {
-            // Buscar el luchador actual en la lista de disponibles
-            val selectedWrestler = availableWrestlers.find { it.licenseNumber == wrestler.licenseNumber }
+        )
 
-            OutlinedTextField(
-                value = selectedWrestler?.fullName ?: "",
-                onValueChange = { },
-                readOnly = true,
-                trailingIcon = {
-                    ExposedDropdownMenuDefaults.TrailingIcon(expanded = dropdownExpanded)
-                },
-                modifier = Modifier.menuAnchor().fillMaxWidth(),
-                label = { Text("Luchador") },
-                singleLine = true
-            )
-
-            ExposedDropdownMenu(
-                expanded = dropdownExpanded,
-                onDismissRequest = { dropdownExpanded = false }
-            ) {
-                availableWrestlers.forEach { availableWrestler ->
-                    DropdownMenuItem(
-                        text = {
-                            Text(
-                                text = availableWrestler.fullName,
-                                color = MaterialTheme.colorScheme.onSurface
-                            )
-                        },
-                        onClick = {
-                            onWrestlerSelected(availableWrestler)
-                            dropdownExpanded = false
-                        }
-                    )
-                }
-            }
-        }
-
-        // Número de licencia (solo lectura, se autocomplementa al seleccionar luchador)
-        OutlinedTextField(
+        DropdownField(
             value = wrestler.licenseNumber,
-            onValueChange = { },
+            onValueChange = {},
+            label = "Licencia",
+            options = emptyList(),
             readOnly = true,
-            label = { Text("Licencia") },
-            modifier = Modifier.weight(1f),
-            singleLine = true
+            modifier = Modifier.weight(1f)
         )
     }
 }
@@ -1121,17 +1041,16 @@ private fun WrestlerSelectionRow(
 private fun MatchActDevelopmentSection(viewModel: MatchActViewModel) {
     val uiState by viewModel.uiState.collectAsState()
 
-    // Calcular resultado final como el último marcador registrado
+    // Calcular resultado final automáticamente
     val calculatedLocalScore = uiState.bouts
         .mapNotNull { bout -> bout.localScore.toIntOrNull() }
         .maxOrNull() ?: 0
 
-// Para el equipo visitante: encuentra el máximo de todos los marcadores visitantes
     val calculatedVisitorScore = uiState.bouts
         .mapNotNull { bout -> bout.visitorScore.toIntOrNull() }
         .maxOrNull() ?: 0
 
-    // Actualizar automáticamente los resultados finales cuando cambien los marcadores
+    // Actualizar automáticamente los resultados finales
     LaunchedEffect(calculatedLocalScore, calculatedVisitorScore) {
         viewModel.setLocalTeamScore(calculatedLocalScore.toString())
         viewModel.setVisitorTeamScore(calculatedVisitorScore.toString())
@@ -1157,267 +1076,200 @@ private fun MatchActDevelopmentSection(viewModel: MatchActViewModel) {
             Spacer(modifier = Modifier.height(WrestlingTheme.dimensions.spacing_16))
 
             // Tabla de desarrollo
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .border(
-                        width = 1.dp,
-                        color = MaterialTheme.colorScheme.outlineVariant,
-                        shape = WrestlingTheme.shapes.small
-                    )
-                    .padding(12.dp)
-            ) {
-                // Cabecera de la tabla - MEJORADA con espaciado exacto
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(6.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    // Columnas para equipo local
-                    Row(
-                        modifier = Modifier.weight(1f),
-                        horizontalArrangement = Arrangement.spacedBy(6.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            text = "Club Local",
-                            style = MaterialTheme.typography.titleSmall,
-                            fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.primary,
-                            modifier = Modifier
-                                .weight(1f) // Flexible para el luchador
-                                .background(
-                                    color = MaterialTheme.colorScheme.primary.copy(alpha = 0.1f),
-                                    shape = WrestlingTheme.shapes.small
-                                )
-                                .padding(vertical = 8.dp),
-                            textAlign = TextAlign.Center
-                        )
-
-                        Text(
-                            text = "1",
-                            style = MaterialTheme.typography.bodySmall,
-                            modifier = Modifier.width(40.dp),
-                            textAlign = TextAlign.Center,
-                            fontWeight = FontWeight.Medium
-                        )
-                        Text(
-                            text = "2",
-                            style = MaterialTheme.typography.bodySmall,
-                            modifier = Modifier.width(40.dp),
-                            textAlign = TextAlign.Center,
-                            fontWeight = FontWeight.Medium
-                        )
-                        Text(
-                            text = "3",
-                            style = MaterialTheme.typography.bodySmall,
-                            modifier = Modifier.width(40.dp),
-                            textAlign = TextAlign.Center,
-                            fontWeight = FontWeight.Medium
-                        )
-                        Text(
-                            text = "Amonest.",
-                            style = MaterialTheme.typography.bodySmall,
-                            modifier = Modifier.width(80.dp),
-                            textAlign = TextAlign.Center,
-                            fontWeight = FontWeight.Medium
-                        )
-                    }
-
-                    // Columnas para equipo visitante
-                    Row(
-                        modifier = Modifier.weight(1f),
-                        horizontalArrangement = Arrangement.spacedBy(6.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            text = "Club Visitante",
-                            style = MaterialTheme.typography.titleSmall,
-                            fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.secondary,
-                            modifier = Modifier
-                                .weight(1f) // Flexible para el luchador
-                                .background(
-                                    color = MaterialTheme.colorScheme.secondary.copy(alpha = 0.1f),
-                                    shape = WrestlingTheme.shapes.small
-                                )
-                                .padding(vertical = 8.dp),
-                            textAlign = TextAlign.Center
-                        )
-
-                        Text(
-                            text = "1",
-                            style = MaterialTheme.typography.bodySmall,
-                            modifier = Modifier.width(40.dp),
-                            textAlign = TextAlign.Center,
-                            fontWeight = FontWeight.Medium
-                        )
-                        Text(
-                            text = "2",
-                            style = MaterialTheme.typography.bodySmall,
-                            modifier = Modifier.width(40.dp),
-                            textAlign = TextAlign.Center,
-                            fontWeight = FontWeight.Medium
-                        )
-                        Text(
-                            text = "3",
-                            style = MaterialTheme.typography.bodySmall,
-                            modifier = Modifier.width(40.dp),
-                            textAlign = TextAlign.Center,
-                            fontWeight = FontWeight.Medium
-                        )
-                        Text(
-                            text = "Amonest.",
-                            style = MaterialTheme.typography.bodySmall,
-                            modifier = Modifier.width(80.dp),
-                            textAlign = TextAlign.Center,
-                            fontWeight = FontWeight.Medium
-                        )
-                    }
-
-                    // Columna de resultado mejorada
-                    Row(
-                        modifier = Modifier.width(90.dp),
-                        horizontalArrangement = Arrangement.spacedBy(6.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            text = "L",
-                            style = MaterialTheme.typography.titleSmall,
-                            fontWeight = FontWeight.Bold,
-                            modifier = Modifier
-                                .weight(1f)
-                                .background(
-                                    color = MaterialTheme.colorScheme.primary.copy(alpha = 0.1f),
-                                    shape = WrestlingTheme.shapes.small
-                                )
-                                .padding(vertical = 8.dp),
-                            textAlign = TextAlign.Center,
-                            color = MaterialTheme.colorScheme.primary
-                        )
-                        Text(
-                            text = "V",
-                            style = MaterialTheme.typography.titleSmall,
-                            fontWeight = FontWeight.Bold,
-                            modifier = Modifier
-                                .weight(1f)
-                                .background(
-                                    color = MaterialTheme.colorScheme.secondary.copy(alpha = 0.1f),
-                                    shape = WrestlingTheme.shapes.small
-                                )
-                                .padding(vertical = 8.dp),
-                            textAlign = TextAlign.Center,
-                            color = MaterialTheme.colorScheme.secondary
-                        )
-                    }
-
-                    // Espacio para el botón de eliminar
-                    Spacer(modifier = Modifier.width(38.dp)) // Ajustado para IconButton
-                }
-
-                HorizontalDivider(
-                    modifier = Modifier.padding(vertical = 12.dp),
-                    color = MaterialTheme.colorScheme.outlineVariant
-                )
-
-                // Filas de la tabla (por cada lucha)
-                uiState.bouts.forEachIndexed { index, bout ->
-                    MatchBoutRow(
-                        boutIndex = index,
-                        bout = bout,
-                        localWrestlers = uiState.localWrestlers,
-                        visitorWrestlers = uiState.visitorWrestlers,
-                        availableLocalWrestlers = viewModel.getAvailableWrestlers(true),
-                        availableVisitorWrestlers = viewModel.getAvailableWrestlers(false),
-                        onUpdate = { updatedBout ->
-                            viewModel.updateBout(index, updatedBout)
-                        },
-                        onDelete = {
-                            viewModel.removeBout(index)
-                        }
-                    )
-
-                    if (index < uiState.bouts.size - 1) {
-                        HorizontalDivider(
-                            modifier = Modifier.padding(vertical = 6.dp),
-                            color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
-                        )
-                    }
-                }
-
-                Spacer(modifier = Modifier.height(12.dp))
-
-                // Botón para añadir lucha
-                WrestlingButton(
-                    text = "Añadir Lucha",
-                    onClick = { viewModel.addBout() },
-                    type = WrestlingButtonType.SECONDARY,
-                    modifier = Modifier.align(Alignment.End)
-                )
-            }
+            BoutDevelopmentTable(viewModel, uiState)
 
             Spacer(modifier = Modifier.height(WrestlingTheme.dimensions.spacing_24))
 
-            // Resultado final - ACTUALIZADO para mostrar cálculo automático
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(WrestlingTheme.dimensions.spacing_16),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = "Resultado Final:",
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold
-                )
-
-                // Resultado calculado automáticamente (solo lectura)
-                OutlinedTextField(
-                    value = calculatedLocalScore.toString(),
-                    onValueChange = { /* Solo lectura */ },
-                    readOnly = true,
-                    label = { Text("Club Local") },
-                    modifier = Modifier.weight(1f),
-                    colors = OutlinedTextFieldDefaults.colors(
-                        disabledTextColor = MaterialTheme.colorScheme.onSurface,
-                        disabledBorderColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.5f),
-                        disabledLabelColor = MaterialTheme.colorScheme.primary
-                    ),
-                    enabled = false
-                )
-
-                OutlinedTextField(
-                    value = calculatedVisitorScore.toString(),
-                    onValueChange = { /* Solo lectura */ },
-                    readOnly = true,
-                    label = { Text("Club Visitante") },
-                    modifier = Modifier.weight(1f),
-                    colors = OutlinedTextFieldDefaults.colors(
-                        disabledTextColor = MaterialTheme.colorScheme.onSurface,
-                        disabledBorderColor = MaterialTheme.colorScheme.secondary.copy(alpha = 0.5f),
-                        disabledLabelColor = MaterialTheme.colorScheme.secondary
-                    ),
-                    enabled = false
-                )
-            }
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            // Texto explicativo
-            Text(
-                text = "* El resultado final corresponde al último marcador registrado en la tabla",
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.fillMaxWidth(),
-                textAlign = TextAlign.Center
-            )
+            // Resultado final automático
+            FinalResultSection(calculatedLocalScore, calculatedVisitorScore)
         }
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun BoutDevelopmentTable(
+    viewModel: MatchActViewModel,
+    uiState: org.iesharia.features.matches.ui.viewmodel.MatchActUiState
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .border(
+                width = 1.dp,
+                color = MaterialTheme.colorScheme.outlineVariant,
+                shape = WrestlingTheme.shapes.small
+            )
+            .padding(12.dp)
+    ) {
+        // Cabecera de la tabla
+        BoutTableHeader()
+
+        HorizontalDivider(
+            modifier = Modifier.padding(vertical = 12.dp),
+            color = MaterialTheme.colorScheme.outlineVariant
+        )
+
+        // Filas de datos
+        uiState.bouts.forEachIndexed { index, bout ->
+            MatchBoutRow(
+                bout = bout,
+                localWrestlers = uiState.localWrestlers,
+                visitorWrestlers = uiState.visitorWrestlers,
+                availableLocalWrestlers = viewModel.getAvailableWrestlers(true),
+                availableVisitorWrestlers = viewModel.getAvailableWrestlers(false),
+                onUpdate = { updatedBout ->
+                    viewModel.updateBout(index, updatedBout)
+                },
+                onDelete = {
+                    viewModel.removeBout(index)
+                }
+            )
+
+            if (index < uiState.bouts.size - 1) {
+                HorizontalDivider(
+                    modifier = Modifier.padding(vertical = 6.dp),
+                    color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
+                )
+            }
+        }
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        WrestlingButton(
+            text = "Añadir Lucha",
+            onClick = { viewModel.addBout() },
+            type = WrestlingButtonType.SECONDARY,
+            modifier = Modifier.align(Alignment.End)
+        )
+    }
+}
+
+@Composable
+private fun BoutTableHeader() {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(6.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        // Columnas para equipo local
+        Row(
+            modifier = Modifier.weight(1f),
+            horizontalArrangement = Arrangement.spacedBy(6.dp)
+        ) {
+            Text(
+                text = "Club Local",
+                style = MaterialTheme.typography.titleSmall,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.primary,
+                modifier = Modifier
+                    .weight(1f)
+                    .background(
+                        color = MaterialTheme.colorScheme.primary.copy(alpha = 0.1f),
+                        shape = WrestlingTheme.shapes.small
+                    )
+                    .padding(vertical = 8.dp),
+                textAlign = TextAlign.Center
+            )
+
+            repeat(3) { i ->
+                Text(
+                    text = "${i + 1}",
+                    style = MaterialTheme.typography.bodySmall,
+                    modifier = Modifier.width(40.dp),
+                    textAlign = TextAlign.Center,
+                    fontWeight = FontWeight.Medium
+                )
+            }
+
+            Text(
+                text = "Amonestaciones",
+                style = MaterialTheme.typography.bodySmall,
+                modifier = Modifier.width(80.dp),
+                textAlign = TextAlign.Center,
+                fontWeight = FontWeight.Medium
+            )
+        }
+
+        // Columnas para equipo visitante
+        Row(
+            modifier = Modifier.weight(1f),
+            horizontalArrangement = Arrangement.spacedBy(6.dp)
+        ) {
+            Text(
+                text = "Club Visitante",
+                style = MaterialTheme.typography.titleSmall,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.secondary,
+                modifier = Modifier
+                    .weight(1f)
+                    .background(
+                        color = MaterialTheme.colorScheme.secondary.copy(alpha = 0.1f),
+                        shape = WrestlingTheme.shapes.small
+                    )
+                    .padding(vertical = 8.dp),
+                textAlign = TextAlign.Center
+            )
+
+            repeat(3) { i ->
+                Text(
+                    text = "${i + 1}",
+                    style = MaterialTheme.typography.bodySmall,
+                    modifier = Modifier.width(40.dp),
+                    textAlign = TextAlign.Center,
+                    fontWeight = FontWeight.Medium
+                )
+            }
+
+            Text(
+                text = "Amonestaciones",
+                style = MaterialTheme.typography.bodySmall,
+                modifier = Modifier.width(80.dp),
+                textAlign = TextAlign.Center,
+                fontWeight = FontWeight.Medium
+            )
+        }
+
+        // Columna de resultado
+        Row(
+            modifier = Modifier.width(90.dp),
+            horizontalArrangement = Arrangement.spacedBy(6.dp)
+        ) {
+            Text(
+                text = "L",
+                style = MaterialTheme.typography.titleSmall,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.primary,
+                modifier = Modifier
+                    .weight(1f)
+                    .background(
+                        color = MaterialTheme.colorScheme.primary.copy(alpha = 0.1f),
+                        shape = WrestlingTheme.shapes.small
+                    )
+                    .padding(vertical = 8.dp),
+                textAlign = TextAlign.Center
+            )
+            Text(
+                text = "V",
+                style = MaterialTheme.typography.titleSmall,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.secondary,
+                modifier = Modifier
+                    .weight(1f)
+                    .background(
+                        color = MaterialTheme.colorScheme.secondary.copy(alpha = 0.1f),
+                        shape = WrestlingTheme.shapes.small
+                    )
+                    .padding(vertical = 8.dp),
+                textAlign = TextAlign.Center
+            )
+        }
+
+        Spacer(modifier = Modifier.width(38.dp)) // Espacio para botón eliminar
+    }
+}
+
 @Composable
 private fun MatchBoutRow(
-    boutIndex: Int,
     bout: MatchActBout,
     localWrestlers: List<MatchActWrestler>,
     visitorWrestlers: List<MatchActWrestler>,
@@ -1426,277 +1278,40 @@ private fun MatchBoutRow(
     onUpdate: (MatchActBout) -> Unit,
     onDelete: () -> Unit
 ) {
-    // Usar IntrinsicSize para que todos los elementos tengan la misma altura naturalmente
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .height(IntrinsicSize.Min), // CLAVE: permite que todos los elementos se adapten a la altura del más alto
+            .height(IntrinsicSize.Min),
         horizontalArrangement = Arrangement.spacedBy(6.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        // Datos del equipo local
-        Row(
-            modifier = Modifier.weight(1f),
-            horizontalArrangement = Arrangement.spacedBy(6.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            // Selector de luchador local
-            var localWrestlerExpanded by remember { mutableStateOf(false) }
+        // Datos del equipo local - pasar weight como modifier
+        BoutTeamRow(
+            isLocal = true,
+            bout = bout,
+            wrestlers = localWrestlers,
+            availableWrestlers = availableLocalWrestlers,
+            onUpdate = onUpdate,
+            modifier = Modifier.weight(1f) // Pasar weight aquí
+        )
 
-            ExposedDropdownMenuBox(
-                expanded = localWrestlerExpanded,
-                onExpandedChange = { localWrestlerExpanded = it },
-                modifier = Modifier.weight(1f) // Flexible, coincide con la cabecera
-            ) {
-                // Buscar el luchador seleccionado basado en el número del bout
-                val selectedWrestlerIndex = bout.localWrestlerNumber.toIntOrNull()?.minus(1)
-                val selectedLocalWrestler = if (selectedWrestlerIndex != null && selectedWrestlerIndex < localWrestlers.size) {
-                    val matchWrestler = localWrestlers[selectedWrestlerIndex]
-                    availableLocalWrestlers.find { it.licenseNumber == matchWrestler.licenseNumber }
-                } else null
+        // Datos del equipo visitante - pasar weight como modifier
+        BoutTeamRow(
+            isLocal = false,
+            bout = bout,
+            wrestlers = visitorWrestlers,
+            availableWrestlers = availableVisitorWrestlers,
+            onUpdate = onUpdate,
+            modifier = Modifier.weight(1f) // Pasar weight aquí
+        )
 
-                OutlinedTextField(
-                    value = selectedLocalWrestler?.let { wrestler ->
-                        "${wrestler.classification?.displayName() ?: "Sin Cat."} - ${wrestler.fullName}"
-                    } ?: "",
-                    onValueChange = { },
-                    readOnly = true,
-                    trailingIcon = {
-                        ExposedDropdownMenuDefaults.TrailingIcon(expanded = localWrestlerExpanded)
-                    },
-                    modifier = Modifier
-                        .menuAnchor()
-                        .fillMaxWidth()
-                        .fillMaxHeight(), // Ocupa toda la altura disponible
-                    label = { Text("Luchador Local", style = MaterialTheme.typography.bodySmall) },
-                    singleLine = true
-                )
-
-                ExposedDropdownMenu(
-                    expanded = localWrestlerExpanded,
-                    onDismissRequest = { localWrestlerExpanded = false }
-                ) {
-                    // Mostrar todos los luchadores de la alineación local
-                    localWrestlers.forEachIndexed { index, matchWrestler ->
-                        val wrestler = availableLocalWrestlers.find { it.licenseNumber == matchWrestler.licenseNumber }
-                        if (wrestler != null) {
-                            DropdownMenuItem(
-                                text = {
-                                    Text("${wrestler.classification?.displayName() ?: "Sin Cat."} - ${wrestler.fullName} - ${wrestler.licenseNumber}")
-                                },
-                                onClick = {
-                                    onUpdate(bout.copy(localWrestlerNumber = (index + 1).toString()))
-                                    localWrestlerExpanded = false
-                                }
-                            )
-                        }
-                    }
-                }
-            }
-
-            // Agarrada 1 local
-            MatchBoutCheckbox(
-                checked = bout.localCheck1,
-                onCheckedChange = {
-                    onUpdate(bout.copy(localCheck1 = it))
-                },
-                modifier = Modifier
-                    .width(40.dp)
-                    .fillMaxHeight() // Ocupa toda la altura disponible
-            )
-
-            // Agarrada 2 local
-            MatchBoutCheckbox(
-                checked = bout.localCheck2,
-                onCheckedChange = {
-                    onUpdate(bout.copy(localCheck2 = it))
-                },
-                modifier = Modifier
-                    .width(40.dp)
-                    .fillMaxHeight() // Ocupa toda la altura disponible
-            )
-
-            // Agarrada 3 local
-            MatchBoutCheckbox(
-                checked = bout.localCheck3,
-                onCheckedChange = {
-                    onUpdate(bout.copy(localCheck3 = it))
-                },
-                modifier = Modifier
-                    .width(40.dp)
-                    .fillMaxHeight() // Ocupa toda la altura disponible
-            )
-
-            // Amonestaciones local
-            WrestlingTextField(
-                value = bout.localPenalty,
-                onValueChange = {
-                    onUpdate(bout.copy(localPenalty = it))
-                },
-                keyboardType = KeyboardType.Number,
-                modifier = Modifier
-                    .width(80.dp)
-                    .fillMaxHeight(), // Ocupa toda la altura disponible
-                label = ""
-            )
-        }
-
-        // Datos del equipo visitante
-        Row(
-            modifier = Modifier.weight(1f),
-            horizontalArrangement = Arrangement.spacedBy(6.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            // Selector de luchador visitante
-            var visitorWrestlerExpanded by remember { mutableStateOf(false) }
-
-            ExposedDropdownMenuBox(
-                expanded = visitorWrestlerExpanded,
-                onExpandedChange = { visitorWrestlerExpanded = it },
-                modifier = Modifier.weight(1f) // Flexible, coincide con la cabecera
-            ) {
-                // Buscar el luchador seleccionado basado en el número del bout
-                val selectedWrestlerIndex = bout.visitorWrestlerNumber.toIntOrNull()?.minus(1)
-                val selectedVisitorWrestler = if (selectedWrestlerIndex != null && selectedWrestlerIndex < visitorWrestlers.size) {
-                    val matchWrestler = visitorWrestlers[selectedWrestlerIndex]
-                    availableVisitorWrestlers.find { it.licenseNumber == matchWrestler.licenseNumber }
-                } else null
-
-                OutlinedTextField(
-                    value = selectedVisitorWrestler?.let { wrestler ->
-                        "${wrestler.classification?.displayName() ?: "Sin Cat."} - ${wrestler.fullName}"
-                    } ?: "",
-                    onValueChange = { },
-                    readOnly = true,
-                    trailingIcon = {
-                        ExposedDropdownMenuDefaults.TrailingIcon(expanded = visitorWrestlerExpanded)
-                    },
-                    modifier = Modifier
-                        .menuAnchor()
-                        .fillMaxWidth()
-                        .fillMaxHeight(), // Ocupa toda la altura disponible
-                    label = { Text("Luchador Visitante", style = MaterialTheme.typography.bodySmall) },
-                    singleLine = true
-                )
-
-                ExposedDropdownMenu(
-                    expanded = visitorWrestlerExpanded,
-                    onDismissRequest = { visitorWrestlerExpanded = false }
-                ) {
-                    // Mostrar todos los luchadores de la alineación visitante
-                    visitorWrestlers.forEachIndexed { index, matchWrestler ->
-                        val wrestler = availableVisitorWrestlers.find { it.licenseNumber == matchWrestler.licenseNumber }
-                        if (wrestler != null) {
-                            DropdownMenuItem(
-                                text = {
-                                    Text("${wrestler.classification?.displayName() ?: "Sin Cat."} - ${wrestler.fullName} - ${wrestler.licenseNumber}")
-                                },
-                                onClick = {
-                                    onUpdate(bout.copy(visitorWrestlerNumber = (index + 1).toString()))
-                                    visitorWrestlerExpanded = false
-                                }
-                            )
-                        }
-                    }
-                }
-            }
-
-            // Agarrada 1 visitante
-            MatchBoutCheckbox(
-                checked = bout.visitorCheck1,
-                onCheckedChange = {
-                    onUpdate(bout.copy(visitorCheck1 = it))
-                },
-                modifier = Modifier
-                    .width(40.dp)
-                    .fillMaxHeight() // Ocupa toda la altura disponible
-            )
-
-            // Agarrada 2 visitante
-            MatchBoutCheckbox(
-                checked = bout.visitorCheck2,
-                onCheckedChange = {
-                    onUpdate(bout.copy(visitorCheck2 = it))
-                },
-                modifier = Modifier
-                    .width(40.dp)
-                    .fillMaxHeight() // Ocupa toda la altura disponible
-            )
-
-            // Agarrada 3 visitante
-            MatchBoutCheckbox(
-                checked = bout.visitorCheck3,
-                onCheckedChange = {
-                    onUpdate(bout.copy(visitorCheck3 = it))
-                },
-                modifier = Modifier
-                    .width(40.dp)
-                    .fillMaxHeight() // Ocupa toda la altura disponible
-            )
-
-            // Amonestaciones visitante
-            WrestlingTextField(
-                value = bout.visitorPenalty,
-                onValueChange = {
-                    onUpdate(bout.copy(visitorPenalty = it))
-                },
-                keyboardType = KeyboardType.Number,
-                modifier = Modifier
-                    .width(80.dp)
-                    .fillMaxHeight(), // Ocupa toda la altura disponible
-                label = ""
-            )
-        }
-
-        // CORRECCIÓN PRINCIPAL: Campos de marcador acumulado separados y editables
-        Row(
-            modifier = Modifier
-                .width(90.dp)
-                .fillMaxHeight(), // Ocupa toda la altura disponible
-            horizontalArrangement = Arrangement.spacedBy(6.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            // Marcador acumulado equipo local
-            WrestlingTextField(
-                value = bout.localScore,
-                onValueChange = { newValue ->
-                    // Validar que sea un número válido
-                    val cleanValue = newValue.filter { it.isDigit() }
-                    if (cleanValue.length <= 2) { // Máximo 2 dígitos
-                        onUpdate(bout.copy(localScore = cleanValue))
-                    }
-                },
-                keyboardType = KeyboardType.Number,
-                modifier = Modifier
-                    .weight(1f)
-                    .fillMaxHeight(), // Ocupa toda la altura disponible
-                label = ""
-            )
-
-            // Marcador acumulado equipo visitante
-            WrestlingTextField(
-                value = bout.visitorScore,
-                onValueChange = { newValue ->
-                    // Validar que sea un número válido
-                    val cleanValue = newValue.filter { it.isDigit() }
-                    if (cleanValue.length <= 2) { // Máximo 2 dígitos
-                        onUpdate(bout.copy(visitorScore = cleanValue))
-                    }
-                },
-                keyboardType = KeyboardType.Number,
-                modifier = Modifier
-                    .weight(1f)
-                    .fillMaxHeight(), // Ocupa toda la altura disponible
-                label = ""
-            )
-        }
+        // Marcadores
+        BoutScoreSection(bout = bout, onUpdate = onUpdate)
 
         // Botón eliminar
         IconButton(
             onClick = onDelete,
-            modifier = Modifier
-                .size(38.dp) // Tamaño fijo para coincidir con el espacio en la cabecera
-                .fillMaxHeight() // Ocupa toda la altura disponible
+            modifier = Modifier.size(38.dp)
         ) {
             Icon(
                 imageVector = Icons.Default.Delete,
@@ -1709,6 +1324,143 @@ private fun MatchBoutRow(
 }
 
 @Composable
+private fun BoutTeamRow(
+    isLocal: Boolean,
+    bout: MatchActBout,
+    wrestlers: List<MatchActWrestler>,
+    availableWrestlers: List<Wrestler>,
+    onUpdate: (MatchActBout) -> Unit,
+    modifier: Modifier = Modifier // Añadir parámetro modifier
+) {
+    Row(
+        modifier = modifier, // Usar el modifier pasado como parámetro
+        horizontalArrangement = Arrangement.spacedBy(6.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        // Selector de luchador
+        val wrestlerNumber = if (isLocal) bout.localWrestlerNumber else bout.visitorWrestlerNumber
+        val selectedWrestlerIndex = wrestlerNumber.toIntOrNull()?.minus(1)
+        val selectedWrestler = if (selectedWrestlerIndex != null && selectedWrestlerIndex < wrestlers.size) {
+            val matchWrestler = wrestlers[selectedWrestlerIndex]
+            availableWrestlers.find { it.licenseNumber == matchWrestler.licenseNumber }
+        } else null
+
+        DropdownField(
+            value = selectedWrestler?.let { wrestler ->
+                "${wrestler.classification.displayName()} - ${wrestler.fullName}"
+            } ?: "",
+            onValueChange = { selectedValue ->
+                // Extraer el número del luchador basado en la selección
+                val wrestlerOptions = wrestlers.mapIndexedNotNull { index, matchWrestler ->
+                    val wrestler = availableWrestlers.find { it.licenseNumber == matchWrestler.licenseNumber }
+                    wrestler?.let {
+                        "${it.classification.displayName()} - ${it.fullName}" to (index + 1)
+                    }
+                }
+
+                val selectedIndex = wrestlerOptions.find { it.first == selectedValue }?.second
+                selectedIndex?.let { index ->
+                    if (isLocal) {
+                        onUpdate(bout.copy(localWrestlerNumber = index.toString()))
+                    } else {
+                        onUpdate(bout.copy(visitorWrestlerNumber = index.toString()))
+                    }
+                }
+            },
+            label = if (isLocal) "Luchador Local" else "Luchador Visitante",
+            options = wrestlers.mapIndexedNotNull { _, matchWrestler ->
+                val wrestler = availableWrestlers.find { it.licenseNumber == matchWrestler.licenseNumber }
+                wrestler?.let {
+                    "${it.classification.displayName()} - ${it.fullName}"
+                }
+            },
+            modifier = Modifier.weight(1f)
+        )
+
+        // Checkboxes para agarradas
+        val checks = if (isLocal) {
+            listOf(bout.localCheck1, bout.localCheck2, bout.localCheck3)
+        } else {
+            listOf(bout.visitorCheck1, bout.visitorCheck2, bout.visitorCheck3)
+        }
+
+        checks.forEachIndexed { index, checked ->
+            MatchBoutCheckbox(
+                checked = checked,
+                onCheckedChange = { newChecked ->
+                    when {
+                        isLocal -> when (index) {
+                            0 -> onUpdate(bout.copy(localCheck1 = newChecked))
+                            1 -> onUpdate(bout.copy(localCheck2 = newChecked))
+                            2 -> onUpdate(bout.copy(localCheck3 = newChecked))
+                        }
+                        else -> when (index) {
+                            0 -> onUpdate(bout.copy(visitorCheck1 = newChecked))
+                            1 -> onUpdate(bout.copy(visitorCheck2 = newChecked))
+                            2 -> onUpdate(bout.copy(visitorCheck3 = newChecked))
+                        }
+                    }
+                },
+                modifier = Modifier.width(40.dp)
+            )
+        }
+
+        // Campo de amonestaciones
+        val penalty = if (isLocal) bout.localPenalty else bout.visitorPenalty
+        WrestlingTextField(
+            value = penalty,
+            onValueChange = { newValue ->
+                if (isLocal) {
+                    onUpdate(bout.copy(localPenalty = newValue))
+                } else {
+                    onUpdate(bout.copy(visitorPenalty = newValue))
+                }
+            },
+            keyboardType = KeyboardType.Number,
+            modifier = Modifier.width(80.dp),
+            label = ""
+        )
+    }
+}
+
+@Composable
+private fun BoutScoreSection(
+    bout: MatchActBout,
+    onUpdate: (MatchActBout) -> Unit
+) {
+    Row(
+        modifier = Modifier.width(90.dp),
+        horizontalArrangement = Arrangement.spacedBy(6.dp)
+    ) {
+        WrestlingTextField(
+            value = bout.localScore,
+            onValueChange = { newValue ->
+                val cleanValue = newValue.filter { it.isDigit() }
+                if (cleanValue.length <= 2) {
+                    onUpdate(bout.copy(localScore = cleanValue))
+                }
+            },
+            keyboardType = KeyboardType.Number,
+            modifier = Modifier.weight(1f),
+            label = ""
+        )
+
+        WrestlingTextField(
+            value = bout.visitorScore,
+            onValueChange = { newValue ->
+                val cleanValue = newValue.filter { it.isDigit() }
+                if (cleanValue.length <= 2) {
+                    onUpdate(bout.copy(visitorScore = cleanValue))
+                }
+            },
+            keyboardType = KeyboardType.Number,
+            modifier = Modifier.weight(1f),
+            label = ""
+        )
+    }
+}
+
+@Composable
 private fun MatchBoutCheckbox(
     checked: Boolean,
     onCheckedChange: (Boolean) -> Unit,
@@ -1716,7 +1468,6 @@ private fun MatchBoutCheckbox(
 ) {
     Box(
         modifier = modifier
-            .wrapContentHeight() // Permite que tenga su altura natural
             .clip(WrestlingTheme.shapes.small)
             .border(
                 width = 1.dp,
@@ -1731,7 +1482,7 @@ private fun MatchBoutCheckbox(
                 shape = WrestlingTheme.shapes.small
             )
             .clickable { onCheckedChange(!checked) }
-            .padding(vertical = 12.dp), // Padding interno para dar altura suficiente
+            .padding(vertical = 12.dp),
         contentAlignment = Alignment.Center
     ) {
         if (checked) {
@@ -1743,4 +1494,50 @@ private fun MatchBoutCheckbox(
             )
         }
     }
+}
+
+@Composable
+private fun FinalResultSection(
+    localScore: Int,
+    visitorScore: Int
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(WrestlingTheme.dimensions.spacing_16),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            text = "Resultado Final:",
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.Bold
+        )
+
+        DropdownField(
+            value = localScore.toString(),
+            onValueChange = {},
+            label = "Club Local",
+            options = emptyList(),
+            readOnly = true,
+            modifier = Modifier.weight(1f)
+        )
+
+        DropdownField(
+            value = visitorScore.toString(),
+            onValueChange = {},
+            label = "Club Visitante",
+            options = emptyList(),
+            readOnly = true,
+            modifier = Modifier.weight(1f)
+        )
+    }
+
+    Spacer(modifier = Modifier.height(8.dp))
+
+    Text(
+        text = "* El resultado final corresponde al último marcador registrado en la tabla",
+        style = MaterialTheme.typography.bodySmall,
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
+        modifier = Modifier.fillMaxWidth(),
+        textAlign = TextAlign.Center
+    )
 }
