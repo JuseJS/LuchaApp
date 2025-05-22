@@ -59,7 +59,12 @@ val viewModelModule = module {
         MatchActViewModel(
             matchId = parameters.get(),
             getMatchDetailsUseCase = get(),
+            getMatchActUseCase = get(),
+            saveMatchActUseCase = get(),
             matchRepository = get(),
+            matchActRepository = get(),
+            getCompetitionsUseCase = get(),
+            getWrestlersByTeamIdUseCase = get(),
             navigationManager = get(),
             errorHandler = get()
         )
