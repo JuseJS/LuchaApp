@@ -24,8 +24,6 @@ import androidx.compose.ui.unit.dp
 import org.iesharia.core.ui.components.WrestlingButton
 import org.iesharia.core.ui.components.WrestlingButtonType
 import org.iesharia.core.ui.components.WrestlingTextField
-import org.iesharia.core.ui.components.common.InfoRow
-import org.iesharia.core.ui.components.common.InfoRowStyle
 import org.iesharia.core.ui.components.common.SectionDivider
 import org.iesharia.core.ui.components.common.SectionDividerType
 import org.iesharia.core.ui.screens.BaseContentScreen
