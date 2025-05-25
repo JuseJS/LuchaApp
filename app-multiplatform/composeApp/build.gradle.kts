@@ -118,18 +118,13 @@ compose.desktop {
 
             // macOS configuration
             macOS {
-                // For macOS you need .icns format - if you don't have it, you can convert your ico or png
-                // using online converters or specify a default compose icon by not setting this
-                // If you have an icns file, configure it like:
-                // iconFile.set(project.file("src/commonMain/composeResources/drawable/app_logo.icns"))
+                iconFile.set(project.file("src/commonMain/composeResources/drawable/app_icon.icns"))
                 bundleID = "org.iesharia.luchacanaria"
             }
 
             // Linux configuration
             linux {
-                // For Linux you typically need a PNG
-                // If you have a PNG version of your logo, use:
-                // iconFile.set(project.file("src/commonMain/composeResources/drawable/app_logo.png"))
+                iconFile.set(project.file("src/commonMain/composeResources/drawable/app_logo.png"))
             }
         }
     }
