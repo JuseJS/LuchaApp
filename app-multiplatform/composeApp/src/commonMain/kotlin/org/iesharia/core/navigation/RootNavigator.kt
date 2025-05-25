@@ -1,9 +1,13 @@
 package org.iesharia.core.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.transitions.SlideTransition
+import org.iesharia.features.auth.domain.security.SessionManager
 import org.iesharia.features.auth.ui.screens.LoginScreen
+import org.iesharia.features.home.ui.screens.HomeScreen
 import org.koin.compose.koinInject
 
 /**

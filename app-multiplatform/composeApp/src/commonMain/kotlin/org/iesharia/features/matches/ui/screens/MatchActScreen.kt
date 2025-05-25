@@ -10,6 +10,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Save
 import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -30,9 +31,10 @@ import org.iesharia.core.ui.screens.BaseContentScreen
 import org.iesharia.core.ui.theme.WrestlingTheme
 import org.iesharia.di.rememberViewModel
 import org.iesharia.features.competitions.domain.model.AgeCategory
-import org.iesharia.features.matches.ui.viewmodel.MatchActBout
 import org.iesharia.features.matches.ui.viewmodel.MatchActViewModel
-import org.iesharia.features.matches.ui.viewmodel.MatchActWrestler
+import org.iesharia.features.matches.domain.model.MatchActBout
+import org.iesharia.features.matches.domain.model.MatchActWrestler
+import org.iesharia.features.matches.domain.model.AssistantReferee
 import org.iesharia.features.wrestlers.domain.model.Wrestler
 import org.koin.core.parameter.parametersOf
 import org.iesharia.features.matches.domain.model.Referee as DomainReferee
@@ -54,11 +56,29 @@ class MatchActScreen(private val matchId: String) : BaseContentScreen() {
 
     @Composable
     override fun TopBarActions() {
-        IconButton(onClick = { viewModel.saveAct() }) {
+        val uiState by viewModel.uiState.collectAsState()
+        
+        // Botón para guardar borrador
+        IconButton(onClick = { viewModel.saveAct(complete = false) }) {
+            Icon(
+                imageVector = Icons.Default.Save,
+                contentDescription = "Guardar Borrador",
+                tint = MaterialTheme.colorScheme.onSurface
+            )
+        }
+        
+        // Botón para finalizar acta
+        IconButton(
+            onClick = { viewModel.saveAct(complete = true) },
+            enabled = !uiState.isCompleted
+        ) {
             Icon(
                 imageVector = Icons.Default.Check,
-                contentDescription = "Guardar Acta",
-                tint = MaterialTheme.colorScheme.primary
+                contentDescription = "Finalizar Acta",
+                tint = if (uiState.isCompleted) 
+                    MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
+                else 
+                    MaterialTheme.colorScheme.primary
             )
         }
     }
@@ -645,7 +665,7 @@ private fun AssistantRefereesSection(
 
 @Composable
 private fun AssistantRefereesList(
-    assistantReferees: List<org.iesharia.features.matches.ui.viewmodel.AssistantReferee>,
+    assistantReferees: List<AssistantReferee>,
     onRemove: (Int) -> Unit
 ) {
     Card(
@@ -724,7 +744,7 @@ private fun AssistantRefereesList(
 @Composable
 private fun AssistantRefereeRow(
     index: Int,
-    assistant: org.iesharia.features.matches.ui.viewmodel.AssistantReferee,
+    assistant: AssistantReferee,
     onRemove: () -> Unit
 ) {
     Row(
@@ -1051,6 +1071,9 @@ private fun WrestlerSelectionTable(
     modifier: Modifier = Modifier
 ) {
     val teamColor = if (isLocal) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.secondary
+    
+    // Debug log
+    println("WrestlerSelectionTable - ${if (isLocal) "Local" else "Visitor"} - Available wrestlers: ${availableWrestlers.size}")
 
     Column(modifier = modifier) {
         // Cabecera de la tabla

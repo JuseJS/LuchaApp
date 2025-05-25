@@ -6,9 +6,12 @@ import org.iesharia.core.domain.model.AppError
 import org.iesharia.core.domain.model.Favorite
 import org.iesharia.core.navigation.NavigationManager
 import org.iesharia.features.common.domain.usecase.GetFavoritesUseCase
+import org.iesharia.features.common.domain.usecase.ToggleFavoriteUseCase
+import org.iesharia.core.network.dto.EntityTypeDto
 import org.iesharia.features.competitions.domain.repository.CompetitionRepository
 import org.iesharia.features.wrestlers.domain.model.WrestlerClassification
 import org.iesharia.features.wrestlers.domain.model.WrestlerMatchResult
+import org.iesharia.features.wrestlers.domain.model.WrestlerStatistics
 import org.iesharia.features.wrestlers.domain.repository.WrestlerRepository
 import org.iesharia.features.wrestlers.domain.usecase.GetWrestlerResultsUseCase
 
@@ -20,6 +23,7 @@ class WrestlerDetailViewModel(
     private val wrestlerRepository: WrestlerRepository,
     private val competitionRepository: CompetitionRepository,
     private val getFavoritesUseCase: GetFavoritesUseCase,
+    private val toggleFavoriteUseCase: ToggleFavoriteUseCase,
     private val getWrestlerResultsUseCase: GetWrestlerResultsUseCase,
     navigationManager: NavigationManager,
     errorHandler: ErrorHandler
@@ -44,9 +48,9 @@ class WrestlerDetailViewModel(
                 val statisticsByClassification = calculateStatistics(matchResults)
 
                 // Comprobar si es favorito
-                val favorites = getFavoritesUseCase()
-                val isFavorite = favorites.any {
-                    it is Favorite.WrestlerFavorite && it.wrestler.id == wrestlerId
+                val favorites = getFavoritesUseCase().getOrElse { emptyList() }
+                val isFavorite = favorites.any { favorite ->
+                    favorite is Favorite.WrestlerFavorite && favorite.wrestler.id == wrestlerId
                 }
 
                 // Devolver nuevo estado
@@ -139,12 +143,31 @@ class WrestlerDetailViewModel(
     }
 
     /**
-     * Alternar estado de favorito (placeholder para funcionalidad real)
+     * Alternar estado de favorito
      */
     fun toggleFavorite() {
-        // En una implementación real, se llamaría a un usecase para gestionar favoritos
-        updateState {
-            it.copy(isFavorite = !it.isFavorite)
+        val currentState = uiState.value
+        if (currentState.wrestler == null) return
+        
+        launchSafe {
+            // Actualizar estado UI inmediatamente
+            updateState { it.copy(isFavorite = !it.isFavorite) }
+            
+            // Llamar al servidor
+            toggleFavoriteUseCase(
+                entityId = wrestlerId,
+                entityType = EntityTypeDto.WRESTLER,
+                currentState = currentState.isFavorite
+            ).fold(
+                onSuccess = {
+                    // Éxito - el estado UI ya está actualizado
+                },
+                onFailure = { throwable ->
+                    // Error - revertir el estado UI
+                    updateState { it.copy(isFavorite = currentState.isFavorite) }
+                    errorHandler.handleError(AppError.NetworkError(throwable.message ?: "Error al cambiar favorito"))
+                }
+            )
         }
     }
 

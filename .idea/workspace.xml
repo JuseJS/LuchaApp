@@ -4,11 +4,44 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="0ef49ca6-379a-4222-84d6-07ae823a3402" name="Changes" comment="refactor: restructure project and initialize KMP application&#10;&#10;- Reorganize project documentation into docs/&#10;- Set up initial KMP application structure&#10;- Create base configuration files for multiplatform setup">
-      <change afterPath="$PROJECT_DIR$/.idea/LuchaApp.iml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+    <list default="true" id="0ef49ca6-379a-4222-84d6-07ae823a3402" name="Changes" comment="fix">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app-multiplatform/composeApp/src/commonMain/kotlin/org/iesharia/core/navigation/NavigationExtensions.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app-multiplatform/composeApp/src/commonMain/kotlin/org/iesharia/core/navigation/NavigationExtensions.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app-multiplatform/composeApp/src/commonMain/kotlin/org/iesharia/core/navigation/NavigationFactory.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app-multiplatform/composeApp/src/commonMain/kotlin/org/iesharia/core/navigation/NavigationFactory.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app-multiplatform/composeApp/src/commonMain/kotlin/org/iesharia/core/navigation/RootNavigator.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app-multiplatform/composeApp/src/commonMain/kotlin/org/iesharia/core/navigation/RootNavigator.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app-multiplatform/composeApp/src/commonMain/kotlin/org/iesharia/core/ui/screens/BaseContentScreen.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app-multiplatform/composeApp/src/commonMain/kotlin/org/iesharia/core/ui/screens/BaseContentScreen.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app-multiplatform/composeApp/src/commonMain/kotlin/org/iesharia/di/UiModules.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app-multiplatform/composeApp/src/commonMain/kotlin/org/iesharia/di/UiModules.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app-multiplatform/composeApp/src/commonMain/kotlin/org/iesharia/features/auth/ui/components/AuthForms.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app-multiplatform/composeApp/src/commonMain/kotlin/org/iesharia/features/auth/ui/components/AuthForms.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app-multiplatform/composeApp/src/commonMain/kotlin/org/iesharia/features/auth/ui/screens/LoginScreen.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app-multiplatform/composeApp/src/commonMain/kotlin/org/iesharia/features/auth/ui/screens/LoginScreen.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app-multiplatform/composeApp/src/commonMain/kotlin/org/iesharia/features/auth/ui/viewmodel/LoginViewModel.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app-multiplatform/composeApp/src/commonMain/kotlin/org/iesharia/features/auth/ui/viewmodel/LoginViewModel.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app-multiplatform/composeApp/src/commonMain/kotlin/org/iesharia/features/competitions/ui/components/CompetitionsSection.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app-multiplatform/composeApp/src/commonMain/kotlin/org/iesharia/features/competitions/ui/components/CompetitionsSection.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app-multiplatform/composeApp/src/commonMain/kotlin/org/iesharia/features/competitions/ui/components/FiltersDialog.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app-multiplatform/composeApp/src/commonMain/kotlin/org/iesharia/features/competitions/ui/components/FiltersDialog.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app-multiplatform/composeApp/src/commonMain/kotlin/org/iesharia/features/competitions/ui/viewmodel/CompetitionDetailViewModel.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app-multiplatform/composeApp/src/commonMain/kotlin/org/iesharia/features/competitions/ui/viewmodel/CompetitionDetailViewModel.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app-multiplatform/composeApp/src/commonMain/kotlin/org/iesharia/features/home/ui/components/FavoritesSection.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app-multiplatform/composeApp/src/commonMain/kotlin/org/iesharia/features/home/ui/components/FavoritesSection.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app-multiplatform/composeApp/src/commonMain/kotlin/org/iesharia/features/home/ui/screens/HomeContent.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app-multiplatform/composeApp/src/commonMain/kotlin/org/iesharia/features/home/ui/screens/HomeContent.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app-multiplatform/composeApp/src/commonMain/kotlin/org/iesharia/features/home/ui/screens/HomeFavoritesSection.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app-multiplatform/composeApp/src/commonMain/kotlin/org/iesharia/features/home/ui/screens/HomeFavoritesSection.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app-multiplatform/composeApp/src/commonMain/kotlin/org/iesharia/features/home/ui/screens/HomeScreen.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app-multiplatform/composeApp/src/commonMain/kotlin/org/iesharia/features/home/ui/screens/HomeScreen.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app-multiplatform/composeApp/src/commonMain/kotlin/org/iesharia/features/home/ui/screens/HomeSearchResults.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app-multiplatform/composeApp/src/commonMain/kotlin/org/iesharia/features/home/ui/screens/HomeSearchResults.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app-multiplatform/composeApp/src/commonMain/kotlin/org/iesharia/features/home/ui/viewmodel/HomeUiState.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app-multiplatform/composeApp/src/commonMain/kotlin/org/iesharia/features/home/ui/viewmodel/HomeUiState.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app-multiplatform/composeApp/src/commonMain/kotlin/org/iesharia/features/home/ui/viewmodel/HomeViewModel.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app-multiplatform/composeApp/src/commonMain/kotlin/org/iesharia/features/home/ui/viewmodel/HomeViewModel.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app-multiplatform/composeApp/src/commonMain/kotlin/org/iesharia/features/matches/ui/screens/MatchActScreen.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app-multiplatform/composeApp/src/commonMain/kotlin/org/iesharia/features/matches/ui/screens/MatchActScreen.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app-multiplatform/composeApp/src/commonMain/kotlin/org/iesharia/features/matches/ui/screens/MatchDetailScreen.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app-multiplatform/composeApp/src/commonMain/kotlin/org/iesharia/features/matches/ui/screens/MatchDetailScreen.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app-multiplatform/composeApp/src/commonMain/kotlin/org/iesharia/features/matches/ui/viewmodel/MatchActUiState.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app-multiplatform/composeApp/src/commonMain/kotlin/org/iesharia/features/matches/ui/viewmodel/MatchActUiState.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app-multiplatform/composeApp/src/commonMain/kotlin/org/iesharia/features/matches/ui/viewmodel/MatchActViewModel.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app-multiplatform/composeApp/src/commonMain/kotlin/org/iesharia/features/matches/ui/viewmodel/MatchActViewModel.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app-multiplatform/composeApp/src/commonMain/kotlin/org/iesharia/features/matches/ui/viewmodel/MatchDetailViewModel.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app-multiplatform/composeApp/src/commonMain/kotlin/org/iesharia/features/matches/ui/viewmodel/MatchDetailViewModel.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app-multiplatform/composeApp/src/commonMain/kotlin/org/iesharia/features/teams/ui/viewmodel/TeamDetailViewModel.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app-multiplatform/composeApp/src/commonMain/kotlin/org/iesharia/features/teams/ui/viewmodel/TeamDetailViewModel.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app-multiplatform/composeApp/src/commonMain/kotlin/org/iesharia/features/wrestlers/ui/components/DetailedStatisticsTable.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app-multiplatform/composeApp/src/commonMain/kotlin/org/iesharia/features/wrestlers/ui/components/DetailedStatisticsTable.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app-multiplatform/composeApp/src/commonMain/kotlin/org/iesharia/features/wrestlers/ui/components/WrestlerStatisticsCalculator.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app-multiplatform/composeApp/src/commonMain/kotlin/org/iesharia/features/wrestlers/ui/components/WrestlerStatisticsCalculator.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app-multiplatform/composeApp/src/commonMain/kotlin/org/iesharia/features/wrestlers/ui/components/WrestlerStatisticsSection.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app-multiplatform/composeApp/src/commonMain/kotlin/org/iesharia/features/wrestlers/ui/components/WrestlerStatisticsSection.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app-multiplatform/composeApp/src/commonMain/kotlin/org/iesharia/features/wrestlers/ui/viewmodel/WrestlerDetailUiState.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app-multiplatform/composeApp/src/commonMain/kotlin/org/iesharia/features/wrestlers/ui/viewmodel/WrestlerDetailUiState.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app-multiplatform/composeApp/src/commonMain/kotlin/org/iesharia/features/wrestlers/ui/viewmodel/WrestlerDetailViewModel.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app-multiplatform/composeApp/src/commonMain/kotlin/org/iesharia/features/wrestlers/ui/viewmodel/WrestlerDetailViewModel.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app-multiplatform/gradle/libs.versions.toml" beforeDir="false" afterPath="$PROJECT_DIR$/app-multiplatform/gradle/libs.versions.toml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app-multiplatform/shared/build.gradle.kts" beforeDir="false" afterPath="$PROJECT_DIR$/app-multiplatform/shared/build.gradle.kts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app-multiplatform/shared/src/commonMain/kotlin/org/iesharia/core/navigation/NavigationManager.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app-multiplatform/shared/src/commonMain/kotlin/org/iesharia/core/navigation/NavigationManager.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app-multiplatform/shared/src/commonMain/kotlin/org/iesharia/core/navigation/Routes.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app-multiplatform/shared/src/commonMain/kotlin/org/iesharia/core/navigation/Routes.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app-multiplatform/shared/src/commonMain/kotlin/org/iesharia/di/KoinModules.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app-multiplatform/shared/src/commonMain/kotlin/org/iesharia/di/KoinModules.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app-multiplatform/shared/src/commonMain/kotlin/org/iesharia/features/auth/domain/security/SessionManager.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app-multiplatform/shared/src/commonMain/kotlin/org/iesharia/features/auth/domain/security/SessionManager.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app-multiplatform/shared/src/commonMain/kotlin/org/iesharia/features/common/domain/usecase/GetFavoritesUseCase.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app-multiplatform/shared/src/commonMain/kotlin/org/iesharia/features/common/domain/usecase/GetFavoritesUseCase.kt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -48,17 +81,17 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "android.gradle.sync.needed": "true",
-    "git-widget-placeholder": "main",
-    "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "/Volumes/MacSecundario/LuchaApp"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+    &quot;android.gradle.sync.needed&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/Volumes/MacSecundario/LuchaApp&quot;
   }
-}]]></component>
+}</component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
@@ -76,11 +109,28 @@
       <option name="project" value="LOCAL" />
       <updated>1745948625765</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="fix">
+      <option name="closed" value="true" />
+      <created>1747999225353</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1747999225353</updated>
+    </task>
+    <task id="LOCAL-00003" summary="fix">
+      <option name="closed" value="true" />
+      <created>1747999361554</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1747999361554</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="refactor: restructure project and initialize KMP application&#10;&#10;- Reorganize project documentation into docs/&#10;- Set up initial KMP application structure&#10;- Create base configuration files for multiplatform setup" />
-    <option name="LAST_COMMIT_MESSAGE" value="refactor: restructure project and initialize KMP application&#10;&#10;- Reorganize project documentation into docs/&#10;- Set up initial KMP application structure&#10;- Create base configuration files for multiplatform setup" />
+    <MESSAGE value="fix" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix" />
   </component>
 </project>

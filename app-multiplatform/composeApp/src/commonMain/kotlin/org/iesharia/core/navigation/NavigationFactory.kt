@@ -3,6 +3,7 @@ package org.iesharia.core.navigation
 import cafe.adriel.voyager.core.screen.Screen
 import org.iesharia.features.auth.ui.screens.LoginScreen
 import org.iesharia.features.competitions.ui.screens.CompetitionDetailScreen
+import org.iesharia.features.config.ui.screens.ConfigScreen
 import org.iesharia.features.home.ui.screens.HomeScreen
 import org.iesharia.features.matches.ui.screens.MatchActScreen
 import org.iesharia.features.matches.ui.screens.MatchDetailScreen
@@ -52,6 +53,9 @@ class NavigationFactory {
                 println("NavigationFactory: Creando MatchActScreen con ID: $matchId") // Debug
                 MatchActScreen(matchId)
             }
+
+            // Configuración
+            is Routes.Config.Settings -> ConfigScreen()
 
             // Ruta desconocida
             else -> LoginScreen()

@@ -5,7 +5,11 @@ import org.iesharia.core.common.ErrorHandler
 import org.iesharia.core.domain.model.Favorite
 import org.iesharia.core.navigation.NavigationManager
 import org.iesharia.features.common.domain.usecase.GetFavoritesUseCase
+import org.iesharia.features.common.domain.usecase.ToggleFavoriteUseCase
+import org.iesharia.core.network.dto.EntityTypeDto
+import org.iesharia.core.domain.model.AppError
 import org.iesharia.features.competitions.domain.repository.CompetitionRepository
+import org.iesharia.features.teams.domain.usecase.GetTeamByIdUseCase
 import org.iesharia.features.wrestlers.domain.model.Wrestler
 import org.iesharia.features.wrestlers.domain.model.WrestlerCategory
 import org.iesharia.features.wrestlers.domain.model.WrestlerClassification
@@ -14,8 +18,10 @@ import org.iesharia.features.wrestlers.domain.usecase.GetWrestlersByTeamIdUseCas
 class TeamDetailViewModel(
     private val teamId: String,
     private val competitionRepository: CompetitionRepository,
+    private val getTeamByIdUseCase: GetTeamByIdUseCase,
     private val getWrestlersByTeamIdUseCase: GetWrestlersByTeamIdUseCase,
     private val getFavoritesUseCase: GetFavoritesUseCase,
+    private val toggleFavoriteUseCase: ToggleFavoriteUseCase,
     navigationManager: NavigationManager,
     errorHandler: ErrorHandler
 ) : BaseViewModel<TeamDetailUiState>(TeamDetailUiState(), errorHandler, navigationManager) {
@@ -31,11 +37,10 @@ class TeamDetailViewModel(
         // Usar la función loadEntity de BaseViewModel
         loadEntity(
             entityId = teamId,
-            fetchEntity = {
-                val competitions = competitionRepository.getCompetitions()
-                competitions.flatMap { it.teams }.find { it.id == teamId }
-            },
+            fetchEntity = { getTeamByIdUseCase(teamId) },
             processEntity = { team ->
+                println("🏀 Cargando detalles del equipo: ${team.name} (ID: ${team.id})")
+                
                 // Obtener luchadores
                 val wrestlers = getWrestlersByTeamIdUseCase(teamId)
 
@@ -55,28 +60,47 @@ class TeamDetailViewModel(
                 val teamCompetitions = competitionRepository.getCompetitions().filter { competition ->
                     competition.teams.any { it.id == teamId }
                 }
+                
+                println("🏆 Competiciones del equipo: ${teamCompetitions.size}")
+                teamCompetitions.forEach { comp ->
+                    println("  - ${comp.name}: ${comp.matchDays.size} jornadas")
+                    println("    Equipos: ${comp.teams.size}")
+                    println("    Partidos totales: ${comp.matchDays.flatMap { it.matches }.size}")
+                }
 
                 // Obtener enfrentamientos
                 val matchesByCompetition = teamCompetitions.associate { competition ->
+                    println("\n🔍 Buscando partidos del equipo en ${competition.name}")
+                    
                     val lastMatchDay = competition.lastCompletedMatchDay?.let { matchDay ->
-                        if (matchDay.matches.any { match ->
-                                match.localTeam.id == teamId || match.visitorTeam.id == teamId
-                            }) matchDay else null
+                        val teamMatch = matchDay.matches.find { match ->
+                            match.localTeam.id == teamId || match.visitorTeam.id == teamId
+                        }
+                        if (teamMatch != null) {
+                            println("  ✅ Último partido completado: Jornada ${matchDay.number}")
+                            println("     ${teamMatch.localTeam.name} vs ${teamMatch.visitorTeam.name}")
+                            matchDay
+                        } else null
                     }
 
                     val nextMatchDay = competition.nextMatchDay?.let { matchDay ->
-                        if (matchDay.matches.any { match ->
-                                match.localTeam.id == teamId || match.visitorTeam.id == teamId
-                            }) matchDay else null
+                        val teamMatch = matchDay.matches.find { match ->
+                            match.localTeam.id == teamId || match.visitorTeam.id == teamId
+                        }
+                        if (teamMatch != null) {
+                            println("  ⏭️ Próximo partido: Jornada ${matchDay.number}")
+                            println("     ${teamMatch.localTeam.name} vs ${teamMatch.visitorTeam.name}")
+                            matchDay
+                        } else null
                     }
 
                     competition.id to Pair(lastMatchDay, nextMatchDay)
                 }
 
                 // Comprobar si es favorito
-                val favorites = getFavoritesUseCase()
-                val isFavorite = favorites.any {
-                    it is Favorite.TeamFavorite && it.team.id == teamId
+                val favorites = getFavoritesUseCase().getOrElse { emptyList() }
+                val isFavorite = favorites.any { favorite ->
+                    favorite is Favorite.TeamFavorite && favorite.team.id == teamId
                 }
 
                 // Devolver nuevo estado
@@ -116,9 +140,28 @@ class TeamDetailViewModel(
      * Alternar estado de favorito
      */
     fun toggleFavorite() {
-        // Por ahora, solo actualizamos el estado UI
-        updateState {
-            it.copy(isFavorite = !it.isFavorite)
+        val currentState = uiState.value
+        if (currentState.team == null) return
+        
+        launchSafe {
+            // Actualizar estado UI inmediatamente
+            updateState { it.copy(isFavorite = !it.isFavorite) }
+            
+            // Llamar al servidor
+            toggleFavoriteUseCase(
+                entityId = teamId,
+                entityType = EntityTypeDto.TEAM,
+                currentState = currentState.isFavorite
+            ).fold(
+                onSuccess = {
+                    // Éxito - el estado UI ya está actualizado
+                },
+                onFailure = { throwable ->
+                    // Error - revertir el estado UI
+                    updateState { it.copy(isFavorite = currentState.isFavorite) }
+                    errorHandler.handleError(AppError.NetworkError(throwable.message ?: "Error al cambiar favorito"))
+                }
+            )
         }
     }
 

@@ -7,11 +7,13 @@ import org.iesharia.core.navigation.NavigationManager
 import org.iesharia.core.navigation.Routes
 import org.iesharia.features.matches.domain.repository.MatchRepository
 import org.iesharia.features.matches.domain.usecase.GetMatchDetailsUseCase
+import org.iesharia.features.matches.domain.usecase.GetMatchActUseCase
 
 class MatchDetailViewModel(
     private val matchId: String,
     private val getMatchDetailsUseCase: GetMatchDetailsUseCase,
     private val matchRepository: MatchRepository,
+    private val getMatchActUseCase: GetMatchActUseCase,
     navigationManager: NavigationManager,
     errorHandler: ErrorHandler
 ) : BaseViewModel<MatchDetailUiState>(MatchDetailUiState(), errorHandler, navigationManager) {
@@ -28,16 +30,56 @@ class MatchDetailViewModel(
             entityId = matchId,
             fetchEntity = {
                 // Obtener detalles del enfrentamiento
-                val (match, localTeamWrestlers, visitorTeamWrestlers) = getMatchDetailsUseCase(matchId)
+                val (match, _, _) = getMatchDetailsUseCase(matchId)
                 match
             },
             processEntity = { match ->
-                // Obtener datos adicionales
-                val (referee, assistantReferees) = matchRepository.getMatchReferees(matchId)
+                // Intentar obtener el acta del enfrentamiento
+                val matchAct = try {
+                    getMatchActUseCase.byMatchId(matchId)
+                } catch (e: Exception) {
+                    println("No se encontró acta para el match: ${e.message}")
+                    null
+                }
+                
+                // Obtener luchadores
+                val (allLocalWrestlers, allVisitorWrestlers) = try {
+                    val (_, local, visitor) = getMatchDetailsUseCase(matchId)
+                    Pair(local, visitor)
+                } catch (e: Exception) {
+                    Pair(emptyList(), emptyList())
+                }
+                
+                // Si hay acta, filtrar solo los luchadores que participaron
+                val (localTeamWrestlers, visitorTeamWrestlers) = if (matchAct != null && match.hasAct) {
+                    println("Filtrando luchadores que participaron en el acta...")
+                    val localActWrestlerIds = matchAct.localTeam.wrestlers.map { it.wrestlerId }.toSet()
+                    val visitorActWrestlerIds = matchAct.visitorTeam.wrestlers.map { it.wrestlerId }.toSet()
+                    
+                    val localParticipants = allLocalWrestlers.filter { it.id in localActWrestlerIds }
+                    val visitorParticipants = allVisitorWrestlers.filter { it.id in visitorActWrestlerIds }
+                    
+                    println("Luchadores locales que participaron: ${localParticipants.size}")
+                    println("Luchadores visitantes que participaron: ${visitorParticipants.size}")
+                    
+                    Pair(localParticipants, visitorParticipants)
+                } else {
+                    println("No hay acta, mostrando todos los luchadores de los equipos...")
+                    Pair(allLocalWrestlers, allVisitorWrestlers)
+                }
+                
+                // Obtener árbitros del acta si existe
+                val (referee, assistantReferees) = if (matchAct != null) {
+                    val mainRefereeName = "${matchAct.mainReferee.name} (${matchAct.mainReferee.licenseNumber})"
+                    val assistantRefereeNames = matchAct.assistantReferees.map { 
+                        "${it.name} (${it.licenseNumber})"
+                    }
+                    Pair(mainRefereeName, assistantRefereeNames)
+                } else {
+                    matchRepository.getMatchReferees(matchId)
+                }
+                
                 val statsMap = matchRepository.getMatchStatistics(matchId)
-
-                // Obtener luchadores de ambos equipos
-                val (_, localTeamWrestlers, visitorTeamWrestlers) = getMatchDetailsUseCase(matchId)
 
                 // Crear objeto de estadísticas
                 val matchStats = MatchStats(

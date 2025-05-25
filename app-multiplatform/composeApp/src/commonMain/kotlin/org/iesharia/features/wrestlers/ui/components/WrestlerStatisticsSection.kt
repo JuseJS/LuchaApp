@@ -7,7 +7,7 @@ import org.iesharia.core.ui.components.common.SectionDivider
 import org.iesharia.core.ui.components.common.SectionDividerType
 import org.iesharia.core.ui.theme.WrestlingTheme
 import org.iesharia.features.wrestlers.domain.model.WrestlerClassification
-import org.iesharia.features.wrestlers.ui.viewmodel.WrestlerStatistics
+import org.iesharia.features.wrestlers.domain.model.WrestlerStatistics
 
 /**
  * Sección de estadísticas de rendimiento del luchador

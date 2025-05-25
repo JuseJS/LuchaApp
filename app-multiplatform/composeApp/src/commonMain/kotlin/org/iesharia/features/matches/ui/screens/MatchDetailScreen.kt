@@ -32,6 +32,11 @@ class MatchDetailScreen(private val matchId: String) : BaseContentScreen() {
     @Composable
     override fun SetupViewModel() {
         viewModel = rememberViewModel<MatchDetailViewModel> { parametersOf(matchId) }
+        
+        // Refresh data when screen becomes visible (e.g., returning from MatchActScreen)
+        LaunchedEffect(Unit) {
+            viewModel.refreshData()
+        }
     }
 
     @Composable
@@ -162,23 +167,6 @@ private fun MatchDetailContent(
                 )
             }
             Spacer(modifier = Modifier.height(WrestlingTheme.dimensions.spacing_24))
-        }
-
-        // Estadísticas del enfrentamiento (solo si está completado)
-        if (match.completed && uiState.matchStats != null) {
-            item {
-                AnimatedVisibility(
-                    visible = showStats,
-                    enter = fadeIn(tween(500)) + expandVertically(tween(500))
-                ) {
-                    MatchStatsSection(
-                        stats = uiState.matchStats!!,
-                        localTeamName = match.localTeam.name,
-                        visitorTeamName = match.visitorTeam.name
-                    )
-                }
-                Spacer(modifier = Modifier.height(WrestlingTheme.dimensions.spacing_24))
-            }
         }
 
         // Información de árbitros

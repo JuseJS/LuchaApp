@@ -6,12 +6,15 @@ import org.iesharia.core.domain.model.AppError
 import org.iesharia.core.domain.model.Favorite
 import org.iesharia.core.navigation.NavigationManager
 import org.iesharia.features.common.domain.usecase.GetFavoritesUseCase
+import org.iesharia.features.common.domain.usecase.ToggleFavoriteUseCase
+import org.iesharia.core.network.dto.EntityTypeDto
 import org.iesharia.features.competitions.domain.repository.CompetitionRepository
 
 class CompetitionDetailViewModel(
     private val competitionId: String,
     private val competitionRepository: CompetitionRepository,
     private val getFavoritesUseCase: GetFavoritesUseCase,
+    private val toggleFavoriteUseCase: ToggleFavoriteUseCase,
     navigationManager: NavigationManager,
     errorHandler: ErrorHandler
 ) : BaseViewModel<CompetitionDetailUiState>(CompetitionDetailUiState(), errorHandler, navigationManager) {
@@ -26,9 +29,9 @@ class CompetitionDetailViewModel(
             fetchEntity = { competitionRepository.getCompetition(competitionId) },
             processEntity = { competition ->
                 // Comprobar si es favorito
-                val favorites = getFavoritesUseCase()
-                val isFavorite = favorites.any {
-                    it is Favorite.CompetitionFavorite && it.competition.id == competitionId
+                val favorites = getFavoritesUseCase().getOrElse { emptyList() }
+                val isFavorite = favorites.any { favorite ->
+                    favorite is Favorite.CompetitionFavorite && favorite.competition.id == competitionId
                 }
 
                 // Devolver nuevo estado
@@ -58,11 +61,37 @@ class CompetitionDetailViewModel(
         navigateToEntityDetail(EntityType.TEAM, teamId)
     }
 
-    // Esta función es un placeholder para la funcionalidad de favoritos
     fun toggleFavorite() {
-        // Por ahora, solo actualizamos el estado UI
-        updateState {
-            it.copy(isFavorite = !it.isFavorite)
+        val currentState = uiState.value
+        if (currentState.competition == null) return
+        
+        launchSafe(
+            errorHandler = { error ->
+                errorHandler.handleError(error)
+            }
+        ) {
+            // Actualizamos el estado UI inmediatamente para una respuesta más rápida
+            updateState {
+                it.copy(isFavorite = !it.isFavorite)
+            }
+            
+            // Hacemos la llamada al servidor
+            toggleFavoriteUseCase(
+                entityId = competitionId,
+                entityType = EntityTypeDto.COMPETITION,
+                currentState = currentState.isFavorite
+            ).fold(
+                onSuccess = {
+                    // Éxito, el estado ya está actualizado
+                },
+                onFailure = { error ->
+                    // Si falla, revertimos el cambio
+                    updateState {
+                        it.copy(isFavorite = currentState.isFavorite)
+                    }
+                    errorHandler.handleError(error as? AppError ?: AppError.UnknownError(error, "Error al actualizar favorito"))
+                }
+            )
         }
     }
 

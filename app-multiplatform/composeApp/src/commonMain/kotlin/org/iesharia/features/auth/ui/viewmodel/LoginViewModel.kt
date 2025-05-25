@@ -7,12 +7,14 @@ import org.iesharia.core.navigation.NavigationManager
 import org.iesharia.core.resources.AppStrings
 import org.iesharia.features.auth.domain.repository.UserRepository
 import org.iesharia.features.auth.domain.security.SessionManager
+import org.iesharia.core.network.service.HealthService
 
 class LoginViewModel(
     navigationManager: NavigationManager,
     errorHandler: ErrorHandler,
     private val userRepository: UserRepository,
-    private val sessionManager: SessionManager
+    private val sessionManager: SessionManager,
+    private val healthService: HealthService? = null
 ) : BaseViewModel<LoginUiState>(LoginUiState(), errorHandler, navigationManager) {
 
     init {
@@ -120,6 +122,14 @@ class LoginViewModel(
                     }
                     else -> {
                         updateState { it.copy(isLoading = false) }
+                        // Verificar conectividad si hay un error de red
+                        if (error.message?.contains("connect", ignoreCase = true) == true ||
+                            error.message?.contains("timeout", ignoreCase = true) == true ||
+                            error.message?.contains("network", ignoreCase = true) == true) {
+                            launchSafe {
+                                healthService?.testConnection()
+                            }
+                        }
                     }
                 }
             }
@@ -181,15 +191,29 @@ class LoginViewModel(
                         }
                     }
                     is AppError.ServerError -> {
+                        // Check if it's a password validation error from backend
+                        val message = error.message
+                        val isPasswordError = message.contains("contraseña", ignoreCase = true) || 
+                                            message.contains("password", ignoreCase = true)
+                        
                         updateState {
                             it.copy(
                                 isLoading = false,
-                                registerEmailError = error.message
+                                registerPasswordError = if (isPasswordError) message else "",
+                                registerEmailError = if (!isPasswordError) message else ""
                             )
                         }
                     }
                     else -> {
                         updateState { it.copy(isLoading = false) }
+                        // Verificar conectividad si hay un error de red
+                        if (error.message?.contains("connect", ignoreCase = true) == true ||
+                            error.message?.contains("timeout", ignoreCase = true) == true ||
+                            error.message?.contains("network", ignoreCase = true) == true) {
+                            launchSafe {
+                                healthService?.testConnection()
+                            }
+                        }
                     }
                 }
             }
@@ -213,8 +237,12 @@ class LoginViewModel(
 
             if (currentState.registerPassword.isBlank()) {
                 throw AppError.ValidationError(field = "password", message = AppStrings.Auth.passwordRequired)
-            } else if (currentState.registerPassword.length < 6) {
-                throw AppError.ValidationError(field = "password", message = AppStrings.Auth.passwordTooShort)
+            } else if (currentState.registerPassword.length < 8) {
+                throw AppError.ValidationError(field = "password", message = "La contraseña debe tener al menos 8 caracteres")
+            } else if (!currentState.registerPassword.any { it.isUpperCase() }) {
+                throw AppError.ValidationError(field = "password", message = "La contraseña debe contener al menos una mayúscula")
+            } else if (!currentState.registerPassword.any { it in "!@#$%^&*()_+-=[]{}|;':,.<>?" }) {
+                throw AppError.ValidationError(field = "password", message = "La contraseña debe contener al menos un carácter especial")
             }
 
             if (currentState.registerConfirmPassword != currentState.registerPassword) {

@@ -15,7 +15,7 @@ import org.iesharia.core.ui.components.common.DataDisplayBox
 import org.iesharia.core.ui.theme.WrestlingTheme
 import org.iesharia.core.ui.util.FormatUtils
 import org.iesharia.features.wrestlers.domain.model.WrestlerClassification
-import org.iesharia.features.wrestlers.ui.viewmodel.WrestlerStatistics
+import org.iesharia.features.wrestlers.domain.model.WrestlerStatistics
 
 /**
  * Tabla detallada de estadísticas por clasificación

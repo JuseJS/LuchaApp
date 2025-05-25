@@ -42,8 +42,7 @@ class LoginScreen : AppScreen() {
             snackbarHostState = snackbarHostState
         )
 
-        // Manejar navegación
-        navigator.HandleNavigationManager(navigationManager)
+        // No manejar navegación aquí - ya se maneja en RootNavigator
 
         Surface(
             modifier = Modifier.fillMaxSize(),

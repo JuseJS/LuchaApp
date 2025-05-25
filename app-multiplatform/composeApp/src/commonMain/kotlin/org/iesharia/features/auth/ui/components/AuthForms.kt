@@ -33,7 +33,9 @@ object AuthForms {
     private val passwordValidator: (String, Map<String, String>) -> ValidationResult = { password, _ ->
         when {
             password.isBlank() -> ValidationResult.Invalid(AppStrings.Auth.passwordRequired)
-            password.length < 6 -> ValidationResult.Invalid(AppStrings.Auth.passwordTooShort)
+            password.length < 8 -> ValidationResult.Invalid("La contraseña debe tener al menos 8 caracteres")
+            !password.any { it.isUpperCase() } -> ValidationResult.Invalid("La contraseña debe contener al menos una mayúscula")
+            !password.any { it in "!@#$%^&*()_+-=[]{}|;':,.<>?" } -> ValidationResult.Invalid("La contraseña debe contener al menos un carácter especial")
             else -> ValidationResult.Valid
         }
     }

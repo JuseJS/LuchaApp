@@ -2,30 +2,24 @@ package org.iesharia.di
 
 import org.iesharia.core.common.DefaultErrorHandler
 import org.iesharia.core.common.ErrorHandler
-import org.iesharia.core.data.mock.MockDataGenerator
-import org.iesharia.features.competitions.data.repository.MockCompetitionRepository
-import org.iesharia.features.auth.data.repository.MockUserRepository
-import org.iesharia.features.competitions.domain.repository.CompetitionRepository
-import org.iesharia.features.auth.domain.repository.UserRepository
 import org.iesharia.features.auth.domain.usecase.LoginUseCase
+import org.iesharia.features.auth.domain.usecase.LogoutUseCase
 import org.iesharia.features.common.domain.usecase.GetFavoritesUseCase
+import org.iesharia.features.common.domain.usecase.ToggleFavoriteUseCase
+import org.iesharia.features.common.domain.usecase.ObserveFavoritesUseCase
 import org.iesharia.features.competitions.domain.usecase.GetCompetitionsUseCase
-import org.iesharia.features.matches.data.repository.MockMatchActRepository
-import org.iesharia.features.matches.data.repository.MockMatchRepository
-import org.iesharia.features.matches.domain.repository.MatchActRepository
-import org.iesharia.features.matches.domain.repository.MatchRepository
 import org.iesharia.features.matches.domain.usecase.GetMatchActUseCase
 import org.iesharia.features.matches.domain.usecase.GetMatchDetailsUseCase
 import org.iesharia.features.matches.domain.usecase.SaveMatchActUseCase
 import org.iesharia.features.teams.domain.usecase.GetTeamMatchesUseCase
+import org.iesharia.features.teams.domain.usecase.GetAllTeamsUseCase
+import org.iesharia.features.teams.domain.usecase.GetTeamByIdUseCase
 import org.iesharia.features.wrestlers.domain.usecase.GetWrestlerResultsUseCase
 import org.koin.core.KoinApplication
 import org.koin.core.context.startKoin
 import org.koin.core.module.Module
 import org.koin.dsl.module
 import org.iesharia.core.navigation.NavigationManager
-import org.iesharia.features.wrestlers.data.repository.MockWrestlerRepository
-import org.iesharia.features.wrestlers.domain.repository.WrestlerRepository
 import org.iesharia.features.wrestlers.domain.usecase.GetWrestlersByTeamIdUseCase
 import org.iesharia.features.auth.domain.security.SessionManager
 import org.iesharia.features.auth.domain.security.RolePermissionManager
@@ -38,20 +32,16 @@ private val commonModule = module {
     single<ErrorHandler> { DefaultErrorHandler() }
 
     // Registrar gestores de sesión y permisos
-    single { SessionManager() }
+    single { SessionManager(get()) }
     single { RolePermissionManager(get()) }
 }
 
 /**
- * Módulo para los repositorios
+ * Módulo para los repositorios Mock (solo para desarrollo/pruebas)
  */
-private val repositoryModule = module {
-    single { MockDataGenerator() }
-    single<CompetitionRepository> { MockCompetitionRepository(get()) }
-    single<UserRepository> { MockUserRepository(get()) }
-    single<WrestlerRepository> { MockWrestlerRepository(get()) }
-    single<MatchRepository> { MockMatchRepository(get()) }
-    single<MatchActRepository> { MockMatchActRepository() }
+private val mockRepositoryModule = module {
+    // Todos los repositorios ahora están implementados en el networkModule
+    // Este módulo queda vacío pero lo mantenemos por si necesitamos mocks en el futuro
 }
 
 /**
@@ -59,10 +49,15 @@ private val repositoryModule = module {
  */
 private val useCaseModule = module {
     factory { GetCompetitionsUseCase(get()) }
-    factory { GetFavoritesUseCase(get()) }
+    factory { GetFavoritesUseCase(get(), get(), get(), get()) }
+    factory { ToggleFavoriteUseCase(get()) }
+    factory { ObserveFavoritesUseCase(get()) }
     factory { GetTeamMatchesUseCase(get()) }
+    factory { GetAllTeamsUseCase(get()) }
+    factory { GetTeamByIdUseCase(get()) }
     factory { GetWrestlerResultsUseCase(get()) }
     factory { LoginUseCase(get()) }
+    factory { LogoutUseCase(get(), get()) }
     factory { GetWrestlersByTeamIdUseCase(get()) }
     factory { GetMatchDetailsUseCase(get()) }
     factory { GetMatchActUseCase(get()) }
@@ -81,7 +76,8 @@ private val navigationModule = module {
  */
 internal val sharedModules = listOf(
     commonModule,
-    repositoryModule,
+    networkModule,      // Módulo de red para repositorios HTTP
+    mockRepositoryModule, // Módulo Mock para datos que aún no tienen API
     useCaseModule,
     navigationModule
 )

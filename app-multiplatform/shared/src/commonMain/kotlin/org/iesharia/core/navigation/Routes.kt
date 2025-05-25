@@ -99,4 +99,16 @@ object Routes {
             override fun createRoute(params: String): String = "$baseRoute/$params"
         }
     }
+
+    /**
+     * Rutas relacionadas con configuración.
+     */
+    object Config {
+        /**
+         * Ruta para la pantalla de configuración.
+         */
+        object Settings : NavigationRoute {
+            override val baseRoute: String = "config/settings"
+        }
+    }
 }

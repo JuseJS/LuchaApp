@@ -5,6 +5,7 @@ import org.iesharia.features.auth.ui.viewmodel.LoginViewModel
 import org.iesharia.core.navigation.NavigationFactory
 import org.iesharia.core.navigation.NavigationManager
 import org.iesharia.features.competitions.ui.viewmodel.CompetitionDetailViewModel
+import org.iesharia.features.config.ui.viewmodel.ConfigViewModel
 import org.iesharia.features.matches.ui.viewmodel.MatchActViewModel
 import org.iesharia.features.matches.ui.viewmodel.MatchDetailViewModel
 import org.iesharia.features.teams.ui.viewmodel.TeamDetailViewModel
@@ -14,13 +15,36 @@ import org.koin.dsl.module
 
 // Módulo específico para ViewModels (en composeApp)
 val viewModelModule = module {
-    factory { HomeViewModel(get(), get(), get(), get(), get<NavigationManager>(), get(), get(), get()) }
-    factory { LoginViewModel(get<NavigationManager>(), get(), get(), get()) }
+    factory { 
+        HomeViewModel(
+            getCompetitionsUseCase = get(),
+            getFavoritesUseCase = get(),
+            toggleFavoriteUseCase = get(),
+            observeFavoritesUseCase = get(),
+            getTeamMatchesUseCase = get(),
+            getWrestlerResultsUseCase = get(),
+            getAllTeamsUseCase = get(),
+            navigationManager = get<NavigationManager>(),
+            errorHandler = get(),
+            userRepository = get(),
+            sessionManager = get()
+        )
+    }
+    factory { LoginViewModel(get<NavigationManager>(), get(), get(), get(), getOrNull()) }
+    factory { 
+        ConfigViewModel(
+            sessionManager = get(),
+            logoutUseCase = get(),
+            navigationManager = get<NavigationManager>(),
+            errorHandler = get()
+        )
+    }
     factory { parameters ->
         CompetitionDetailViewModel(
             competitionId = parameters.get(),
             competitionRepository = get(),
             getFavoritesUseCase = get(),
+            toggleFavoriteUseCase = get(),
             navigationManager = get(),
             errorHandler = get()
         )
@@ -29,8 +53,10 @@ val viewModelModule = module {
         TeamDetailViewModel(
             teamId = parameters.get(),
             competitionRepository = get(),
+            getTeamByIdUseCase = get(),
             getWrestlersByTeamIdUseCase = get(),
             getFavoritesUseCase = get(),
+            toggleFavoriteUseCase = get(),
             navigationManager = get(),
             errorHandler = get()
         )
@@ -41,6 +67,7 @@ val viewModelModule = module {
             wrestlerRepository = get(),
             competitionRepository = get(),
             getFavoritesUseCase = get(),
+            toggleFavoriteUseCase = get(),
             getWrestlerResultsUseCase = get(),
             navigationManager = get(),
             errorHandler = get()
@@ -51,6 +78,7 @@ val viewModelModule = module {
             matchId = parameters.get(),
             getMatchDetailsUseCase = get(),
             matchRepository = get(),
+            getMatchActUseCase = get(),
             navigationManager = get(),
             errorHandler = get()
         )

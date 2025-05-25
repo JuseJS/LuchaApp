@@ -15,13 +15,30 @@ fun Navigator.HandleNavigationManager(
     navigationFactory: NavigationFactory = koinInject()
 ) {
     LaunchedEffect(this) {
+        println("🔌 NavigationExtensions: LaunchedEffect iniciado para Navigator")
         navigationManager.navigationEvents.collectLatest { command ->
+            println("📍 NavigationExtensions: Comando recibido: $command")
             when (command) {
                 is NavigationCommand.Navigate -> {
+                    println("🚀 NavigationExtensions: Navegando a ${command.route.baseRoute}, clearBackStack=${command.clearBackStack}")
                     val screen = navigationFactory.createScreen(command.route)
-                    push(screen)
+                    println("📱 NavigationExtensions: Screen creado: ${screen::class.simpleName}")
+                    
+                    if (command.clearBackStack) {
+                        println("🧹 NavigationExtensions: Limpiando stack y reemplazando con nueva pantalla")
+                        // Log current stack before replacing
+                        println("📚 NavigationExtensions: Stack actual antes de replaceAll: ${items.map { it::class.simpleName }}")
+                        replaceAll(screen)
+                        println("✅ NavigationExtensions: replaceAll ejecutado")
+                        // Log stack after replacing
+                        println("📚 NavigationExtensions: Stack después de replaceAll: ${items.map { it::class.simpleName }}")
+                    } else {
+                        println("➕ NavigationExtensions: Push normal a la pantalla")
+                        push(screen)
+                    }
                 }
                 is NavigationCommand.NavigateBack -> {
+                    println("⬅️ NavigationExtensions: Navegando hacia atrás")
                     pop()
                 }
                 is NavigationCommand.NavigateWithParams<*> -> {

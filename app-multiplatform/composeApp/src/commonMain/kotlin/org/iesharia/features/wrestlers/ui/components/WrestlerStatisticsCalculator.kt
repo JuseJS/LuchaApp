@@ -1,22 +1,8 @@
 package org.iesharia.features.wrestlers.ui.components
 
 import org.iesharia.features.wrestlers.domain.model.WrestlerClassification
-import org.iesharia.features.wrestlers.ui.viewmodel.WrestlerStatistics
-
-/**
- * Modelo de datos que representa las estadísticas agregadas de un luchador
- */
-data class AggregatedWrestlerStatistics(
-    val totalMatches: Int,
-    val wins: Int,
-    val losses: Int,
-    val draws: Int,
-    val points: Double,
-    val effectivenessPercentage: Double,
-    val puntalesMatches: Int,
-    val destacadosMatches: Int,
-    val otherMatches: Int
-)
+import org.iesharia.features.wrestlers.domain.model.WrestlerStatistics
+import org.iesharia.features.wrestlers.domain.model.AggregatedWrestlerStatistics
 
 /**
  * Calcula estadísticas agregadas a partir de estadísticas por clasificación

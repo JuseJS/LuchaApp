@@ -111,13 +111,10 @@ fun HomeContent(
 
             Spacer(modifier = Modifier.height(WrestlingTheme.dimensions.spacing_16))
 
-            // Get all teams from all competitions
-            val allTeams = uiState.competitions.flatMap { it.teams }.distinctBy { it.id }
-
-            // Use the TeamsByDivisionSection component
+            // Use the TeamsByDivisionSection component with teams from state
             TeamsByDivisionSection(
                 title = org.iesharia.core.resources.AppStrings.Home.teams,
-                allTeams = allTeams,
+                allTeams = uiState.teams,
                 onTeamClick = { viewModel.navigateToTeamDetail(it) }
             )
         }

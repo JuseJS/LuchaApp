@@ -4,8 +4,11 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import org.iesharia.features.auth.domain.model.User
+import org.iesharia.core.network.TokenStorage
 
-class SessionManager {
+class SessionManager(
+    private val tokenStorage: TokenStorage
+) {
     private val _currentUser = MutableStateFlow<User?>(null)
     val currentUser: StateFlow<User?> = _currentUser.asStateFlow()
 
@@ -40,9 +43,12 @@ class SessionManager {
      * Cierra la sesión del usuario actual
      */
     fun logout() {
+        println("🔓 SessionManager: Iniciando logout")
         _currentUser.value = null
         _isLoggedIn.value = false
-
-        // Aquí también se limpiaría el almacenamiento local
+        
+        // Limpiar el token almacenado
+        tokenStorage.clearAll()
+        println("✅ SessionManager: Logout completado - usuario: ${_currentUser.value}, isLoggedIn: ${_isLoggedIn.value}")
     }
 }

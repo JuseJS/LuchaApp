@@ -10,7 +10,7 @@ import org.iesharia.core.resources.AppStrings
 import org.iesharia.core.ui.components.common.SectionDivider
 import org.iesharia.core.ui.components.common.SectionDividerType
 import org.iesharia.core.ui.theme.*
-import org.iesharia.features.home.ui.viewmodel.FavoriteType
+import org.iesharia.features.common.domain.model.FavoriteType
 
 @Composable
 fun FavoritesSectionHeader(

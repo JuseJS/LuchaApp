@@ -40,60 +40,10 @@ class MatchActViewModel(
     private var visitorTeamWrestlers: List<Wrestler> = emptyList()
 
     init {
-        // Modificado para cargar primero las competiciones antes de cargar los detalles del enfrentamiento
-        loadCompetitions()
-        loadMatchDetails()
-        loadReferees()
+        // Cargar todos los datos iniciales
+        loadInitialData()
     }
 
-    private fun loadMatchDetails() {
-        loadEntity(
-            entityId = matchId,
-            fetchEntity = {
-                // Obtener detalles del enfrentamiento
-                val (match, localWrestlers, visitorWrestlers) = getMatchDetailsUseCase(matchId)
-                localTeamWrestlers = localWrestlers
-                visitorTeamWrestlers = visitorWrestlers
-
-                // Obtener acta existente o crear una nueva
-                val existingAct = getMatchActUseCase.byMatchId(matchId)
-                Triple(match, existingAct, matchRepository.getMatchDay(matchId))
-            },
-            processEntity = { (match, existingAct, matchDay) ->
-                // Inicializar estado con datos del partido
-                updateState {
-                    val competitionId = matchDay?.competitionId ?: ""
-                    // Obtener el nombre de la competición basado en su ID
-                    val competitionName = getCompetitionName(competitionId)
-
-                    it.copy(
-                        isLoading = false,
-                        errorMessage = null,
-                        match = match,
-                        matchDay = matchDay,
-                        actId = existingAct?.id,
-                        season = match.date.year.toString(),
-                        venue = match.venue,
-                        competitionId = competitionId,
-                        competitionName = competitionName, // Ahora usamos el nombre real
-                        day = match.date.dayOfMonth.toString(),
-                        month = match.date.monthNumber.toString(),
-                        year = match.date.year.toString(),
-                        localClubName = match.localTeam.name,
-                        visitorClubName = match.visitorTeam.name
-                    )
-                }
-
-                if (existingAct != null) {
-                    // Si existe un acta, cargar todos sus datos
-                    updateFromExistingAct(existingAct)
-                }
-
-                // Estado actual con datos parcialmente inicializados
-                uiState.value
-            }
-        )
-    }
 
     /**
      * Obtiene el nombre de una competición a partir de su ID
@@ -103,8 +53,13 @@ class MatchActViewModel(
     }
 
     private fun updateFromExistingAct(act: MatchAct) {
+        println("=== updateFromExistingAct ===")
+        println("Act ID recibido: ${act.id}")
+        println("Act isCompleted: ${act.isCompleted}")
+        
         updateState {
             it.copy(
+                actId = act.id, // Asegurar que tenemos el ID del acta
                 isRegional = act.isRegional,
                 isInsular = act.isInsular,
                 category = act.category.displayName(),
@@ -155,6 +110,7 @@ class MatchActViewModel(
                 },
                 localTeamScore = act.localTeamScore.toString(),
                 visitorTeamScore = act.visitorTeamScore.toString(),
+                isCompleted = act.isCompleted, // Agregar el estado de completado
                 // NUEVOS CAMPOS DE COMENTARIOS - AÑADIDO
                 localTeamComments = act.localTeamComments ?: "",
                 visitorTeamComments = act.visitorTeamComments ?: "",
@@ -167,15 +123,81 @@ class MatchActViewModel(
         return "${time.hour.toString().padStart(2, '0')}:${time.minute.toString().padStart(2, '0')}"
     }
 
-    private fun loadCompetitions() {
+    private fun loadInitialData() {
         launchSafe {
+            // Cargar competiciones primero
             availableCompetitions = getCompetitionsUseCase()
+            
+            // Cargar árbitros disponibles
+            availableReferees = matchActRepository.getAvailableReferees()
+            
+            // Ahora cargar los detalles del enfrentamiento
+            loadMatchDetailsInternal()
         }
     }
-
-    private fun loadReferees() {
-        launchSafe {
-            availableReferees = matchActRepository.getAvailableReferees()
+    
+    private suspend fun loadMatchDetailsInternal() {
+        try {
+            // Obtener detalles del enfrentamiento
+            val (match, localWrestlers, visitorWrestlers) = getMatchDetailsUseCase(matchId)
+            localTeamWrestlers = localWrestlers
+            visitorTeamWrestlers = visitorWrestlers
+            
+            // Log para debug
+            println("Loaded ${localWrestlers.size} local wrestlers and ${visitorWrestlers.size} visitor wrestlers")
+            
+            // Obtener acta existente o crear una nueva
+            println("Buscando acta existente para matchId: $matchId")
+            val existingAct = getMatchActUseCase.byMatchId(matchId)
+            val matchDay = matchRepository.getMatchDay(matchId)
+            
+            println("Acta existente encontrada: ${existingAct?.id}")
+            println("Acta existente isCompleted: ${existingAct?.isCompleted}")
+            
+            if (existingAct == null) {
+                println("NO se encontró acta existente para el match $matchId")
+            } else {
+                println("SÍ se encontró acta existente con ID: ${existingAct.id}")
+            }
+            
+            // Actualizar el estado con todos los datos
+            updateState {
+                val competitionId = matchDay?.competitionId ?: ""
+                // Ahora las competiciones ya deberían estar cargadas
+                val competitionName = getCompetitionName(competitionId)
+                
+                println("Competition ID: $competitionId, Name: $competitionName")
+                
+                it.copy(
+                    isLoading = false,
+                    errorMessage = null,
+                    match = match,
+                    matchDay = matchDay,
+                    actId = existingAct?.id,
+                    season = match.date.year.toString(),
+                    venue = match.venue,
+                    competitionId = competitionId,
+                    competitionName = competitionName,
+                    day = match.date.dayOfMonth.toString(),
+                    month = match.date.monthNumber.toString(),
+                    year = match.date.year.toString(),
+                    localClubName = match.localTeam.name,
+                    visitorClubName = match.visitorTeam.name
+                )
+            }
+            
+            if (existingAct != null) {
+                // Si existe un acta, cargar todos sus datos
+                updateFromExistingAct(existingAct)
+            }
+        } catch (e: Exception) {
+            println("Error loading match details: ${e.message}")
+            updateState {
+                it.copy(
+                    isLoading = false,
+                    errorMessage = e.message ?: "Error al cargar los detalles del acta"
+                )
+            }
         }
     }
 
@@ -314,24 +336,96 @@ class MatchActViewModel(
 
     /**
      * Guarda el acta
+     * @param complete Si true, también completa el acta y actualiza el match
      */
-    fun saveAct() {
+    fun saveAct(complete: Boolean = false) {
         val state = uiState.value
-        val match = state.match ?: return
-
-        launchSafe {
-            // Crear o actualizar el objeto MatchAct a partir del estado UI
-            val act = createMatchActFromState(state)
-
-            // Guardar acta
-            val savedAct = saveMatchActUseCase(act)
-
-            // Actualizar el estado
+        val match = state.match
+        
+        println("=== INICIO saveAct ===")
+        println("Estado actual - actId: ${state.actId}")
+        println("Estado actual - isCompleted: ${state.isCompleted}")
+        println("Parámetro complete: $complete")
+        
+        if (match == null) {
+            println("Error: No hay match asociado al acta")
             updateState {
-                it.copy(
-                    isSaved = true,
-                    actId = savedAct.id
-                )
+                it.copy(errorMessage = "No hay enfrentamiento asociado")
+            }
+            return
+        }
+
+        launchSafe(
+            errorHandler = { error ->
+                println("Error al guardar acta: ${error.message}")
+                updateState {
+                    it.copy(
+                        isLoading = false,
+                        errorMessage = error.message ?: "Error al guardar el acta"
+                    )
+                }
+            }
+        ) {
+            try {
+                // Mostrar estado de carga
+                updateState { it.copy(isLoading = true, errorMessage = null) }
+                
+                // Validar datos mínimos requeridos
+                if (state.competitionName.isBlank()) {
+                    throw IllegalStateException("El nombre de la competición es requerido")
+                }
+                if (state.referee.isBlank() || state.refereeLicense.isBlank()) {
+                    throw IllegalStateException("Los datos del árbitro principal son requeridos")
+                }
+                if (state.startTime.isBlank()) {
+                    throw IllegalStateException("La hora de inicio es requerida")
+                }
+                
+                println("Creando MatchAct desde el estado...")
+                println("actId antes de crear MatchAct: ${state.actId}")
+                
+                // Crear o actualizar el objeto MatchAct a partir del estado UI
+                val act = createMatchActFromState(state)
+                
+                println("MatchAct creado: id=${act.id}, matchId=${act.matchId}")
+                println("¿ID empieza con 'temp_'?: ${act.id.startsWith("temp_")}")
+                println("CompetitionId: ${act.competitionId}, CompetitionName: ${act.competitionName}")
+                println("Referee: ${act.mainReferee.name} (${act.mainReferee.licenseNumber})")
+                println("Luchadores locales: ${act.localTeam.wrestlers.size}")
+                println("Luchadores visitantes: ${act.visitorTeam.wrestlers.size}")
+                println("Número de luchas: ${act.bouts.size}")
+
+                // Guardar acta
+                println("Enviando acta al servidor...")
+                val savedAct = saveMatchActUseCase(act)
+                
+                println("Acta guardada exitosamente con ID: ${savedAct.id}")
+
+                // Si se indica, completar el acta
+                if (complete) {
+                    println("Completando el acta y actualizando el match...")
+                    val completedAct = saveMatchActUseCase.complete(savedAct.id)
+                    println("Acta completada. El match ha sido actualizado con el score: ${completedAct.localTeamScore} - ${completedAct.visitorTeamScore}")
+                }
+
+                // Actualizar el estado
+                updateState {
+                    it.copy(
+                        isLoading = false,
+                        isSaved = true,
+                        actId = savedAct.id,
+                        errorMessage = null,
+                        isCompleted = complete
+                    )
+                }
+                
+                // Navegar de vuelta a la pantalla de detalles del match
+                println("Navegando de vuelta a la pantalla de detalles...")
+                navigateBack()
+            } catch (e: Exception) {
+                println("Excepción al guardar acta: ${e.message}")
+                e.printStackTrace()
+                throw e
             }
         }
     }
@@ -341,23 +435,37 @@ class MatchActViewModel(
      */
     private fun createMatchActFromState(state: MatchActUiState): MatchAct {
         val match = state.match ?: throw IllegalStateException("No hay enfrentamiento asociado")
+        
+        println("createMatchActFromState - match.id: ${match.id}")
+        println("createMatchActFromState - match.localTeam.id: ${match.localTeam.id}")
+        println("createMatchActFromState - match.localTeam.name: ${match.localTeam.name}")
+        println("createMatchActFromState - match.visitorTeam.id: ${match.visitorTeam.id}")
+        println("createMatchActFromState - match.visitorTeam.name: ${match.visitorTeam.name}")
+        println("createMatchActFromState - state.localClubName: '${state.localClubName}'")
+        println("createMatchActFromState - state.visitorClubName: '${state.visitorClubName}'")
 
         // Construir luchadores del equipo local
-        val localWrestlers = state.localWrestlers.mapIndexed { index, wrestler ->
-            ActWrestler(
-                wrestlerId = wrestler.id,
-                licenseNumber = wrestler.licenseNumber,
-                number = index + 1
-            )
+        val localWrestlers = state.localWrestlers.mapIndexedNotNull { index, wrestler ->
+            // Solo incluir luchadores que tengan ID
+            if (wrestler.id.isNotBlank()) {
+                ActWrestler(
+                    wrestlerId = wrestler.id,
+                    licenseNumber = wrestler.licenseNumber,
+                    number = index + 1
+                )
+            } else null
         }
 
         // Construir luchadores del equipo visitante
-        val visitorWrestlers = state.visitorWrestlers.mapIndexed { index, wrestler ->
-            ActWrestler(
-                wrestlerId = wrestler.id,
-                licenseNumber = wrestler.licenseNumber,
-                number = index + 1
-            )
+        val visitorWrestlers = state.visitorWrestlers.mapIndexedNotNull { index, wrestler ->
+            // Solo incluir luchadores que tengan ID
+            if (wrestler.id.isNotBlank()) {
+                ActWrestler(
+                    wrestlerId = wrestler.id,
+                    licenseNumber = wrestler.licenseNumber,
+                    number = index + 1
+                )
+            } else null
         }
 
         // Construir luchas - ACTUALIZADO para incluir la tercera agarrada
@@ -418,8 +526,14 @@ class MatchActViewModel(
         }
 
         // Crear el objeto de acta
+        // Si ya tenemos un actId, usarlo. Si no, generar uno temporal
+        val actId = state.actId ?: "temp_${System.currentTimeMillis()}"
+        
+        println("createMatchActFromState - state.actId: ${state.actId}")
+        println("createMatchActFromState - actId final: $actId")
+        
         return MatchAct(
-            id = state.actId ?: "act_${match.id}",
+            id = actId,
             matchId = match.id,
             competitionId = state.competitionId,
             competitionName = state.competitionName,
@@ -450,15 +564,19 @@ class MatchActViewModel(
                 FieldDelegate(state.fieldDelegate, state.fieldDelegateDni)
             } else null,
             localTeam = ActTeam(
-                teamId = match.localTeam.id,
-                clubName = state.localClubName,
+                teamId = match.localTeam.id.takeIf { it.isNotBlank() } 
+                    ?: throw IllegalStateException("ID del equipo local está vacío"),
+                clubName = state.localClubName.takeIf { it.isNotBlank() } 
+                    ?: match.localTeam.name,
                 wrestlers = localWrestlers,
                 captain = state.localCaptain,
                 coach = state.localCoach
             ),
             visitorTeam = ActTeam(
-                teamId = match.visitorTeam.id,
-                clubName = state.visitorClubName,
+                teamId = match.visitorTeam.id.takeIf { it.isNotBlank() } 
+                    ?: throw IllegalStateException("ID del equipo visitante está vacío"),
+                clubName = state.visitorClubName.takeIf { it.isNotBlank() } 
+                    ?: match.visitorTeam.name,
                 wrestlers = visitorWrestlers,
                 captain = state.visitorCaptain,
                 coach = state.visitorCoach
@@ -480,27 +598,20 @@ class MatchActViewModel(
      * Finaliza el acta y marca la jornada como finalizada
      */
     fun finishAct() {
+        println("=== finishAct llamado ===")
         val state = uiState.value
+        println("Estado actual - actId: ${state.actId}")
 
         launchSafe {
-            // Primero guardar el acta
-            saveAct()
-
-            // Finalizar el acta si hay un ID
-            state.actId?.let { actId ->
-                val completedAct = saveMatchActUseCase.complete(actId)
-
-                // Actualizar estado
-                updateState {
-                    it.copy(isSaved = true)
-                }
-
-                // Navegar de vuelta a la pantalla anterior
-                navigateBack()
-            } ?: run {
-                // Si no hay ID, intentar guardar primero
-                saveAct()
-                navigateBack()
+            // Si ya tenemos un ID de acta, actualizar y completar
+            if (state.actId != null && !state.actId.startsWith("temp_")) {
+                println("Finalizando acta existente con ID: ${state.actId}")
+                // Guardar cambios con complete = true
+                saveAct(complete = true)
+            } else {
+                // Si no hay ID o es temporal, crear nueva y completar
+                println("Creando y finalizando nueva acta")
+                saveAct(complete = true)
             }
         }
     }

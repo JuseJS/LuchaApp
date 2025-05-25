@@ -10,7 +10,7 @@ import org.iesharia.core.ui.theme.WrestlingTheme
 import org.iesharia.features.competitions.domain.model.AgeCategory
 import org.iesharia.features.competitions.domain.model.Competition
 import org.iesharia.features.competitions.domain.model.DivisionCategory
-import org.iesharia.features.home.ui.viewmodel.CompetitionFilters
+import org.iesharia.features.common.domain.model.CompetitionFilters
 
 @Composable
 fun CompetitionsSection(

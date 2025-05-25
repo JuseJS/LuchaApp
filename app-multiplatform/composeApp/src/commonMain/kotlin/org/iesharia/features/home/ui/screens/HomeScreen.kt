@@ -3,6 +3,10 @@ package org.iesharia.features.home.ui.screens
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -12,6 +16,7 @@ import org.iesharia.core.ui.components.WrestlingButton
 import org.iesharia.core.ui.components.WrestlingButtonType
 import org.iesharia.core.ui.screens.BaseContentScreen
 import org.iesharia.core.ui.theme.DarkBackground
+import org.iesharia.core.ui.theme.White90
 import org.iesharia.di.rememberViewModel
 import org.iesharia.features.auth.domain.security.SessionManager
 import org.iesharia.features.home.ui.viewmodel.HomeViewModel
@@ -45,12 +50,16 @@ class HomeScreen : BaseContentScreen() {
         val isLoggedIn = sessionManager.isLoggedIn.collectAsState()
 
         if (isLoggedIn.value) {
-            // Acción de logout para usuarios logueados
-            WrestlingButton(
-                text = "Cerrar Sesión",
-                onClick = { viewModel.logout() },
-                type = WrestlingButtonType.TEXT
-            )
+            // Acción de configuración para usuarios logueados
+            IconButton(
+                onClick = { viewModel.navigateToConfig() }
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Settings,
+                    contentDescription = "Configuración",
+                    tint = White90
+                )
+            }
         } else {
             // Acción de login para invitados
             WrestlingButton(

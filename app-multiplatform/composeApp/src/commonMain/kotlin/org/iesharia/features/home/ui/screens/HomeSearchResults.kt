@@ -74,7 +74,7 @@ fun HomeSearchResults(
                 // Grid de equipos
                 val rowHeight = 72.dp
                 val numRows = (teams.size + 1) / 2
-                val gridHeight = (numRows * (rowHeight + WrestlingTheme.dimensions.spacing_8)) + WrestlingTheme.dimensions.spacing_8
+                val gridHeight = numRows * (rowHeight + WrestlingTheme.dimensions.spacing_8) + WrestlingTheme.dimensions.spacing_8
 
                 LazyVerticalGrid(
                     columns = GridCells.Fixed(2),

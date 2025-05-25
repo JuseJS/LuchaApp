@@ -123,7 +123,8 @@ private fun DisplayFavoriteCompetitions(
             org.iesharia.features.competitions.ui.components.CompetitionItem(
                 competition = favorite.competition,
                 onClick = { viewModel.navigateToCompetitionDetail(favorite.competition.id) },
-                showMatchDays = true
+                showMatchDays = true,
+                onMatchClick = { matchId -> viewModel.navigateToMatchDetail(matchId) }
             )
         }
     }
