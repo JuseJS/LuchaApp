@@ -227,5 +227,5 @@ Este proyecto es un trabajo académico desarrollado como Proyecto de Fin de Curs
 ---
 
 **Desarrollado por:** José Antonio Navarro Pérez  
-**Curso:** 2023-2024  
+**Curso:** 2024-2025  
 **Instituto:** IES Haría
